@@ -4,6 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from bs4 import BeautifulSoup
 import requests
+
 from backend.models.AthleticsSchedule import AthleticsSchedule
 from mongoengine import connect
 from dotenv import load_dotenv
@@ -101,4 +102,4 @@ def update_athletics_schedule():
 
     print(f"Athletics schedule updated: {added_count} new events added, {existing_count} events already existed")
 
-update_athletics_schedule()
+# update_athletics_schedule()

@@ -1,3 +1,7 @@
+#TODO: test the threading and see if switching to scheduler is better
+#TODO: work on form in accordance with the db structure
+#TODO: set up the sheets api to read the data from the google sheet
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import threading
@@ -8,6 +12,7 @@ from dotenv import load_dotenv
 
 from models.Athlete import Athlete
 from models.AthleticsSchedule import AthleticsSchedule
+from models.GeneralEvent import GeneralEvent
 
 app = Flask(__name__)
 CORS(app)
@@ -35,7 +40,7 @@ def roster():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/schedule', methods=['GET'])
+@app.route('/api/schedule/athletics', methods=['GET'])
 def schedule():
     try:
         sport = request.args.get('sport')
@@ -57,6 +62,26 @@ def schedule():
             query['home'] = home
         
         events = AthleticsSchedule.objects(**query).to_json()
+        return events
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/schedule/general', methods=['GET'])
+def general_schedule():
+    try:
+        date = request.args.get('date')
+        time = request.args.get('time')
+        name = request.args.get('name')
+
+        query = {}
+        if date:
+            query['date'] = date
+        if time:
+            query['time'] = time
+        if name:
+            query['name'] = name
+        
+        events = GeneralEvent.objects(**query).to_json()
         return events
     except Exception as e:
         return jsonify({"error": str(e)}), 500

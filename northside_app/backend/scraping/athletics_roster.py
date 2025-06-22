@@ -4,6 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from bs4 import BeautifulSoup
 import requests
+
 from backend.models.Athlete import Athlete
 from mongoengine import connect
 from dotenv import load_dotenv
@@ -36,9 +37,10 @@ def update_athletics_roster():
         for gender in genders:
             for season in seasons:
                 for level in levels:
+                    # for future me: uncomment the next line to scrape the current season
                     # url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/roster/"
-                    temp_url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/24-25/roster/"
-                    response = requests.get(temp_url)
+                    url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/24-25/roster/"
+                    response = requests.get(url)
                     html_content = response.text
                     soup = BeautifulSoup(html_content, 'html.parser')
 
@@ -62,7 +64,6 @@ def update_athletics_roster():
                         
                         # print(grades)
                         # print(positions)
-                        length = len(players)
                         for player in players:
                             existing_athlete = Athlete.objects(
                                 name=player,
@@ -88,4 +89,4 @@ def update_athletics_roster():
 
     print(f"Added {added_count} athletes, existing {existing_count} athletes.")
 
-update_athletics_roster()
+# update_athletics_roster()

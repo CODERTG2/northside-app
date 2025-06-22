@@ -59,4 +59,4 @@ def update_general_events():
                         existing_count += 1
     print(f"General schedule updated: {added_count} new events added, {existing_count} events already existed")
 
-update_general_events()
+# update_general_events()
