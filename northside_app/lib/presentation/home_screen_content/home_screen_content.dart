@@ -2,58 +2,45 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'home_screen_content_controller.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
 import '../../models/article.dart';
-import '../../models/bulletin_post.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
   const HomeScreenContent({super.key});
 
-  // This is the single source of truth for all posts.
-  static final List<BulletinPost> _allPosts = [
-    BulletinPost(title: 'Homecoming Tickets on Sale!', subtitle: 'Get them before they sell out!', date: DateTime.now().add(const Duration(days: 2)), imagePath: 'assets/images/homecoming_bg.png', isPinned: true),
-    BulletinPost(title: 'Spirit Week Next Week', subtitle: 'Show your school spirit!', date: DateTime.now().add(const Duration(days: 1)), imagePath: 'assets/images/homecoming_bg.png', isPinned: true),
-    BulletinPost(title: 'Parent-Teacher Conferences', subtitle: 'Sign-ups are open', date: DateTime.now(), imagePath: 'assets/images/homecoming_bg.png'),
-    BulletinPost(title: 'Soccer Team Wins!', subtitle: 'A thrilling victory', date: DateTime.now().subtract(const Duration(days: 1)), imagePath: 'assets/images/homecoming_bg.png'),
-    BulletinPost(title: 'School Play Auditions', subtitle: 'In the auditorium', date: DateTime.now().add(const Duration(days: 5)), imagePath: 'assets/images/homecoming_bg.png'),
+  final List<Article> _homeScreenArticles = const [
+    Article(
+      title: 'Homecoming 2024',
+      subtitle: 'This Friday',
+      imagePath: 'assets/images/homecoming_bg.png',
+      content: 'Join us for a night of fun and festivities! The annual homecoming dance will be held this Friday in the main gym. Music, food, and great memories await. Don\'t miss out!',
+    ),
+    Article(
+      title: 'Spirit Week Begins!',
+      subtitle: 'All Week',
+      imagePath: 'assets/images/homecoming_bg.png',
+      content: 'Show your school spirit! Participate in our daily themes, from Pajama Day on Monday to School Colors on Friday. Let\'s make this the best Spirit Week ever!',
+    ),
   ];
-  
-  // Getter to filter the posts for the home screen carousel
-  List<Article> get _homeScreenArticles {
-    final today = DateTime.now();
-    final upcomingPosts = _allPosts.where((post) {
-      return post.isPinned || post.date.isAfter(today.subtract(const Duration(days: 1))) || isSameDay(post.date, today);
-    }).toList();
-    
-    // Convert BulletinPost to Article
-    return upcomingPosts.map((post) => Article(
-      title: post.title,
-      subtitle: post.subtitle,
-      imagePath: post.imagePath,
-      content: post.content,
-    )).toList();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7),
       body: Stack(
         children: [
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFF44336),
-                  Color(0xFF2196F3),
-                  Color(0xFFF2F2F7),
+                  Color(0xFFFBC8C4), // Vibrant Red
+                  Color(0xFFC8DAF5), // Vibrant Blue
+                  Colors.white
                 ],
-                stops: [0.0, 0.5, 0.9],
+                stops: [0.0, 0.4, 0.6],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -76,6 +63,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     );
   }
 
+  // --- WIDGET WITH THE FIX ---
   Widget _buildQuickActions() {
     final AppShellController appShellController = Get.find();
     return Padding(
@@ -91,6 +79,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
           _QuickActionButton(iconWidget: const Icon(Icons.sports_basketball, color: Colors.black54, size: 26), label: 'Athletics', onTap: () => appShellController.changePage(1)),
           _QuickActionButton(iconWidget: const Icon(Icons.calendar_today_outlined, color: Colors.black54, size: 26), label: 'Events', onTap: () => appShellController.changePage(2)),
           _QuickActionButton(iconWidget: const Icon(Icons.article, color: Colors.black54, size: 26), label: 'HoofBeat', onTap: () => Get.to(() => const HoofBeatPage())),
+          // FIX: The label is now "Bulletin", the icon is updated, and it correctly navigates to index 3.
           _QuickActionButton(iconWidget: const Icon(Icons.campaign, color: Colors.black54, size: 26), label: 'Bulletin', onTap: () => appShellController.changePage(3)),
         ],
       ),
