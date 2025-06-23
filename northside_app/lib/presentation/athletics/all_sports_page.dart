@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
 import 'sport_detail_page.dart';
 
 class SeasonSports {
@@ -39,13 +40,14 @@ class _AllSportsPageState extends State<AllSportsPage> {
   @override
   Widget build(BuildContext context) {
     final currentSports = _sportsData[_selectedSeason]!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.blue),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primaryBlue),
           onPressed: () => Get.back(),
         ),
         title: const Text(
@@ -100,7 +102,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
                     season,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.blue.shade600 : Colors.grey.shade600,
+                      color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
                     ),
                   ),
                 ),
@@ -141,7 +143,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
             name: sport,
             onTap: () => Get.to(() => SportDetailPage(sportName: fullSportName)),
           );
-        }),
+        }).toList(),
       ],
     );
   }
