@@ -19,14 +19,14 @@ class AthleticsPage extends StatelessWidget {
       subtitle: 'For the first time in 2 years...',
       imagePath: 'assets/images/softball_image.png',
       content: 'An incredible season culminates in a historic state championship appearance. The team\'s hard work and dedication have paid off, inspiring the entire school community. Go Mustangs!',
-      date: DateTime.now,
+      // date: DateTime.now,
     ),
     Article(
       title: 'Soccer Team Wins City Finals',
       subtitle: 'A thrilling 2-1 victory!',
       imagePath: 'assets/images/softball_image.png',
       content: 'In a nail-biting final match, our varsity soccer team clinched the city championship with a goal in the final minutes. Congratulations to the players and coaches!',
-      date: DateTime.now,
+      // date: DateTime.now,
     ),
   ];
 
@@ -112,14 +112,14 @@ class AthleticsPage extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onViewAll,
-            child: Row(
+            child: const Row(
               children: [
-                const Text(
+                Text(
                   'View All',
                   style: TextStyle(fontSize: 14, color: AppColors.primaryBlue, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primaryBlue),
+                SizedBox(width: 4),
+                Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primaryBlue),
               ],
             ),
           ),
@@ -146,12 +146,12 @@ class AthleticsPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
           ),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.add_circle_outline, color: AppColors.primaryBlue),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.add_circle_outline, color: AppColors.primaryBlue),
+              SizedBox(width: 8),
+              Text(
                 'Register for a sport',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
               ),
