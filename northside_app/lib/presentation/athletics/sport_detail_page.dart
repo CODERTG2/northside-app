@@ -2,18 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
 
-// --- UPDATED Data Models ---
 class GameSchedule {
-  const GameSchedule({
-    required this.date,
-    required this.time,
-    required this.event,
-    required this.opponent,
-    required this.location,
-    required this.score,
-    required this.result,
-  });
+  const GameSchedule({required this.date, required this.time, required this.event, required this.opponent, required this.location, required this.score, required this.result});
   final String date;
   final String time;
   final String event;
@@ -24,18 +16,12 @@ class GameSchedule {
 }
 
 class Player {
-  const Player({
-    required this.name,
-    required this.number,
-    required this.position,
-    required this.grade,
-  });
+  const Player({required this.name, required this.number, required this.position, required this.grade});
   final String name;
   final String number;
   final String position;
   final String grade;
 }
-// --- End of Data Models ---
 
 class SportDetailPage extends StatefulWidget {
   const SportDetailPage({super.key, required this.sportName});
@@ -46,24 +32,20 @@ class SportDetailPage extends StatefulWidget {
 }
 
 class _SportDetailPageState extends State<SportDetailPage> {
-  // --- State and Placeholder Data ---
-  final String _selectedLevel = 'All';
+  String _selectedLevel = 'All';
   final List<String> _levels = ['All', 'JV', 'Varsity'];
 
   final List<GameSchedule> _schedules = const [
     GameSchedule(date: '8/24', time: '11:30AM', event: 'Red North', opponent: 'Chicago (Lane)', location: 'CPS Hansen Field', score: '0-5', result: 'L'),
     GameSchedule(date: '8/24', time: '11:30AM', event: 'Red North', opponent: 'Chicago (Taft)', location: 'CPS Hansen Field', score: '3-1', result: 'W'),
     GameSchedule(date: '8/24', time: '11:30AM', event: 'Red North', opponent: 'Chicago (Whitney Young)', location: 'Northeastern Illinois', score: '0-5', result: 'L'),
-    // ... add more placeholder data as needed
   ];
 
   final List<Player> _roster = const [
     Player(name: 'John Appleseed', number: '10', position: 'Forward', grade: '12'),
     Player(name: 'Mac Pineapple', number: '7', position: 'Midfield', grade: '11'),
     Player(name: 'Peter Parker', number: '1', position: 'Goalkeeper', grade: '12'),
-    // ... add more placeholder data as needed
   ];
-  // --- End of State ---
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +55,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.blue),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primaryBlue),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -107,10 +89,41 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
 
-  // --- Main UI Component Builder Methods ---
-
   Widget _buildTeamLevelTabs() {
-    return Container( /* ... same as before ... */ );
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: _levels.map((level) {
+          final isSelected = _selectedLevel == level;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _selectedLevel = level),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2))] : [],
+                ),
+                child: Center(
+                  child: Text(
+                    level,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   Widget _buildTableContainer(String title, Widget table) {
@@ -127,7 +140,6 @@ class _SportDetailPageState extends State<SportDetailPage> {
         children: [
           Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          // This makes the table scrollable horizontally
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: table,
@@ -137,11 +149,9 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
 
-  // --- Table Builder Methods ---
-
-  Widget _buildScheduleTable() {
+  DataTable _buildScheduleTable() {
     return DataTable(
-      columnSpacing: 30, // Adjust spacing between columns
+      columnSpacing: 30,
       columns: ['DATE', 'TIME', 'EVENT', 'OPPONENT', 'LOCATION', 'SCORE', 'W/L'].map((h) => DataColumn(label: _headerText(h))).toList(),
       rows: _schedules.map((s) => DataRow(cells: [
         DataCell(_dataText(s.date)),
@@ -155,7 +165,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
   
-  Widget _buildRosterTable() {
+  DataTable _buildRosterTable() {
     return DataTable(
       columnSpacing: 30,
       columns: ['NAME', '#', 'POSITION', 'GRADE'].map((h) => DataColumn(label: _headerText(h))).toList(),
@@ -167,8 +177,6 @@ class _SportDetailPageState extends State<SportDetailPage> {
       ])).toList(),
     );
   }
-
-  // --- Generic Helper Widgets ---
 
   Text _headerText(String text) {
     return Text(text, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 12));
