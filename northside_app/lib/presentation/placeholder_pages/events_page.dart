@@ -7,9 +7,8 @@ import 'dart:collection';
 import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
-import '../../core/utils/app_colors.dart';
+import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
 
-// FIX: Article objects now correctly omit the date
 final kEvents = LinkedHashMap<DateTime, List<Article>>(
   equals: isSameDay,
   hashCode: (key) => key.day * 1000000 + key.month * 10000 + key.year,
