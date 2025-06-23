@@ -44,8 +44,9 @@ class _BulletinPageState extends State<BulletinPage> {
     final Map<String, List<BulletinPost>> grouped = {};
     for (var post in nonPinnedPosts) {
       String dateHeader;
-      if (isSameDay(post.date, today)) dateHeader = 'Today';
-      else if (isSameDay(post.date, today.subtract(const Duration(days: 1)))) dateHeader = 'Yesterday';
+      if (isSameDay(post.date, today)) {
+        dateHeader = 'Today';
+      } else if (isSameDay(post.date, today.subtract(const Duration(days: 1)))) dateHeader = 'Yesterday';
       else if (isSameDay(post.date, today.add(const Duration(days: 1)))) dateHeader = 'Tomorrow';
       else dateHeader = DateFormat('EEEE, MMMM d').format(post.date);
       
@@ -101,7 +102,7 @@ class _BulletinPageState extends State<BulletinPage> {
                 ),
               ),
             );
-          }).toList(),
+          }),
           const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
