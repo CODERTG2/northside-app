@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:ui';
+import 'dart:ui'; // Needed for BackdropFilter
 
 import 'app_shell_controller.dart';
 import '../home_screen_content/home_screen_content.dart';
@@ -27,7 +27,10 @@ class AppShellScreen extends GetView<AppShellController> {
     return Obx(() => Scaffold(
           body: Stack(
             children: [
+              // The main page content
               pages[controller.navBarIndex.value],
+
+              // The floating navigation bar at the bottom
               Align(
                 alignment: Alignment.bottomCenter,
                 child: _buildFloatingM3NavBar(context),
@@ -37,13 +40,20 @@ class AppShellScreen extends GetView<AppShellController> {
         ));
   }
 
+  // --- REFINED FLOATING MATERIAL 3 NAVIGATION BAR ---
   Widget _buildFloatingM3NavBar(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
       height: 65,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20, spreadRadius: -2)],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            spreadRadius: -2,
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(50),
@@ -56,9 +66,10 @@ class AppShellScreen extends GetView<AppShellController> {
             selectedIndex: controller.navBarIndex.value,
             onDestinationSelected: controller.changePage,
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+
+            // FIX: Using Spacers to push the icons into a compact group.
             destinations: const <Widget>[
-              // FIX: A flexible spacer to push the icons to the center
-              SizedBox(width: 8),
+              Spacer(), // Pushes from the left
               NavigationDestination(
                 selectedIcon: Icon(Icons.home, color: Colors.white),
                 icon: Icon(Icons.home_outlined, color: Colors.black87),
@@ -79,8 +90,7 @@ class AppShellScreen extends GetView<AppShellController> {
                 icon: Icon(Icons.person_outline, color: Colors.black87),
                 label: 'Profile',
               ),
-              // FIX: A flexible spacer to push the icons to the center
-              SizedBox(width: 8),
+              Spacer(), // Pushes from the right
             ],
           ),
         ),
