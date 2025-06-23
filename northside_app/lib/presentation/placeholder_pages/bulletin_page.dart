@@ -38,6 +38,7 @@ class _BulletinPageState extends State<BulletinPage> {
   void _buildGroupedList() {
     final today = DateTime.now();
     final nonPinnedPosts = _allPosts.where((post) => !post.isPinned).toList();
+    // FIX: Correctly sort posts in descending order (newest first).
     nonPinnedPosts.sort((a, b) => b.date.compareTo(a.date));
 
     final Map<String, List<BulletinPost>> grouped = {};
@@ -45,7 +46,8 @@ class _BulletinPageState extends State<BulletinPage> {
       String dateHeader;
       if (isSameDay(post.date, today)) dateHeader = 'Today';
       else if (isSameDay(post.date, today.subtract(const Duration(days: 1)))) dateHeader = 'Yesterday';
-      else dateHeader = DateFormat('MMMM d, yyyy').format(post.date);
+      else if (isSameDay(post.date, today.add(const Duration(days: 1)))) dateHeader = 'Tomorrow';
+      else dateHeader = DateFormat('EEEE, MMMM d').format(post.date);
       
       if (grouped[dateHeader] == null) grouped[dateHeader] = [];
       grouped[dateHeader]!.add(post);
@@ -71,79 +73,43 @@ class _BulletinPageState extends State<BulletinPage> {
   @override
   Widget build(BuildContext context) {
     final pinnedPosts = _allPosts.where((post) => post.isPinned).toList();
+    final dateKeys = _groupedPosts.keys.toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      body: Stack(
-        children: [
-          // --- BOTTOM LAYER: The static header and pinned section ---
-          Column(
-            children: [
-              const SharedHeader(title: 'Bulletin'),
-              const SizedBox(height: 24),
-              if (pinnedPosts.isNotEmpty) ...[
-                _buildSectionHeader("Pinned"),
-                _buildPinnedCarousel(pinnedPosts),
-              ],
-            ],
-          ),
-          // --- TOP LAYER: The scrollable pop-up sheet ---
-          DraggableScrollableSheet(
-            initialChildSize: 0.65, // Starts lower down on the screen
-            minChildSize: 0.65,
-            maxChildSize: 0.9, // Can be dragged almost to the top
-            builder: (context, scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF2F2F7),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: -5)],
+      body: CustomScrollView(
+        slivers: [
+          const SliverToBoxAdapter(child: SharedHeader(title: 'Bulletin')),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          if (pinnedPosts.isNotEmpty) ...[
+            SliverToBoxAdapter(child: _buildSectionHeader("Pinned")),
+            SliverToBoxAdapter(child: _buildPinnedCarousel(pinnedPosts)),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          ],
+          // This creates the list with sticky headers
+          ...dateKeys.map((date) {
+            final postsForDate = _groupedPosts[date]!;
+            return SliverStickyHeader(
+              header: _buildDateHeader(date),
+              sliver: SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _BulletinEventCard(post: postsForDate[index]),
+                    childCount: postsForDate.length,
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    // The little drag handle at the top of the sheet
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 12),
-                      width: 40,
-                      height: 5,
-                      decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
-                    ),
-                    Expanded(
-                      child: _buildMainFeed(scrollController),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+              ),
+            );
+          }).toList(),
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
     );
   }
 
-  Widget _buildMainFeed(ScrollController scrollController) {
-    final dateKeys = _groupedPosts.keys.toList();
-    return CustomScrollView(
-      controller: scrollController,
-      slivers: [
-        ...dateKeys.map((date) {
-          final postsForDate = _groupedPosts[date]!;
-          return SliverStickyHeader(
-            header: _buildDateHeader(date),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => _BulletinEventCard(post: postsForDate[index]),
-                childCount: postsForDate.length,
-              ),
-            ),
-          );
-        }).toList(),
-        const SliverToBoxAdapter(child: SizedBox(height: 120)),
-      ],
-    );
-  }
-
   Widget _buildSectionHeader(String title) {
+    // FIX: This header is now correctly aligned.
     return Padding(
       padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 16.0),
       child: Text(
@@ -154,6 +120,7 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   Widget _buildDateHeader(String date) {
+    // FIX: This container makes the header full-width and opaque.
     return Container(
       color: const Color(0xFFF2F2F7),
       padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 16.0),
@@ -180,11 +147,11 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 }
 
-// FIX: A new card specifically for the main feed, styled like the Home screen's card.
+// FIX: This is the large card for the main feed, styled like the Home screen's card.
 class _BulletinEventCard extends StatelessWidget {
   const _BulletinEventCard({required this.post});
   final BulletinPost post;
-  
+
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
       ArticleDetailSheet(
@@ -206,7 +173,7 @@ class _BulletinEventCard extends StatelessWidget {
       onTap: () => _showArticleSheet(post),
       child: Container(
         height: 280,
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -235,7 +202,7 @@ class _BulletinEventCard extends StatelessWidget {
                         children: [
                           const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey),
                           const SizedBox(width: 8),
-                          Text(DateFormat('MMMM d').format(post.date), style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                          Text(post.subtitle, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
                           const Spacer(),
                           const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
                           const SizedBox(width: 4),
@@ -254,7 +221,7 @@ class _BulletinEventCard extends StatelessWidget {
   }
 }
 
-// Card for the "Pinned" section
+// FIX: This card is now correctly styled for the "Pinned" carousel.
 class _PinnedPostCard extends StatelessWidget {
   const _PinnedPostCard({required this.post});
   final BulletinPost post;
@@ -279,23 +246,28 @@ class _PinnedPostCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => _showArticleSheet(post),
       child: Container(
-        width: 160,
+        width: 250, // Pinned cards are wider
         margin: const EdgeInsets.only(right: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               child: Image.asset(post.imagePath!, height: 120, width: double.infinity, fit: BoxFit.cover),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
-                  Text(post.subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(post.subtitle, style: TextStyle(fontSize: 14, color: Colors.grey.shade600), maxLines: 2, overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
