@@ -47,3 +47,4 @@ app.*.map.json
 .env
 /backend/__pycache__/
 /backend/models/__pycache__/
+/backend/gsheets/credentials.json
