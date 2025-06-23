@@ -4,8 +4,8 @@ class Article {
   const Article({
     required this.title,
     required this.subtitle,
-    this.imagePath,
-    this.content = 'This is the full detail content for the article...',
+    this.imagePath, // Image is optional
+    required this.content,
   });
 
   final String title;
