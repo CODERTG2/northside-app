@@ -141,7 +141,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
             name: sport,
             onTap: () => Get.to(() => SportDetailPage(sportName: fullSportName)),
           );
-        }).toList(),
+        }),
       ],
     );
   }

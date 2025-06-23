@@ -8,6 +8,8 @@ import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/utils/app_colors.dart';
+// Add the correct import for WebViewSheet
+import '../../widgets/webview_sheet.dart';
 
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});

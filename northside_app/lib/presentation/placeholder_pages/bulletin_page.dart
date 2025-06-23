@@ -9,7 +9,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../models/bulletin_post.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
-import '../../widgets/shared_header.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({super.key});

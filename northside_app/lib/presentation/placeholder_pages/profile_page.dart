@@ -76,7 +76,7 @@ class ProfilePage extends StatelessWidget {
               onTap: () {
                 if (option.actionType == ProfileActionType.info) {
                   Get.bottomSheet(
-                    ArticleDetailSheet(article: appInfoArticle),
+                    const ArticleDetailSheet(article: appInfoArticle),
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                   );
@@ -95,7 +95,7 @@ class ProfilePage extends StatelessWidget {
                 }
               },
             );
-          }).toList(),
+          }),
           // FIX: The SizedBox and the call to _buildLogoutButton have been removed.
         ],
       ),

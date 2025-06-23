@@ -47,7 +47,7 @@ class SportDetailPage extends StatefulWidget {
 
 class _SportDetailPageState extends State<SportDetailPage> {
   // --- State and Placeholder Data ---
-  String _selectedLevel = 'All';
+  final String _selectedLevel = 'All';
   final List<String> _levels = ['All', 'JV', 'Varsity'];
 
   final List<GameSchedule> _schedules = const [

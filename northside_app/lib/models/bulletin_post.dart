@@ -1,6 +1,5 @@
 // lib/models/bulletin_post.dart
 
-import 'package:flutter/material.dart';
 
 class BulletinPost {
   const BulletinPost({
