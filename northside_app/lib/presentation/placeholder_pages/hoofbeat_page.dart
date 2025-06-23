@@ -318,7 +318,7 @@ class _PollCardState extends State<_PollCard> {
         children: [
           Text(widget.question, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          ...widget.options.map((option) => _buildPollOption(option)),
+          ...widget.options.map((option) => _buildPollOption(option)).toList(),
         ],
       ),
     );
