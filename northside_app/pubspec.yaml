@@ -25,6 +25,7 @@ dependencies:
 
   flutter_lints:
   scrollable_positioned_list: 
+  sliver_tools: ^0.2.12
 
 dev_dependencies:
   flutter_test:
