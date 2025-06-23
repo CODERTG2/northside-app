@@ -4,16 +4,12 @@ class Article {
   const Article({
     required this.title,
     required this.subtitle,
-    required this.date, // NEW: The date of the announcement
-    this.isPinned = false, // NEW: To identify pinned items
     this.imagePath,
-    required this.content,
+    this.content = 'This is the full detail content for the article...',
   });
 
   final String title;
   final String subtitle;
-  final DateTime date;
-  final bool isPinned;
   final String? imagePath;
   final String content;
 }
