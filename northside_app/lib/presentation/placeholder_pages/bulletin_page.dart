@@ -9,6 +9,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../models/bulletin_post.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
+import '../../widgets/shared_header.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({super.key});
@@ -18,18 +19,14 @@ class BulletinPage extends StatefulWidget {
 }
 
 class _BulletinPageState extends State<BulletinPage> {
-  // --- Controllers and State for dynamic scrolling ---
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
   String _currentHeaderText = 'Bulletin';
   bool _showGoToTodayButton = false;
   int _todayIndex = -1;
-  // --- End of State ---
+  List<dynamic> _groupedItems = [];
 
-  final List<dynamic> _groupedItems = [];
-
-  // --- Placeholder Data ---
   final List<BulletinPost> _allPosts = [
     BulletinPost(title: 'Homecoming Tickets on Sale!', subtitle: 'Get them before they sell out!', date: DateTime.now().add(const Duration(days: 2)), imagePath: 'assets/images/homecoming_bg.png', isPinned: true),
     BulletinPost(title: 'Spirit Week Next Week', subtitle: 'Show your school spirit!', date: DateTime.now().add(const Duration(days: 1)), imagePath: 'assets/images/homecoming_bg.png', isPinned: true),
@@ -39,7 +36,6 @@ class _BulletinPageState extends State<BulletinPage> {
     BulletinPost(title: 'School Play Auditions', subtitle: 'In the auditorium', date: DateTime.now().add(const Duration(days: 5)), imagePath: 'assets/images/homecoming_bg.png'),
     BulletinPost(title: 'Club Fair Sign-ups', subtitle: 'In the main hallway during lunch', date: DateTime.now().add(const Duration(days: 6)), imagePath: 'assets/images/homecoming_bg.png'),
   ];
-  // --- End Placeholder Data ---
 
   @override
   void initState() {
@@ -88,17 +84,17 @@ class _BulletinPageState extends State<BulletinPage> {
   void _updateHeaderAndButton() {
     if (_groupedItems.isEmpty || _itemPositionsListener.itemPositions.value.isEmpty) return;
 
-    final firstVisibleItemIndex = _itemPositionsListener.itemPositions.value
+    final firstVisibleItem = _itemPositionsListener.itemPositions.value
         .where((item) => item.itemLeadingEdge < 1)
-        .last.index;
-
-    final item = _groupedItems[firstVisibleItemIndex];
+        .last;
+    
+    final item = _groupedItems[firstVisibleItem.index];
     String newHeaderText = "Bulletin";
 
     if (item is String) {
       newHeaderText = item;
     } else if (item is BulletinPost) {
-      for (var i = firstVisibleItemIndex; i >= 0; i--) {
+      for (var i = firstVisibleItem.index; i >= 0; i--) {
         if (_groupedItems[i] is String) {
           newHeaderText = _groupedItems[i] as String;
           break;
@@ -112,7 +108,7 @@ class _BulletinPageState extends State<BulletinPage> {
       });
     }
 
-    final showButton = _todayIndex != -1 && firstVisibleItemIndex >= _todayIndex;
+    final showButton = _todayIndex != -1 && firstVisibleItem.index >= _todayIndex;
     if (showButton != _showGoToTodayButton) {
       setState(() {
         _showGoToTodayButton = showButton;
@@ -130,16 +126,9 @@ class _BulletinPageState extends State<BulletinPage> {
     }
   }
 
-  void _showArticleSheet(BulletinPost post) {
+  void _showArticleSheet(Article article) {
     Get.bottomSheet(
-      ArticleDetailSheet(
-        article: Article(
-          title: post.title,
-          subtitle: post.subtitle,
-          imagePath: post.imagePath,
-          content: post.content,
-        ),
-      ),
+      ArticleDetailSheet(article: article),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
@@ -157,7 +146,7 @@ class _BulletinPageState extends State<BulletinPage> {
             itemScrollController: _itemScrollController,
             itemPositionsListener: _itemPositionsListener,
             itemCount: _groupedItems.length,
-            padding: EdgeInsets.only(top: pinnedPosts.isNotEmpty ? 300 : 120),
+            padding: EdgeInsets.only(top: pinnedPosts.isNotEmpty ? 300 : 120, bottom: 40),
             itemBuilder: (context, index) {
               final item = _groupedItems[index];
               if (item is String) {
@@ -184,7 +173,7 @@ class _BulletinPageState extends State<BulletinPage> {
   Widget _buildDynamicHeader(List<BulletinPost> pinnedPosts) {
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      color: const Color(0xFFF2F2F7),
+      color: const Color(0xFFF2F2F7).withOpacity(0.95),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,40 +197,6 @@ class _BulletinPageState extends State<BulletinPage> {
     );
   }
 
-  Widget _buildGoToTodayButton() {
-    return ElevatedButton.icon(
-      onPressed: _scrollToToday,
-      icon: const Icon(Icons.arrow_upward, size: 16),
-      label: const Text('Today'),
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.black, backgroundColor: Colors.white,
-        shape: const StadiumBorder(),
-        elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.2),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 16.0),
-      child: Text(
-        title,
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
-      ),
-    );
-  }
-
-  Widget _buildDateHeader(String date) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
-      child: Text(
-        date,
-        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
   Widget _buildPinnedCarousel(List<BulletinPost> posts) {
     return SizedBox(
       height: 150,
@@ -257,11 +212,18 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   Widget _buildEventCard(BulletinPost post, {bool isPinned = false}) {
+    // Convert to simple Article for the detail sheet
+    final article = Article(
+      title: post.title,
+      subtitle: post.subtitle,
+      imagePath: post.imagePath,
+      content: post.content,
+    );
     return GestureDetector(
-      onTap: () => _showArticleSheet(post),
+      onTap: () => _showArticleSheet(article),
       child: Container(
         height: isPinned ? 150 : 250,
-        margin: isPinned ? const EdgeInsets.only(right: 16) : const EdgeInsets.fromLTRB(24,0,24,16),
+        margin: isPinned ? const EdgeInsets.only(right: 16) : const EdgeInsets.fromLTRB(24, 0, 24, 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -274,7 +236,7 @@ class _BulletinPageState extends State<BulletinPage> {
               flex: isPinned ? 1 : 2,
               child: ClipRRect(
                 borderRadius: isPinned ? BorderRadius.circular(20) : const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.asset(post.imagePath!, fit: BoxFit.cover),
+                child: Image.asset(article.imagePath!, fit: BoxFit.cover),
               ),
             ),
             if (!isPinned)
@@ -286,15 +248,49 @@ class _BulletinPageState extends State<BulletinPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(post.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(article.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                      Text(post.subtitle, style: TextStyle(color: Colors.grey.shade600)),
+                      Text(article.subtitle, style: TextStyle(color: Colors.grey.shade600)),
                     ],
                   ),
                 ),
               )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildGoToTodayButton() {
+    return ElevatedButton.icon(
+      onPressed: _scrollToToday,
+      icon: const Icon(Icons.arrow_upward, size: 16),
+      label: const Text('Today'),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.black, backgroundColor: Colors.white,
+        shape: const StadiumBorder(),
+        elevation: 4,
+        shadowColor: Colors.black.withOpacity(0.2),
+      ),
+    );
+  }
+
+  Widget _buildDateHeader(String date) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
+      child: Text(
+        date,
+        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 16.0),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
       ),
     );
   }
