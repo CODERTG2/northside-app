@@ -193,50 +193,62 @@ class _NewsCard extends StatelessWidget {
     final double cardRadius = screenWidth * 0.05;
     final double fontSizeTitle = screenWidth * 0.045;
     final double fontSizeSubtitle = screenWidth * 0.035;
-    return Container(
-      margin: EdgeInsets.only(right: screenWidth * 0.04),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(cardRadius),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
-              child: Image.asset(article.imagePath!, fit: BoxFit.cover, width: double.infinity),
-            ),
+    final double cardPadding = screenWidth * 0.04;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double cardHeight = constraints.maxHeight;
+        final double imageHeight = cardHeight * 0.58; // 58% for image
+        final double textHeight = cardHeight * 0.42; // 42% for text
+        return Container(
+          margin: EdgeInsets.only(right: screenWidth * 0.04),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(cardRadius),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
           ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.all(screenWidth * 0.04),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    article.title,
-                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: imageHeight,
+                width: double.infinity,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
+                  child: Image.asset(
+                    article.imagePath!,
+                    fit: BoxFit.cover,
                   ),
-                  SizedBox(height: screenWidth * 0.01),
-                  Text(
-                    article.subtitle,
-                    style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                ),
               ),
-            ),
+              SizedBox(
+                height: textHeight,
+                child: Padding(
+                  padding: EdgeInsets.all(cardPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        article.title,
+                        style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: screenWidth * 0.01),
+                      Text(
+                        article.subtitle,
+                        style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
