@@ -24,6 +24,13 @@ class ProfileOption {
   final String? url;
 }
 
+// Add this at the top-level, after imports and before ProfilePage
+const Article appInfoArticle = Article(
+  title: 'App Info',
+  subtitle: 'Version, credits, and more',
+  content: 'Northside App\nVersion 1.0.0\n\nDeveloped by the Northside Team.\n\nSpecial thanks to all contributors and the school community.',
+);
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -54,23 +61,19 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const appInfoArticle = Article(
-      title: 'App Information',
-      subtitle: '',
-      content: 'Version 1.0.0\nDeveloped by Northside App Team.\n\nThis application is designed to provide students and parents with easy access to school-related information. For support, please contact the school administration.',
-      imagePath: null,
-    );
-
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0).copyWith(bottom: 120.0),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06).copyWith(bottom: screenHeight * 0.12),
         children: [
-          const SizedBox(height: 40),
-          _buildProfileHeader(),
-          const SizedBox(height: 32),
+          SizedBox(height: screenHeight * 0.05),
+          _buildProfileHeader(context),
+          SizedBox(height: screenHeight * 0.04),
           ..._options.map((option) {
             return _buildInfoCard(
+              context: context,
               title: option.title,
               subtitle: option.subtitle,
               onTap: () {
@@ -96,41 +99,48 @@ class ProfilePage extends StatelessWidget {
               },
             );
           }).toList(),
-          // FIX: The SizedBox and the call to _buildLogoutButton have been removed.
         ],
       ),
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double avatarSize = screenWidth * 0.25;
+    final double iconSize = screenWidth * 0.15;
+    final double nameFontSize = screenWidth * 0.07;
+    final double infoFontSize = screenWidth * 0.045;
     return Column(
       children: [
         Container(
-          width: 100,
-          height: 100,
+          width: avatarSize,
+          height: avatarSize,
           decoration: BoxDecoration(
             color: Colors.grey.shade300,
             shape: BoxShape.circle,
             border: Border.all(color: Colors.black, width: 3),
           ),
-          child: const Icon(Icons.person, size: 60, color: Colors.black),
+          child: Icon(Icons.person, size: iconSize, color: Colors.black),
         ),
-        const SizedBox(height: 16),
-        const Text('John', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text('60546723', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
-        const SizedBox(height: 4),
-        Text('Northside College Prep', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
+        SizedBox(height: screenWidth * 0.04),
+        Text('John', style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+        SizedBox(height: screenWidth * 0.01),
+        Text('60546723', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+        SizedBox(height: screenWidth * 0.01),
+        Text('Northside College Prep', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
       ],
     );
   }
 
-  Widget _buildInfoCard({required String title, required String subtitle, required VoidCallback onTap}) {
+  Widget _buildInfoCard({required BuildContext context, required String title, required String subtitle, required VoidCallback onTap}) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double titleFontSize = screenWidth * 0.045;
+    final double subtitleFontSize = screenWidth * 0.037;
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        margin: EdgeInsets.only(bottom: screenWidth * 0.03),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenWidth * 0.04),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -139,14 +149,12 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(subtitle, style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
+            Text(title, style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+            SizedBox(height: screenWidth * 0.01),
+            Text(subtitle, style: TextStyle(fontSize: subtitleFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
     );
   }
-
-  // FIX: The _buildLogoutButton method has been completely removed.
 }
