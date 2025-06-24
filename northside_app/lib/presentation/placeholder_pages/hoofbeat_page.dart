@@ -42,6 +42,40 @@ class HoofBeatPage extends StatelessWidget {
     );
   }
 
+  Widget _buildHeader(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.08; // Scales with screen width
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'HoofBeat',
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          CircleAvatar(
+            radius: screenWidth * 0.055,
+            backgroundColor: const Color(0xFFE5E5EA),
+            child: Icon(Icons.person, color: Colors.black, size: screenWidth * 0.07),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.045;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,52 +91,22 @@ class HoofBeatPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 40),
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           const SizedBox(height: 16),
           _buildTopStoryCarousel(),
           const SizedBox(height: 32),
-          _buildSectionHeader("Trending Stories"),
+          _buildSectionHeader(context, "Trending Stories"),
           const SizedBox(height: 16),
           _buildTrendingStories(),
           const SizedBox(height: 32),
-          _buildSectionHeader("News"),
+          _buildSectionHeader(context, "News"),
           const SizedBox(height: 16),
           _buildNewsList(),
           const SizedBox(height: 32),
-          _buildSectionHeader("Polls"),
+          _buildSectionHeader(context, "Polls"),
           const SizedBox(height: 16),
           _buildPollsSection(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'HoofBeat',
-            style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: Color(0xFFE5E5EA),
-            child: Icon(Icons.person, color: Colors.black, size: 28),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Text(
-        title,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
       ),
     );
   }
@@ -234,8 +238,13 @@ class _TrendingStoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double cardHeight = screenHeight * 0.28; // 28% of screen height for card
+    final double imageHeight = cardHeight * (1.5 / 4.0); // 37.5% of card height
+
     return Container(
       width: 150,
+      height: cardHeight,
       margin: const EdgeInsets.only(right: 16.0, bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -247,17 +256,25 @@ class _TrendingStoryCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.asset(article.imagePath!, height: 120, width: double.infinity, fit: BoxFit.cover),
+            child: Image.asset(
+              article.imagePath!,
+              height: imageHeight,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(article.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
-                Text(article.subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600), maxLines: 1),
-              ],
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(article.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 4),
+                  Text(article.subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600), maxLines: 1),
+                ],
+              ),
             ),
           ),
         ],
