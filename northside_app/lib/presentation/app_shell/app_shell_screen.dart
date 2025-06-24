@@ -10,6 +10,7 @@ import '../placeholder_pages/athletics_page.dart';
 import '../placeholder_pages/profile_page.dart';
 import '../placeholder_pages/events_page.dart';
 import '../placeholder_pages/bulletin_page.dart';
+import '../../core/theme/app_theme.dart';
 
 class AppShellScreen extends GetView<AppShellController> {
   const AppShellScreen({super.key});
@@ -45,10 +46,10 @@ class AppShellScreen extends GetView<AppShellController> {
   Widget _buildFloatingM3NavBar(BuildContext context) {
     return Container(
       // This outer container defines the full width and shadow of the floating pill.
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+      margin: EdgeInsets.fromLTRB(AppTheme.horizontalPadding, 0, AppTheme.horizontalPadding, 30),
       height: 65,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(100), // Pill shape
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.15),
@@ -58,7 +59,7 @@ class AppShellScreen extends GetView<AppShellController> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(100), // Pill shape
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
           child: Container(
@@ -72,7 +73,7 @@ class AppShellScreen extends GetView<AppShellController> {
                 child: NavigationBar(
                   backgroundColor: Colors.transparent, // Lets the blur show through.
                   elevation: 0, // The outer container handles the shadow.
-                  indicatorColor: const Color(0xFF007AFF),
+                  indicatorColor: Theme.of(context).colorScheme.primary,
                   selectedIndex: controller.navBarIndex.value,
                   onDestinationSelected: controller.changePage,
                   labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
