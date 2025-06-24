@@ -106,9 +106,13 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget _buildCalendar(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double dayFontSize = screenWidth * 0.042;
+    final double dowFontSize = screenWidth * 0.031; // Slightly smaller for fit
+    final double headerFontSize = screenWidth * 0.052; // Slightly smaller for fit
+    final double iconSize = screenWidth * 0.052;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-      padding: EdgeInsets.all(screenWidth * 0.04),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.055), // More vertical padding
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -125,13 +129,24 @@ class _EventsPageState extends State<EventsPage> {
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: false,
-          titleTextStyle: Theme.of(context).textTheme.titleLarge!,
-          leftChevronIcon: Icon(Icons.arrow_back_ios, size: screenWidth * 0.04),
-          rightChevronIcon: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.04),
+          titleTextStyle: TextStyle(
+            fontSize: headerFontSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          leftChevronIcon: Icon(Icons.arrow_back_ios, size: iconSize),
+          rightChevronIcon: Icon(Icons.arrow_forward_ios, size: iconSize),
         ),
-        calendarStyle: const CalendarStyle(
-          todayDecoration: BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
-          selectedDecoration: BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: TextStyle(fontSize: dowFontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+          weekendStyle: TextStyle(fontSize: dowFontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+        ),
+        calendarStyle: CalendarStyle(
+          defaultTextStyle: TextStyle(fontSize: dayFontSize, color: Colors.black),
+          weekendTextStyle: TextStyle(fontSize: dayFontSize, color: Colors.black),
+          outsideTextStyle: TextStyle(fontSize: dayFontSize * 0.95, color: Colors.grey.shade400),
+          todayDecoration: const BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
+          selectedDecoration: const BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
         ),
         onPageChanged: (focusedDay) {
           _focusedDay = focusedDay;
