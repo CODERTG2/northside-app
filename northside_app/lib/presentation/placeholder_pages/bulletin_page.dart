@@ -130,12 +130,14 @@ class _BulletinPageState extends State<BulletinPage> {
 
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
-      ArticleDetailSheet(
-        article: Article(
-          title: post.title,
-          subtitle: post.subtitle,
-          imagePath: post.imagePath,
-          content: post.content,
+      SafeArea(
+        child: ArticleDetailSheet(
+          article: Article(
+            title: post.title,
+            subtitle: post.subtitle,
+            imagePath: post.imagePath,
+            content: post.content,
+          ),
         ),
       ),
       isScrollControlled: true,
@@ -373,12 +375,14 @@ class _BulletinEventCard extends StatelessWidget {
 
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
-      ArticleDetailSheet(
-        article: Article(
-          title: post.title,
-          subtitle: post.subtitle,
-          imagePath: post.imagePath,
-          content: post.content,
+      SafeArea(
+        child: ArticleDetailSheet(
+          article: Article(
+            title: post.title,
+            subtitle: post.subtitle,
+            imagePath: post.imagePath,
+            content: post.content,
+          ),
         ),
       ),
       isScrollControlled: true,
@@ -468,12 +472,14 @@ class _PinnedPostCard extends StatelessWidget {
 
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
-      ArticleDetailSheet(
-        article: Article(
-          title: post.title,
-          subtitle: post.subtitle,
-          imagePath: post.imagePath,
-          content: post.content,
+      SafeArea(
+        child: ArticleDetailSheet(
+          article: Article(
+            title: post.title,
+            subtitle: post.subtitle,
+            imagePath: post.imagePath,
+            content: post.content,
+          ),
         ),
       ),
       isScrollControlled: true,
