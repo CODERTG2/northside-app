@@ -12,6 +12,8 @@ class SharedHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppShellController appShellController = Get.find();
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double titleFontSize = screenWidth * 0.07; // Responsive title size
 
     return Padding(
       padding: EdgeInsets.fromLTRB(24.0, MediaQuery.of(context).padding.top + 16, 24.0, 0),
@@ -20,7 +22,21 @@ class SharedHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.displayLarge,
+            style: TextStyle(
+              fontSize: titleFontSize,
+              fontWeight: FontWeight.w900,
+              color: Colors.black,
+              letterSpacing: -1.2, // Even tighter tracking for extra bold impact
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.12),
+                  offset: const Offset(0, 2),
+                  blurRadius: 2,
+                ),
+              ],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           GestureDetector(
             onTap: () {
