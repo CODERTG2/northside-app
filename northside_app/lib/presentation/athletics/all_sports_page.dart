@@ -39,6 +39,8 @@ class _AllSportsPageState extends State<AllSportsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     final currentSports = _sportsData[_selectedSeason]!;
 
     return Scaffold(
@@ -47,42 +49,43 @@ class _AllSportsPageState extends State<AllSportsPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primaryBlue),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primaryBlue, size: screenWidth * 0.06),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
+        title: Text(
           'All Sports',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: EdgeInsets.only(right: screenWidth * 0.04),
             child: CircleAvatar(
-              radius: 18,
+              radius: screenWidth * 0.05,
               backgroundColor: Colors.grey.shade300,
-              child: const Icon(Icons.person, color: Colors.black, size: 24),
+              child: Icon(Icons.person, color: Colors.black, size: screenWidth * 0.06),
             ),
           ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
         children: [
-          const SizedBox(height: 16),
-          _buildSeasonTabs(),
-          const SizedBox(height: 24),
-          _buildSportsColumns(currentSports),
+          SizedBox(height: screenHeight * 0.02),
+          _buildSeasonTabs(context),
+          SizedBox(height: screenHeight * 0.03),
+          _buildSportsColumns(context, currentSports),
         ],
       ),
     );
   }
 
-  Widget _buildSeasonTabs() {
+  Widget _buildSeasonTabs(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(screenWidth * 0.01),
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
       ),
       child: Row(
         children: _seasons.map((season) {
@@ -91,10 +94,10 @@ class _AllSportsPageState extends State<AllSportsPage> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedSeason = season),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
                   boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)] : [],
                 ),
                 child: Center(
@@ -103,6 +106,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
+                      fontSize: screenWidth * 0.045,
                     ),
                   ),
                 ),
@@ -114,27 +118,29 @@ class _AllSportsPageState extends State<AllSportsPage> {
     );
   }
 
-  Widget _buildSportsColumns(SeasonSports sports) {
+  Widget _buildSportsColumns(BuildContext context, SeasonSports sports) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _buildSportColumn('Men\'s', sports.mens)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildSportColumn('Women\'s', sports.womens)),
+        Expanded(child: _buildSportColumn(context, 'Men\'s', sports.mens)),
+        SizedBox(width: screenWidth * 0.04),
+        Expanded(child: _buildSportColumn(context, 'Women\'s', sports.womens)),
       ],
     );
   }
 
-  Widget _buildSportColumn(String title, List<String> sports) {
+  Widget _buildSportColumn(BuildContext context, String title, List<String> sports) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     final sportPrefix = title == 'Men\'s' ? 'Men\'s' : 'Women\'s';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
+          padding: EdgeInsets.only(bottom: screenWidth * 0.03),
           child: Text(
             title,
-            style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+            style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.045),
           ),
         ),
         ...sports.map((sport) {
@@ -156,21 +162,25 @@ class _SportChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.04;
+    final double borderRadius = screenWidth * 0.04;
+    final double verticalPadding = screenWidth * 0.04;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        margin: EdgeInsets.only(bottom: screenWidth * 0.03),
+        padding: EdgeInsets.symmetric(vertical: verticalPadding),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Center(
           child: Text(
             name,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
           ),
         ),
       ),
