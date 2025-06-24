@@ -9,7 +9,7 @@ import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/theme/app_theme.dart';
-import '../../controllers/bulletin_controller.dart';
+import '../controllers/bulletin_controller.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
   const HomeScreenContent({super.key});
@@ -38,7 +38,8 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
             padding: EdgeInsets.only(bottom: 120),
             children: [
               const SharedHeader(title: 'Home'),
-              const SizedBox(height: 20),
+              // Use a vertical gap that matches the original (20px) but scales slightly for very tall screens
+              SizedBox(height: (MediaQuery.of(context).size.height * 0.025).clamp(16.0, 28.0)),
               _buildQuickActions(),
               const SizedBox(height: 32),
               _buildEventsCarousel(bulletinController),
