@@ -56,16 +56,6 @@ class _AllSportsPageState extends State<AllSportsPage> {
           'All Sports',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
         ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: screenWidth * 0.04),
-            child: CircleAvatar(
-              radius: screenWidth * 0.05,
-              backgroundColor: Colors.grey.shade300,
-              child: Icon(Icons.person, color: Colors.black, size: screenWidth * 0.06),
-            ),
-          ),
-        ],
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),

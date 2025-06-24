@@ -7,9 +7,10 @@ import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/theme/app_theme.dart';
-import '../controllers/bulletin_controller.dart';
+import '../../controllers/bulletin_controller.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
   const HomeScreenContent({super.key});
@@ -38,12 +39,11 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
             padding: EdgeInsets.only(bottom: 120),
             children: [
               const SharedHeader(title: 'Home'),
-              // Use a vertical gap that matches the original (20px) but scales slightly for very tall screens
-              SizedBox(height: (MediaQuery.of(context).size.height * 0.025).clamp(16.0, 28.0)),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height for consistent spacing
               _buildQuickActions(),
-              const SizedBox(height: 32),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.04), // 4% of screen height
               _buildEventsCarousel(bulletinController),
-              const SizedBox(height: 20),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height
               Obx(() => _buildPageIndicator(bulletinController)),
             ],
           ),
@@ -55,12 +55,14 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
   // --- WIDGET WITH THE FIX ---
   Widget _buildQuickActions() {
     final AppShellController appShellController = Get.find();
-    return Padding(
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      margin: EdgeInsets.zero,
       child: GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         childAspectRatio: 2.7,
@@ -96,7 +98,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
           return GestureDetector(
             onTap: () {
               Get.bottomSheet(
-                ArticleDetailSheet(article: article),
+                ArticleDetailDraggableSheet(article: article),
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
               );
