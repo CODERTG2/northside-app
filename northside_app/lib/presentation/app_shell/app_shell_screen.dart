@@ -42,12 +42,17 @@ class AppShellScreen extends GetView<AppShellController> {
         ));
   }
 
-  // --- DEFINITIVELY CORRECTED FLOATING NAVIGATION BAR ---
+  // --- DEFINITIVELY PROPORTIONAL FLOATING NAVIGATION BAR ---
   Widget _buildFloatingM3NavBar(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double navBarHeight = screenSize.width * 0.14; // Responsive: 14% of width
+    final double iconSize = navBarHeight * 0.42; // Responsive icon size
+    final double innerPaddingHorizontal = navBarHeight * 0.34; // Proportional side padding
+    final double innerPaddingVertical = navBarHeight * 0.15; // Proportional top/bottom padding
     return Container(
       // This outer container defines the full width and shadow of the floating pill.
-      margin: EdgeInsets.fromLTRB(AppTheme.horizontalPadding, 0, AppTheme.horizontalPadding, 30),
-      height: 65,
+      margin: EdgeInsets.fromLTRB(AppTheme.horizontalPadding, 0, AppTheme.horizontalPadding, screenSize.height * 0.04),
+      height: navBarHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100), // Pill shape
         boxShadow: [
@@ -64,50 +69,42 @@ class AppShellScreen extends GetView<AppShellController> {
           filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
           child: Container(
             color: const Color(0xFFF9F9F9).withOpacity(0.85),
-            // We use a Center widget to position the NavigationBar in the middle.
+            padding: EdgeInsets.symmetric(horizontal: innerPaddingHorizontal, vertical: innerPaddingVertical),
             child: Center(
-              // The SizedBox constrains the width of the NavigationBar,
-              // forcing the icons into a compact group.
-              child: SizedBox(
-                width: 330,
-                child: NavigationBar(
-                  backgroundColor: Colors.transparent, // Lets the blur show through.
-                  elevation: 0, // The outer container handles the shadow.
-                  indicatorColor: Theme.of(context).colorScheme.primary,
-                  selectedIndex: controller.navBarIndex.value,
-                  onDestinationSelected: controller.changePage,
-                  labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-
-                  // FIX: The list of destinations is now complete and in the correct order.
-                  destinations: const <Widget>[
-                    NavigationDestination(
-                      selectedIcon: Icon(Icons.home, color: Colors.white),
-                      icon: Icon(Icons.home_outlined, color: Colors.black87),
-                      label: 'Home',
-                    ),
-                    NavigationDestination(
-                      selectedIcon: Icon(Icons.sports_basketball, color: Colors.white),
-                      icon: Icon(Icons.sports_basketball_outlined, color: Colors.black87),
-                      label: 'Athletics',
-                    ),
-                    // FIX: The missing Events icon has been restored.
-                    NavigationDestination(
-                      selectedIcon: Icon(Icons.calendar_month, color: Colors.white),
-                      icon: Icon(Icons.calendar_month_outlined, color: Colors.black87),
-                      label: 'Events',
-                    ),
-                    NavigationDestination(
-                      selectedIcon: Icon(Icons.article, color: Colors.white),
-                      icon: Icon(Icons.article_outlined, color: Colors.black87),
-                      label: 'Bulletin',
-                    ),
-                    NavigationDestination(
-                      selectedIcon: Icon(Icons.person, color: Colors.white),
-                      icon: Icon(Icons.person_outline, color: Colors.black87),
-                      label: 'Profile',
-                    ),
-                  ],
-                ),
+              child: NavigationBar(
+                backgroundColor: Colors.transparent, // Lets the blur show through.
+                elevation: 0, // The outer container handles the shadow.
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                selectedIndex: controller.navBarIndex.value,
+                onDestinationSelected: controller.changePage,
+                labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                destinations: <Widget>[
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.home, color: Colors.white, size: iconSize),
+                    icon: Icon(Icons.home_outlined, color: Colors.black87, size: iconSize),
+                    label: 'Home',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.sports_basketball, color: Colors.white, size: iconSize),
+                    icon: Icon(Icons.sports_basketball_outlined, color: Colors.black87, size: iconSize),
+                    label: 'Athletics',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.calendar_month, color: Colors.white, size: iconSize),
+                    icon: Icon(Icons.calendar_month_outlined, color: Colors.black87, size: iconSize),
+                    label: 'Events',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.article, color: Colors.white, size: iconSize),
+                    icon: Icon(Icons.article_outlined, color: Colors.black87, size: iconSize),
+                    label: 'Bulletin',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.person, color: Colors.white, size: iconSize),
+                    icon: Icon(Icons.person_outline, color: Colors.black87, size: iconSize),
+                    label: 'Profile',
+                  ),
+                ],
               ),
             ),
           ),
