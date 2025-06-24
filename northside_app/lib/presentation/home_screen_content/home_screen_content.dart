@@ -8,27 +8,15 @@ import '../placeholder_pages/hoofbeat_page.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
+import '../../core/theme/app_theme.dart';
+import '../controllers/bulletin_controller.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
   const HomeScreenContent({super.key});
 
-  final List<Article> _homeScreenArticles = const [
-    Article(
-      title: 'Homecoming 2024',
-      subtitle: 'This Friday',
-      imagePath: 'assets/images/homecoming_bg.png',
-      content: 'Join us for a night of fun and festivities! The annual homecoming dance will be held this Friday in the main gym. Music, food, and great memories await. Don\'t miss out!',
-    ),
-    Article(
-      title: 'Spirit Week Begins!',
-      subtitle: 'All Week',
-      imagePath: 'assets/images/homecoming_bg.png',
-      content: 'Show your school spirit! Participate in our daily themes, from Pajama Day on Monday to School Colors on Friday. Let\'s make this the best Spirit Week ever!',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final BulletinController bulletinController = Get.find();
     return Scaffold(
       body: Stack(
         children: [
@@ -47,15 +35,15 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
             ),
           ),
           ListView(
-            padding: const EdgeInsets.only(bottom: 120),
+            padding: EdgeInsets.only(bottom: 120),
             children: [
               const SharedHeader(title: 'Home'),
               const SizedBox(height: 20),
               _buildQuickActions(),
               const SizedBox(height: 32),
-              _buildEventsCarousel(),
+              _buildEventsCarousel(bulletinController),
               const SizedBox(height: 20),
-              Obx(() => _buildPageIndicator()),
+              Obx(() => _buildPageIndicator(bulletinController)),
             ],
           ),
         ],
@@ -86,17 +74,24 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     );
   }
 
-  Widget _buildEventsCarousel() {
+  Widget _buildEventsCarousel(BulletinController bulletinController) {
+    final events = bulletinController.upcomingEvents;
     return SizedBox(
       height: 350,
       child: PageView.builder(
         controller: controller.pageController,
-        itemCount: _homeScreenArticles.length,
+        itemCount: events.length,
         clipBehavior: Clip.none,
         physics: const BouncingScrollPhysics(),
         onPageChanged: controller.onPageChanged,
         itemBuilder: (context, index) {
-          final article = _homeScreenArticles[index];
+          final post = events[index];
+          final article = Article(
+            title: post.title,
+            subtitle: post.subtitle,
+            imagePath: post.imagePath,
+            content: post.content,
+          );
           return GestureDetector(
             onTap: () {
               Get.bottomSheet(
@@ -139,17 +134,31 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey),
                         const SizedBox(width: 8),
-                        Text(article.subtitle, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
-                        const Spacer(),
+                        Expanded(
+                          child: Text(
+                            article.subtitle,
+                            style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Text('More Details', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                        Flexible(
+                          child: Text(
+                            'More Details',
+                            style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -162,10 +171,10 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     );
   }
 
-  Widget _buildPageIndicator() {
+  Widget _buildPageIndicator(BulletinController bulletinController) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(_homeScreenArticles.length, (index) {
+      children: List.generate(bulletinController.upcomingEvents.length, (index) {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
           width: 8.0,
