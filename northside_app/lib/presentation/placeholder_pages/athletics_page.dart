@@ -8,6 +8,7 @@ import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 
 // NEW: Import the webview sheet
 import '../../widgets/webview_sheet.dart';
@@ -32,36 +33,37 @@ class AthleticsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 120),
+        padding: EdgeInsets.only(bottom: screenHeight * 0.12),
         children: [
-          const SharedHeader(title: 'Athletics'),
-          const SizedBox(height: 16),
-          _buildNewsCarousel(),
-          const SizedBox(height: 32),
+          const SharedHeader(
+            title: 'Athletics',
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          _buildNewsCarousel(context),
+          SizedBox(height: screenHeight * 0.04),
           _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-          const SizedBox(height: 16),
-          _buildSportsGrid(),
-          const SizedBox(height: 24),
-          _buildRegisterButton(),
+          SizedBox(height: screenHeight * 0.02),
+          _buildSportsGrid(context),
+          SizedBox(height: screenHeight * 0.03),
+          _buildRegisterButton(context),
         ],
       ),
     );
   }
 
-  // --- WIDGET WITH THE FIX ---
-  Widget _buildRegisterButton() {
-    // Define the URL for the registration page.
+  Widget _buildRegisterButton(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.045;
     const String registrationUrl = 'https://ncp-ar.rschooltoday.com/oar';
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      // FIX: Wrapped the button's container in a GestureDetector.
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: GestureDetector(
         onTap: () {
-          // This opens the webview sheet when the card is tapped.
           Get.bottomSheet(
             const WebViewSheet(url: registrationUrl),
             isScrollControlled: true,
@@ -69,7 +71,7 @@ class AthleticsPage extends StatelessWidget {
           );
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: EdgeInsets.symmetric(vertical: screenWidth * 0.045),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -78,11 +80,13 @@ class AthleticsPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.add_circle_outline, color: AppColors.primaryBlue),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.add_circle_outline, color: AppColors.primaryBlue, size: screenWidth * 0.06),
+              SizedBox(width: screenWidth * 0.02),
+              Text(
                 'Register for a sport',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
+                style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -91,11 +95,11 @@ class AthleticsPage extends StatelessWidget {
     );
   }
 
-  // --- All other widgets below are unchanged but included for completeness ---
-
-  Widget _buildNewsCarousel() {
+  Widget _buildNewsCarousel(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double cardHeight = screenWidth * 0.7;
     return SizedBox(
-      height: 280,
+      height: cardHeight,
       child: PageView.builder(
         controller: PageController(viewportFraction: 0.85),
         clipBehavior: Clip.none,
@@ -117,16 +121,20 @@ class AthleticsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSportsGrid() {
+  Widget _buildSportsGrid(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double crossAxisSpacing = screenWidth * 0.04;
+    final double mainAxisSpacing = screenWidth * 0.04;
+    final double childAspectRatio = 2.5;
     final sports = ['Baseball', 'Cross Country', 'Lacrosse', 'Soccer'];
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 2.5,
+          crossAxisSpacing: crossAxisSpacing,
+          mainAxisSpacing: mainAxisSpacing,
+          childAspectRatio: childAspectRatio,
         ),
         itemCount: sports.length,
         shrinkWrap: true,
@@ -143,25 +151,29 @@ class AthleticsPage extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(BuildContext context, String title, VoidCallback onViewAll) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.045;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           GestureDetector(
             onTap: onViewAll,
             child: Row(
               children: [
-                const Text(
+                Text(
                   'View All',
-                  style: TextStyle(fontSize: 14, color: AppColors.primaryBlue, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.primaryBlue, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primaryBlue),
+                SizedBox(width: screenWidth * 0.01),
+                Icon(Icons.arrow_forward_ios, size: screenWidth * 0.03, color: AppColors.primaryBlue),
               ],
             ),
           ),
@@ -177,11 +189,15 @@ class _NewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double cardRadius = screenWidth * 0.05;
+    final double fontSizeTitle = screenWidth * 0.045;
+    final double fontSizeSubtitle = screenWidth * 0.035;
     return Container(
-      margin: const EdgeInsets.only(right: 16),
+      margin: EdgeInsets.only(right: screenWidth * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(cardRadius),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
@@ -190,21 +206,31 @@ class _NewsCard extends StatelessWidget {
           Expanded(
             flex: 3,
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
               child: Image.asset(article.imagePath!, fit: BoxFit.cover, width: double.infinity),
             ),
           ),
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(screenWidth * 0.04),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(article.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
-                  Text(article.subtitle, style: TextStyle(fontSize: 14, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(
+                    article.title,
+                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: screenWidth * 0.01),
+                  Text(
+                    article.subtitle,
+                    style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -222,18 +248,25 @@ class _SportButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.045;
+    final double borderRadius = screenWidth * 0.04;
+    final double verticalPadding = screenWidth * 0.04;
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: EdgeInsets.symmetric(vertical: verticalPadding),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Center(
           child: Text(
             name,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
