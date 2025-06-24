@@ -193,3 +193,5 @@ class _SportDetailPageState extends State<SportDetailPage> {
     return Text(text, style: TextStyle(fontWeight: FontWeight.w500, fontSize: screenWidth * 0.04), overflow: TextOverflow.ellipsis);
   }
 }
+
+// If there are any pop-up or modal info screens, wrap their content in SafeArea.
