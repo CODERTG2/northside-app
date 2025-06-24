@@ -37,21 +37,23 @@ class AthleticsPage extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      body: ListView(
-        padding: EdgeInsets.only(bottom: screenHeight * 0.12),
-        children: [
-          const SharedHeader(
-            title: 'Athletics',
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          _buildNewsCarousel(context),
-          SizedBox(height: screenHeight * 0.04),
-          _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-          SizedBox(height: screenHeight * 0.02),
-          _buildSportsGrid(context),
-          SizedBox(height: screenHeight * 0.03),
-          _buildRegisterButton(context),
-        ],
+      body: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.only(bottom: screenHeight * 0.12),
+          children: [
+            const SharedHeader(
+              title: 'Athletics',
+            ),
+            SizedBox(height: screenHeight * 0.02),
+            _buildNewsCarousel(context),
+            SizedBox(height: screenHeight * 0.04),
+            _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
+            SizedBox(height: screenHeight * 0.02),
+            _buildSportsGrid(context),
+            SizedBox(height: screenHeight * 0.03),
+            _buildRegisterButton(context),
+          ],
+        ),
       ),
     );
   }
@@ -197,8 +199,8 @@ class _NewsCard extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double cardHeight = constraints.maxHeight;
-        final double imageHeight = cardHeight * 0.58; // 58% for image
-        final double textHeight = cardHeight * 0.42; // 42% for text
+        final double imageHeight = cardHeight * 0.58;
+        final double textHeight = cardHeight * 0.42;
         return Container(
           margin: EdgeInsets.only(right: screenWidth * 0.04),
           decoration: BoxDecoration(
