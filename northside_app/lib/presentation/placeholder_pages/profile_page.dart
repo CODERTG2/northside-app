@@ -65,41 +65,43 @@ class ProfilePage extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06).copyWith(bottom: screenHeight * 0.12),
-        children: [
-          SizedBox(height: screenHeight * 0.05),
-          _buildProfileHeader(context),
-          SizedBox(height: screenHeight * 0.04),
-          ..._options.map((option) {
-            return _buildInfoCard(
-              context: context,
-              title: option.title,
-              subtitle: option.subtitle,
-              onTap: () {
-                if (option.actionType == ProfileActionType.info) {
-                  Get.bottomSheet(
-                    ArticleDetailSheet(article: appInfoArticle),
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                  );
-                } else if (option.actionType == ProfileActionType.link && option.url != null) {
-                  Get.bottomSheet(
-                    WebViewSheet(url: option.url!),
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                  );
-                } else if (option.actionType == ProfileActionType.login) {
-                  Get.bottomSheet(
-                    const LoginSheet(),
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                  );
-                }
-              },
-            );
-          }).toList(),
-        ],
+      body: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06).copyWith(bottom: screenHeight * 0.12),
+          children: [
+            SizedBox(height: screenHeight * 0.05),
+            _buildProfileHeader(context),
+            SizedBox(height: screenHeight * 0.04),
+            ..._options.map((option) {
+              return _buildInfoCard(
+                context: context,
+                title: option.title,
+                subtitle: option.subtitle,
+                onTap: () {
+                  if (option.actionType == ProfileActionType.info) {
+                    Get.bottomSheet(
+                      ArticleDetailSheet(article: appInfoArticle),
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                    );
+                  } else if (option.actionType == ProfileActionType.link && option.url != null) {
+                    Get.bottomSheet(
+                      WebViewSheet(url: option.url!),
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                    );
+                  } else if (option.actionType == ProfileActionType.login) {
+                    Get.bottomSheet(
+                      const LoginSheet(),
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                    );
+                  }
+                },
+              );
+            }).toList(),
+          ],
+        ),
       ),
     );
   }
