@@ -20,8 +20,7 @@ class SharedHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            // This ensures the title is bold
-            style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: Colors.black),
+            style: Theme.of(context).textTheme.displayLarge,
           ),
           GestureDetector(
             onTap: () {
