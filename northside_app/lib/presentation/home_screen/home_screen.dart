@@ -24,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Stack(
         children: [
@@ -43,51 +45,51 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: false,
             child: Column(
               children: [
-                _buildHeader(),
-                const SizedBox(height: 20),
-                _buildQuickActions(),
-                const SizedBox(height: 25),
+                _buildHeader(context),
+                SizedBox(height: screenHeight * 0.025),
+                _buildQuickActions(context),
+                SizedBox(height: screenHeight * 0.03),
                 Expanded(child: _buildEventsCarousel()),
-                const SizedBox(height: 15),
-                _buildPageIndicator(),
-                const SizedBox(height: 110),
+                SizedBox(height: screenHeight * 0.02),
+                _buildPageIndicator(screenWidth),
+                SizedBox(height: screenHeight * 0.13),
               ],
             ),
           ),
           // Layer 3: The floating navigation bar.
-          _buildFloatingNavBar(),
+          _buildFloatingNavBar(context, screenWidth, screenHeight),
         ],
       ),
     );
   }
 
   // THIS IS THE CORRECT, INTERACTIVE FLOATING NAVIGATION BAR.
-  Widget _buildFloatingNavBar() {
+  Widget _buildFloatingNavBar(BuildContext context, double screenWidth, double screenHeight) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+        padding: EdgeInsets.fromLTRB(screenWidth * 0.05, 0, screenWidth * 0.05, screenHeight * 0.04),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(50.0),
+          borderRadius: BorderRadius.circular(screenWidth * 0.13),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
             child: Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              height: screenHeight * 0.08,
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.85),
-                borderRadius: BorderRadius.circular(50.0),
+                borderRadius: BorderRadius.circular(screenWidth * 0.13),
                 border: Border.all(color: Colors.white.withOpacity(0.2)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   // Each item is now built with its index to check for selection.
-                  _buildNavItem('Home', 0),
-                  _buildNavItem('Athletics', 1),
-                  _buildNavItem('Attendance', 2),
-                  _buildNavItem('Grades', 3),
-                  _buildNavIconItem(Icons.person_outline, 4),
+                  _buildNavItem('Home', 0, screenWidth),
+                  _buildNavItem('Athletics', 1, screenWidth),
+                  _buildNavItem('Attendance', 2, screenWidth),
+                  _buildNavItem('Grades', 3, screenWidth),
+                  _buildNavIconItem(Icons.person_outline, 4, screenWidth),
                 ],
               ),
             ),
@@ -98,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // This helper widget now handles taps to change the state.
-  Widget _buildNavItem(String label, int index) {
+  Widget _buildNavItem(String label, int index, double screenWidth) {
     final isSelected = _navBarIndex == index;
     return GestureDetector(
       onTap: () {
@@ -107,25 +109,23 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.02),
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF007AFF) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(screenWidth * 0.05),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[700],
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 14,
-          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.w600, color: isSelected ? Colors.white : Colors.black),
         ),
       ),
     );
   }
 
   // This helper widget also handles taps.
-  Widget _buildNavIconItem(IconData icon, int index) {
+  Widget _buildNavIconItem(IconData icon, int index, double screenWidth) {
     final isSelected = _navBarIndex == index;
     return GestureDetector(
       onTap: () {
@@ -134,50 +134,56 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: EdgeInsets.all(screenWidth * 0.01),
         decoration: BoxDecoration(
           border: isSelected ? Border.all(color: const Color(0xFF007AFF), width: 1.5) : null,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(screenWidth * 0.025),
         ),
-        child: Icon(icon, size: 28, color: isSelected ? const Color(0xFF007AFF) : Colors.grey[700]),
+        child: Icon(icon, size: screenWidth * 0.07, color: isSelected ? const Color(0xFF007AFF) : Colors.grey[700]),
       ),
     );
   }
 
   // --- The rest of the file (header, buttons, etc.) is the same. ---
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.09;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24.0, 16.0, 16.0, 16.0),
+      padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.04),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('Home', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Color(0xFF1E1E1E))),
+          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xFF1E1E1E)), maxLines: 1, overflow: TextOverflow.ellipsis),
           CircleAvatar(
-            radius: 22,
+            radius: screenWidth * 0.06,
             backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9),
-            child: const Icon(Icons.person_outline, color: Colors.white, size: 28),
+            child: Icon(Icons.person_outline, color: Colors.white, size: screenWidth * 0.07),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double crossAxisSpacing = screenWidth * 0.04;
+    final double mainAxisSpacing = screenWidth * 0.04;
+    final double childAspectRatio = 2.7;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 2.7,
+        crossAxisSpacing: crossAxisSpacing,
+        mainAxisSpacing: mainAxisSpacing,
+        childAspectRatio: childAspectRatio,
         children: [
-          _QuickActionButton(iconWidget: Image.asset('assets/images/grades_icon.png', width: 32, height: 32), label: 'Grades', onTap: () {}),
-          _QuickActionButton(iconWidget: const Icon(Icons.calendar_today_outlined, color: Colors.black54, size: 26), label: 'Events', onTap: () {}),
-          _QuickActionButton(iconWidget: Image.asset('assets/images/hoofbeat_icon.png', width: 32, height: 32), label: 'HoofBeat', onTap: () {}),
-          _QuickActionButton(iconWidget: Image.asset('assets/images/flexes_icon.png', width: 32, height: 32), label: 'Flexes', onTap: () {}),
+          _QuickActionButton(iconWidget: Image.asset('assets/images/grades_icon.png', width: screenWidth * 0.08, height: screenWidth * 0.08), label: 'Grades', onTap: () {}),
+          _QuickActionButton(iconWidget: Icon(Icons.calendar_today_outlined, color: Colors.black54, size: screenWidth * 0.065), label: 'Events', onTap: () {}),
+          _QuickActionButton(iconWidget: Image.asset('assets/images/hoofbeat_icon.png', width: screenWidth * 0.08, height: screenWidth * 0.08), label: 'HoofBeat', onTap: () {}),
+          _QuickActionButton(iconWidget: Image.asset('assets/images/flexes_icon.png', width: screenWidth * 0.08, height: screenWidth * 0.08), label: 'Flexes', onTap: () {}),
         ],
       ),
     );
@@ -199,14 +205,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPageIndicator() {
+  Widget _buildPageIndicator(double screenWidth) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-          width: 8.0,
-          height: 8.0,
+          margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
+          width: screenWidth * 0.02,
+          height: screenWidth * 0.02,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: _currentPageIndex == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
@@ -225,17 +231,20 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.045;
+    final double borderRadius = screenWidth * 0.04;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [iconWidget, const SizedBox(width: 12), Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))],
+          children: [iconWidget, SizedBox(width: screenWidth * 0.03), Text(label, style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600))],
         ),
       ),
     );
@@ -247,11 +256,16 @@ class _HomecomingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double cardRadius = screenWidth * 0.06;
+    final double fontSizeTitle = screenWidth * 0.055;
+    final double fontSizeSubtitle = screenWidth * 0.04;
+    final double iconSize = screenWidth * 0.045;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24.0),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(cardRadius),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 15, offset: const Offset(0, 5))],
       ),
       child: Column(
@@ -263,13 +277,13 @@ class _HomecomingCard extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(cardRadius), topRight: Radius.circular(cardRadius)),
                   child: Image.asset('assets/images/homecoming_bg.png', fit: BoxFit.cover),
                 ),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.25),
-                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(cardRadius), topRight: Radius.circular(cardRadius)),
                   ),
                 ),
                 Center(
@@ -280,11 +294,11 @@ class _HomecomingCard extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-                    child: const Text(
+                    child: Text(
                       'HOMECOMING',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 34,
+                        fontSize: screenWidth * 0.085,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 2.5,
                         shadows: [Shadow(blurRadius: 5.0, color: Colors.black45, offset: Offset(2, 2))],
@@ -298,30 +312,30 @@ class _HomecomingCard extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
+              padding: EdgeInsets.fromLTRB(screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.03),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RichText(
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'sans-serif'),
+                    text: TextSpan(
+                      style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold, fontFamily: 'sans-serif'),
                       children: [
                         TextSpan(text: 'Homecoming ', style: TextStyle(color: Color(0xFFB94056))),
                         TextSpan(text: '2024', style: TextStyle(color: Color(0xFF2E4096))),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: screenWidth * 0.03),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey.shade600),
-                      const SizedBox(width: 8),
-                      Text('This Friday', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                      Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.grey.shade600),
+                      SizedBox(width: screenWidth * 0.02),
+                      Text('This Friday', style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700), maxLines: 1, overflow: TextOverflow.ellipsis),
                       const Spacer(),
-                      Icon(Icons.more_horiz, size: 20, color: Colors.grey.shade600),
-                      const SizedBox(width: 4),
-                      Text('More Details', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                      Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.grey.shade600),
+                      SizedBox(width: screenWidth * 0.01),
+                      Text('More Details', style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ],
                   ),
                 ],
