@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-import '../../controllers/bulletin_controller.dart';
+import '../controllers/bulletin_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/article.dart';
 import '../../models/bulletin_post.dart';
@@ -185,15 +185,11 @@ class _BulletinPageState extends State<BulletinPage> {
     });
 
     double minSheetExtent;
+    // Always use a minimal fallback, then update as soon as real heights are available
     if (pinnedPosts.isNotEmpty && _calculatedSheetExtent != null) {
       minSheetExtent = _calculatedSheetExtent!;
     } else {
-      // Fallback: use previous logic for first build
-      final double headerHeight = 56;
-      final double sectionHeaderHeight = screenWidth * 0.055 + screenWidth * 0.04;
-      final double carouselHeight = 236;
-      double contentHeight = headerHeight + topSpacer + sectionHeaderHeight + carouselHeight;
-      minSheetExtent = (contentHeight / screenHeight).clamp(0.1, 0.9);
+      minSheetExtent = 0.1; // Minimal fallback, will be updated after layout
     }
 
     return Scaffold(
@@ -353,9 +349,11 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   Widget _buildPinnedCarousel(List<BulletinPost> posts, {Key? key}) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double carouselHeight = screenWidth * 0.56; // ~236 on 420px width, proportional
     return SizedBox(
       key: key,
-      height: 236,
+      height: carouselHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
