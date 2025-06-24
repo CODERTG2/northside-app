@@ -9,7 +9,7 @@ import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/theme/app_theme.dart';
-import '../controllers/bulletin_controller.dart';
+import '../../controllers/bulletin_controller.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
   const HomeScreenContent({super.key});
