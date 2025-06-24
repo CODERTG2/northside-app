@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-import '../controllers/bulletin_controller.dart';
+import '../../controllers/bulletin_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/article.dart';
 import '../../models/bulletin_post.dart';
