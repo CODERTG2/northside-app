@@ -16,11 +16,10 @@ class SharedHeader extends StatelessWidget {
     final double titleFontSize = screenWidth * 0.07; // Responsive title size
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24.0,
-        MediaQuery.of(context).padding.top + 4, // Only a small extra gap after status bar
-        24.0,
-        0,
+      padding: EdgeInsets.only(
+        left: 24.0,
+        right: 24.0,
+        top: MediaQuery.of(context).padding.top + 4, // Only a small extra gap after status bar
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

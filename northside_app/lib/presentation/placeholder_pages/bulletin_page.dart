@@ -12,6 +12,7 @@ import '../../controllers/bulletin_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/article.dart';
 import '../../models/bulletin_post.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 
@@ -130,16 +131,12 @@ class _BulletinPageState extends State<BulletinPage> {
 
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
-      SafeArea(
-        child: ArticleDetailSheet(
-          article: Article(
-            title: post.title,
-            subtitle: post.subtitle,
-            imagePath: post.imagePath,
-            content: post.content,
-          ),
-        ),
-      ),
+      ArticleDetailDraggableSheet(article: Article(
+        title: post.title,
+        subtitle: post.subtitle,
+        imagePath: post.imagePath,
+        content: post.content,
+      )),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
@@ -377,16 +374,12 @@ class _BulletinEventCard extends StatelessWidget {
 
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
-      SafeArea(
-        child: ArticleDetailSheet(
-          article: Article(
-            title: post.title,
-            subtitle: post.subtitle,
-            imagePath: post.imagePath,
-            content: post.content,
-          ),
-        ),
-      ),
+      ArticleDetailDraggableSheet(article: Article(
+        title: post.title,
+        subtitle: post.subtitle,
+        imagePath: post.imagePath,
+        content: post.content,
+      )),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
@@ -474,16 +467,12 @@ class _PinnedPostCard extends StatelessWidget {
 
   void _showArticleSheet(BulletinPost post) {
     Get.bottomSheet(
-      SafeArea(
-        child: ArticleDetailSheet(
-          article: Article(
-            title: post.title,
-            subtitle: post.subtitle,
-            imagePath: post.imagePath,
-            content: post.content,
-          ),
-        ),
-      ),
+      ArticleDetailDraggableSheet(article: Article(
+        title: post.title,
+        subtitle: post.subtitle,
+        imagePath: post.imagePath,
+        content: post.content,
+      )),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );

@@ -64,16 +64,6 @@ class _SportDetailPageState extends State<SportDetailPage> {
           widget.sportName,
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
         ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: screenWidth * 0.04),
-            child: CircleAvatar(
-              radius: screenWidth * 0.055,
-              backgroundColor: Colors.grey.shade300,
-              child: Icon(Icons.person, color: Colors.black, size: screenWidth * 0.07),
-            ),
-          ),
-        ],
       ),
       body: ListView(
         children: [
