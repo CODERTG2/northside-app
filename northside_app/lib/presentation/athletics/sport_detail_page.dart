@@ -49,26 +49,28 @@ class _SportDetailPageState extends State<SportDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.primaryBlue),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primaryBlue, size: screenWidth * 0.06),
           onPressed: () => Get.back(),
         ),
         title: Text(
           widget.sportName,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 28),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: EdgeInsets.only(right: screenWidth * 0.04),
             child: CircleAvatar(
-              radius: 20,
+              radius: screenWidth * 0.055,
               backgroundColor: Colors.grey.shade300,
-              child: const Icon(Icons.person, color: Colors.black, size: 26),
+              child: Icon(Icons.person, color: Colors.black, size: screenWidth * 0.07),
             ),
           ),
         ],
@@ -76,25 +78,26 @@ class _SportDetailPageState extends State<SportDetailPage> {
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: _buildTeamLevelTabs(),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+            child: _buildTeamLevelTabs(context),
           ),
-          const SizedBox(height: 24),
-          _buildTableContainer('Schedules and Scores', _buildScheduleTable()),
-          const SizedBox(height: 24),
-          _buildTableContainer('Rosters', _buildRosterTable()),
-          const SizedBox(height: 40),
+          SizedBox(height: screenHeight * 0.03),
+          _buildTableContainer(context, 'Schedules and Scores', _buildScheduleTable(context)),
+          SizedBox(height: screenHeight * 0.03),
+          _buildTableContainer(context, 'Rosters', _buildRosterTable(context)),
+          SizedBox(height: screenHeight * 0.05),
         ],
       ),
     );
   }
 
-  Widget _buildTeamLevelTabs() {
+  Widget _buildTeamLevelTabs(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(screenWidth * 0.01),
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
       ),
       child: Row(
         children: _levels.map((level) {
@@ -103,10 +106,10 @@ class _SportDetailPageState extends State<SportDetailPage> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedLevel = level),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
                   boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2))] : [],
                 ),
                 child: Center(
@@ -115,6 +118,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
+                      fontSize: screenWidth * 0.045,
                     ),
                   ),
                 ),
@@ -126,20 +130,21 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
 
-  Widget _buildTableContainer(String title, Widget table) {
+  Widget _buildTableContainer(BuildContext context, String title, Widget table) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24.0),
-      padding: const EdgeInsets.all(16.0),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+      padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          Text(title, style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold)),
+          SizedBox(height: screenWidth * 0.02),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: table,
@@ -149,40 +154,42 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
 
-  DataTable _buildScheduleTable() {
+  DataTable _buildScheduleTable(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return DataTable(
-      columnSpacing: 30,
-      columns: ['DATE', 'TIME', 'EVENT', 'OPPONENT', 'LOCATION', 'SCORE', 'W/L'].map((h) => DataColumn(label: _headerText(h))).toList(),
+      columnSpacing: screenWidth * 0.08,
+      columns: ['DATE', 'TIME', 'EVENT', 'OPPONENT', 'LOCATION', 'SCORE', 'W/L'].map((h) => DataColumn(label: _headerText(h, screenWidth))).toList(),
       rows: _schedules.map((s) => DataRow(cells: [
-        DataCell(_dataText(s.date)),
-        DataCell(_dataText(s.time)),
-        DataCell(_dataText(s.event)),
-        DataCell(_dataText(s.opponent)),
-        DataCell(_dataText(s.location)),
-        DataCell(_dataText(s.score)),
-        DataCell(_dataText(s.result)),
+        DataCell(_dataText(s.date, screenWidth)),
+        DataCell(_dataText(s.time, screenWidth)),
+        DataCell(_dataText(s.event, screenWidth)),
+        DataCell(_dataText(s.opponent, screenWidth)),
+        DataCell(_dataText(s.location, screenWidth)),
+        DataCell(_dataText(s.score, screenWidth)),
+        DataCell(_dataText(s.result, screenWidth)),
       ])).toList(),
     );
   }
-  
-  DataTable _buildRosterTable() {
+
+  DataTable _buildRosterTable(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return DataTable(
-      columnSpacing: 30,
-      columns: ['NAME', '#', 'POSITION', 'GRADE'].map((h) => DataColumn(label: _headerText(h))).toList(),
+      columnSpacing: screenWidth * 0.08,
+      columns: ['NAME', '#', 'POSITION', 'GRADE'].map((h) => DataColumn(label: _headerText(h, screenWidth))).toList(),
       rows: _roster.map((p) => DataRow(cells: [
-        DataCell(_dataText(p.name)),
-        DataCell(_dataText(p.number)),
-        DataCell(_dataText(p.position)),
-        DataCell(_dataText(p.grade)),
+        DataCell(_dataText(p.name, screenWidth)),
+        DataCell(_dataText(p.number, screenWidth)),
+        DataCell(_dataText(p.position, screenWidth)),
+        DataCell(_dataText(p.grade, screenWidth)),
       ])).toList(),
     );
   }
 
-  Text _headerText(String text) {
-    return Text(text, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 12));
+  Text _headerText(String text, double screenWidth) {
+    return Text(text, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.032));
   }
 
-  Text _dataText(String text) {
-    return Text(text, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14), overflow: TextOverflow.ellipsis);
+  Text _dataText(String text, double screenWidth) {
+    return Text(text, style: TextStyle(fontWeight: FontWeight.w500, fontSize: screenWidth * 0.04), overflow: TextOverflow.ellipsis);
   }
 }
