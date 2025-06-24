@@ -164,7 +164,7 @@ class _BulletinPageState extends State<BulletinPage> {
 
     // After first frame, measure and set the sheet extent
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_calculatedSheetExtent == null && pinnedPosts.isNotEmpty) {
+      if (pinnedPosts.isNotEmpty) {
         final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
         final sectionHeaderBox = _sectionHeaderKey.currentContext?.findRenderObject() as RenderBox?;
         final carouselBox = _carouselKey.currentContext?.findRenderObject() as RenderBox?;
@@ -173,11 +173,15 @@ class _BulletinPageState extends State<BulletinPage> {
             headerBox.size.height +
             topSpacer +
             sectionHeaderBox.size.height +
-            carouselBox.size.height; // betweenSpacer removed
+            carouselBox.size.height;
           final double minSheetExtent = (totalHeight / screenHeight).clamp(0.1, 0.9);
           if (_calculatedSheetExtent != minSheetExtent) {
             setState(() {
               _calculatedSheetExtent = minSheetExtent;
+            });
+            // Force the sheet to snap to the new min extent so it never covers the carousel
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _sheetController.jumpTo(minSheetExtent);
             });
           }
         }
@@ -185,7 +189,7 @@ class _BulletinPageState extends State<BulletinPage> {
     });
 
     double minSheetExtent;
-    // Always use a minimal fallback, then update as soon as real heights are available
+    // Always use a minimal fallback until real heights are measured
     if (pinnedPosts.isNotEmpty && _calculatedSheetExtent != null) {
       minSheetExtent = _calculatedSheetExtent!;
     } else {
