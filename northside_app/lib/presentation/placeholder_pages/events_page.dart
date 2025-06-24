@@ -8,6 +8,7 @@ import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
+import '../../core/theme/app_theme.dart';
 
 final kEvents = LinkedHashMap<DateTime, List<Article>>(
   equals: isSameDay,
@@ -62,47 +63,52 @@ class _EventsPageState extends State<EventsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 120),
+        padding: EdgeInsets.only(bottom: screenHeight * 0.12),
         children: [
           const SharedHeader(title: 'Events'),
-          const SizedBox(height: 16),
-          _buildFilterButton(),
-          const SizedBox(height: 16),
-          _buildCalendar(),
-          const SizedBox(height: 24),
-          _buildEventList(),
+          SizedBox(height: screenHeight * 0.02),
+          _buildFilterButton(context),
+          SizedBox(height: screenHeight * 0.02),
+          _buildCalendar(context),
+          SizedBox(height: screenHeight * 0.03),
+          _buildEventList(context),
         ],
       ),
     );
   }
-  
-  Widget _buildFilterButton() {
+
+  Widget _buildFilterButton(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.045;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.02),
           decoration: BoxDecoration(
             color: Colors.grey.shade200,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Text(
+          child: Text(
             'For Current Year',
-            style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
+            style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.primaryBlue, fontSize: fontSize),
           ),
         ),
       ),
     );
   }
-  
-  Widget _buildCalendar() {
+
+  Widget _buildCalendar(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24.0),
-      padding: const EdgeInsets.all(16.0),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+      padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -116,12 +122,12 @@ class _EventsPageState extends State<EventsPage> {
         onDaySelected: _onDaySelected,
         eventLoader: _getEventsForDay,
         startingDayOfWeek: StartingDayOfWeek.sunday,
-        headerStyle: const HeaderStyle(
+        headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: false,
-          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          leftChevronIcon: Icon(Icons.arrow_back_ios, size: 16),
-          rightChevronIcon: Icon(Icons.arrow_forward_ios, size: 16),
+          titleTextStyle: Theme.of(context).textTheme.titleLarge!,
+          leftChevronIcon: Icon(Icons.arrow_back_ios, size: screenWidth * 0.04),
+          rightChevronIcon: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.04),
         ),
         calendarStyle: const CalendarStyle(
           todayDecoration: BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
@@ -134,9 +140,10 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget _buildEventList() {
+  Widget _buildEventList(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: ValueListenableBuilder<List<Article>>(
         valueListenable: _selectedEvents,
         builder: (context, value, _) {
@@ -165,17 +172,19 @@ class _NoEventsCard extends StatelessWidget {
   const _NoEventsCard();
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.04;
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(screenWidth * 0.05),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      child: const Center(
+      child: Center(
         child: Text(
           'No Events Today',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.grey),
         ),
       ),
     );
@@ -188,24 +197,40 @@ class _EventDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSizeTitle = screenWidth * 0.05;
+    final double fontSizeSubtitle = screenWidth * 0.04;
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: screenWidth * 0.04),
+      padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppTheme.cardRadius),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(article.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          Text(
+            article.title,
+            style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: screenWidth * 0.02),
           Row(
             children: [
-              Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey.shade600),
-              const SizedBox(width: 8),
-              Text(article.subtitle, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+              Icon(Icons.calendar_today_outlined, size: screenWidth * 0.045, color: Colors.grey.shade600),
+              SizedBox(width: screenWidth * 0.02),
+              Flexible(
+                child: Text(
+                  article.subtitle,
+                  style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ],
