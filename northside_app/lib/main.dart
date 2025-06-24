@@ -2,8 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart'; // Import the package
+import 'package:sizer/sizer.dart';
 
+import 'core/theme/app_theme.dart'; // Import the new theme
 import 'presentation/app_shell/app_shell_binding.dart';
 import 'presentation/app_shell/app_shell_screen.dart';
 
@@ -16,21 +17,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the base theme data
-    final ThemeData theme = ThemeData();
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Northside App',
 
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Northside App',
+          // FIX: Apply our new custom theme to the entire app.
+          theme: AppTheme.lightTheme,
 
-      // FIX: Apply the "Inter" font to the entire application theme.
-      // This will make all text widgets automatically use the Inter font.
-      theme: theme.copyWith(
-        textTheme: GoogleFonts.interTextTheme(theme.textTheme),
-      ),
-
-      initialBinding: AppShellBinding(),
-      home: const AppShellScreen(),
+          initialBinding: AppShellBinding(),
+          home: const AppShellScreen(),
+        );
+      },
     );
   }
 }
