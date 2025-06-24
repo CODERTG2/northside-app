@@ -36,7 +36,16 @@ class HoofBeatPage extends StatelessWidget {
 
   void _showArticleSheet(Article article) {
     Get.bottomSheet(
-      ArticleDetailSheet(article: article),
+      SafeArea(
+        child: ArticleDetailSheet(
+          article: Article(
+            title: article.title,
+            subtitle: article.subtitle,
+            imagePath: article.imagePath,
+            content: article.content,
+          ),
+        ),
+      ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
