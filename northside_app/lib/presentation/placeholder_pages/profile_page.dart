@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/article.dart';
-import '../../widgets/article_detail_sheet.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/webview_sheet.dart';
 import '../../widgets/login_sheet.dart';
 
@@ -80,21 +80,27 @@ class ProfilePage extends StatelessWidget {
                 onTap: () {
                   if (option.actionType == ProfileActionType.info) {
                     Get.bottomSheet(
-                      ArticleDetailSheet(article: appInfoArticle),
+                      ArticleDetailDraggableSheet(article: appInfoArticle),
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
+                      useRootNavigator: false,
+                      enableDrag: true,
                     );
                   } else if (option.actionType == ProfileActionType.link && option.url != null) {
                     Get.bottomSheet(
                       WebViewSheet(url: option.url!),
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
+                      useRootNavigator: false,
+                      enableDrag: true,
                     );
                   } else if (option.actionType == ProfileActionType.login) {
                     Get.bottomSheet(
                       const LoginSheet(),
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
+                      useRootNavigator: false,
+                      enableDrag: true,
                     );
                   }
                 },

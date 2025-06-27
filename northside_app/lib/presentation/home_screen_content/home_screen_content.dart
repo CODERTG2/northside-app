@@ -101,6 +101,8 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                 ArticleDetailDraggableSheet(article: article),
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
+                useRootNavigator: false,
+                enableDrag: true,
               );
             },
             child: Container(

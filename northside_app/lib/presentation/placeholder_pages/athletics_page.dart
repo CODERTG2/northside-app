@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/article.dart';
-import '../../widgets/article_detail_sheet.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/webview_sheet.dart';
 import '../athletics/all_sports_page.dart';
 import '../athletics/sport_detail_page.dart';
@@ -69,6 +69,8 @@ class AthleticsPage extends StatelessWidget {
             const WebViewSheet(url: registrationUrl),
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
+            useRootNavigator: false,
+            enableDrag: true,
           );
         },
         child: Container(
@@ -115,9 +117,11 @@ class AthleticsPage extends StatelessWidget {
           return GestureDetector(
             onTap: () {
               Get.bottomSheet(
-                ArticleDetailSheet(article: article),
+                ArticleDetailDraggableSheet(article: article),
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
+                useRootNavigator: false,
+                enableDrag: true,
               );
             },
             child: _NewsCard(article: article),
