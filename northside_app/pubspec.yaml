@@ -22,6 +22,8 @@ dependencies:
   
   # FIX: Replaced the non-working packages with the correct one.
   sticky_headers: ^0.3.0+2
+  sliver_tools:
+
 
 dev_dependencies:
   flutter_test:
