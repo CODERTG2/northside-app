@@ -1,7 +1,3 @@
-#TODO: test the threading and see if switching to scheduler is better
-#TODO: work on form in accordance with the db structure
-#TODO: set up the sheets api to read the data from the google sheet
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import threading
