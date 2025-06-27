@@ -6,6 +6,7 @@ import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/webview_sheet.dart';
 import '../athletics/all_sports_page.dart';
+import '../athletics/sport_detail_page.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_colors.dart';

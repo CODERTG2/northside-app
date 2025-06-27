@@ -133,8 +133,6 @@ class _EventsPageState extends State<EventsPage> {
             onDaySelected: _onDaySelected,
             eventLoader: _getEventsForDay,
             startingDayOfWeek: StartingDayOfWeek.sunday,
-            // Set availableHeight to prevent overflow on small screens
-            availableHeight: constraints.maxHeight * 0.95,
             // Adjust size to ensure it fits on small screens
             rowHeight: isNarrowScreen ? 40 : 50,
             headerStyle: HeaderStyle(
