@@ -2,16 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../athletics/all_sports_page.dart';
-import '../athletics/sport_detail_page.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_sheet.dart';
-import '../../widgets/shared_header.dart';
-import '../../core/utils/app_colors.dart';
-import '../../core/theme/app_theme.dart';
-
-// NEW: Import the webview sheet
 import '../../widgets/webview_sheet.dart';
+import '../athletics/all_sports_page.dart';
+import '../../widgets/shared_header.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/utils/app_colors.dart';
+import '../../core/utils/text_helper.dart'; // Add this import
 
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});
@@ -99,11 +97,16 @@ class AthleticsPage extends StatelessWidget {
 
   Widget _buildNewsCarousel(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double cardHeight = screenWidth * 0.7;
+    final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar devices
+    // Adjust card height for smaller screens
+    final double cardHeight = isNarrowScreen ? screenWidth * 0.65 : screenWidth * 0.7;
+    
     return SizedBox(
       height: cardHeight,
       child: PageView.builder(
-        controller: PageController(viewportFraction: 0.85),
+        controller: PageController(
+          viewportFraction: isNarrowScreen ? 0.8 : 0.85, // Reduce card width on smaller screens
+        ),
         clipBehavior: Clip.none,
         itemCount: _athleticsArticles.length,
         itemBuilder: (context, index) {
@@ -192,15 +195,19 @@ class _NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar devices
     final double cardRadius = screenWidth * 0.05;
-    final double fontSizeTitle = screenWidth * 0.045;
-    final double fontSizeSubtitle = screenWidth * 0.035;
-    final double cardPadding = screenWidth * 0.04;
+    final double fontSizeTitle = isNarrowScreen ? screenWidth * 0.042 : screenWidth * 0.045;
+    final double fontSizeSubtitle = isNarrowScreen ? screenWidth * 0.032 : screenWidth * 0.035;
+    final double cardPadding = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04;
+    
     return LayoutBuilder(
       builder: (context, constraints) {
         final double cardHeight = constraints.maxHeight;
-        final double imageHeight = cardHeight * 0.58;
-        final double textHeight = cardHeight * 0.42;
+        // More text space for narrow screens
+        final double imageHeight = isNarrowScreen ? cardHeight * 0.55 : cardHeight * 0.58;
+        final double textHeight = isNarrowScreen ? cardHeight * 0.45 : cardHeight * 0.42;
+        
         return Container(
           margin: EdgeInsets.only(right: screenWidth * 0.04),
           decoration: BoxDecoration(
@@ -222,8 +229,7 @@ class _NewsCard extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(
-                height: textHeight,
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.all(cardPadding),
                   child: Column(
@@ -233,7 +239,7 @@ class _NewsCard extends StatelessWidget {
                       Text(
                         article.title,
                         style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
-                        maxLines: 2,
+                        maxLines: isNarrowScreen ? 1 : 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: screenWidth * 0.01),
