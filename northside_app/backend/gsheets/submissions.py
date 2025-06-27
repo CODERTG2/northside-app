@@ -9,13 +9,13 @@ from backend.models.Announcement import Announcement
 from mongoengine import connect
 from dotenv import load_dotenv
 
-def get_submissions():
+def update_submissions():
     try:
         load_dotenv()
         connect(host=os.environ['MONGODB_URL'])
     except Exception as e:
         print(f"Error connecting to the database: {e}")
-        
+
     worksheet = sheet.get_worksheet(0)
     data = worksheet.get_all_values()
     columns = data[0]
@@ -82,4 +82,4 @@ def get_submissions():
     print(f"Submissions processed: {added_events} new events added, {existing_events} events already existed")
     print(f"Submissions processed: {added_announcements} new announcements added, {existing_announcements} announcements already existed")
 
-get_submissions()
+update_submissions()
