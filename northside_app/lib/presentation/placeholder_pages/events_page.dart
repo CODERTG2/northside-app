@@ -9,6 +9,7 @@ import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/text_helper.dart';
 
 final kEvents = LinkedHashMap<DateTime, List<Article>>(
   equals: isSameDay,
@@ -106,50 +107,62 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget _buildCalendar(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double dayFontSize = screenWidth * 0.042;
-    final double dowFontSize = screenWidth * 0.031; // Slightly smaller for fit
-    final double headerFontSize = screenWidth * 0.052; // Slightly smaller for fit
-    final double iconSize = screenWidth * 0.052;
+    final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar small devices
+    final double dayFontSize = isNarrowScreen ? screenWidth * 0.037 : screenWidth * 0.042;
+    final double dowFontSize = isNarrowScreen ? screenWidth * 0.028 : screenWidth * 0.031;
+    final double headerFontSize = isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.052;
+    final double iconSize = isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.052;
+    final double verticalPadding = isNarrowScreen ? screenWidth * 0.04 : screenWidth * 0.055;
+    
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.055), // More vertical padding
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: verticalPadding),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      child: TableCalendar<Article>(
-        firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
-        focusedDay: _focusedDay,
-        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-        onDaySelected: _onDaySelected,
-        eventLoader: _getEventsForDay,
-        startingDayOfWeek: StartingDayOfWeek.sunday,
-        headerStyle: HeaderStyle(
-          formatButtonVisible: false,
-          titleCentered: false,
-          titleTextStyle: TextStyle(
-            fontSize: headerFontSize,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-          leftChevronIcon: Icon(Icons.arrow_back_ios, size: iconSize),
-          rightChevronIcon: Icon(Icons.arrow_forward_ios, size: iconSize),
-        ),
-        daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: TextStyle(fontSize: dowFontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
-          weekendStyle: TextStyle(fontSize: dowFontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
-        ),
-        calendarStyle: CalendarStyle(
-          defaultTextStyle: TextStyle(fontSize: dayFontSize, color: Colors.black),
-          weekendTextStyle: TextStyle(fontSize: dayFontSize, color: Colors.black),
-          outsideTextStyle: TextStyle(fontSize: dayFontSize * 0.95, color: Colors.grey.shade400),
-          todayDecoration: const BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
-          selectedDecoration: const BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
-        ),
-        onPageChanged: (focusedDay) {
-          _focusedDay = focusedDay;
+      // Wrap in LayoutBuilder to adjust calendar based on available space
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return TableCalendar<Article>(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: _onDaySelected,
+            eventLoader: _getEventsForDay,
+            startingDayOfWeek: StartingDayOfWeek.sunday,
+            // Set availableHeight to prevent overflow on small screens
+            availableHeight: constraints.maxHeight * 0.95,
+            // Adjust size to ensure it fits on small screens
+            rowHeight: isNarrowScreen ? 40 : 50,
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: false,
+              titleTextStyle: TextStyle(
+                fontSize: headerFontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              leftChevronIcon: Icon(Icons.arrow_back_ios, size: iconSize),
+              rightChevronIcon: Icon(Icons.arrow_forward_ios, size: iconSize),
+            ),
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(fontSize: dowFontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+              weekendStyle: TextStyle(fontSize: dowFontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            ),
+            calendarStyle: CalendarStyle(
+              defaultTextStyle: TextStyle(fontSize: dayFontSize, color: Colors.black),
+              weekendTextStyle: TextStyle(fontSize: dayFontSize, color: Colors.black),
+              outsideTextStyle: TextStyle(fontSize: dayFontSize * 0.95, color: Colors.grey.shade400),
+              todayDecoration: const BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
+              selectedDecoration: const BoxDecoration(color: AppColors.primaryBlue, shape: BoxShape.circle),
+            ),
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+          );
         },
       ),
     );
@@ -185,21 +198,25 @@ class _EventsPageState extends State<EventsPage> {
 
 class _NoEventsCard extends StatelessWidget {
   const _NoEventsCard();
+  
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double fontSize = screenWidth * 0.04;
+    final bool isNarrowScreen = screenWidth < 360;
     return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05),
+      padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.04 : screenWidth * 0.05),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Center(
-        child: Text(
+        child: TextHelper.responsiveText(
           'No Events Today',
-          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.grey),
+          context: context,
+          isBold: true,
+          color: Colors.grey,
+          customSizeMultiplier: isNarrowScreen ? 0.038 : 0.04,
         ),
       ),
     );
@@ -213,12 +230,12 @@ class _EventDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double fontSizeTitle = screenWidth * 0.05;
-    final double fontSizeSubtitle = screenWidth * 0.04;
+    final bool isNarrowScreen = screenWidth < 360;
+    
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.only(bottom: screenWidth * 0.04),
-      padding: EdgeInsets.all(screenWidth * 0.04),
+      margin: EdgeInsets.only(bottom: isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04),
+      padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppTheme.cardRadius),
@@ -227,23 +244,25 @@ class _EventDetailCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          TextHelper.responsiveText(
             article.title,
-            style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+            context: context,
+            isBold: true,
+            isTitle: true,
             maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: screenWidth * 0.02),
+          SizedBox(height: isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02),
           Row(
             children: [
-              Icon(Icons.calendar_today_outlined, size: screenWidth * 0.045, color: Colors.grey.shade600),
+              Icon(Icons.calendar_today_outlined, 
+                  size: isNarrowScreen ? screenWidth * 0.04 : screenWidth * 0.045, 
+                  color: Colors.grey.shade600),
               SizedBox(width: screenWidth * 0.02),
               Flexible(
-                child: Text(
+                child: TextHelper.responsiveText(
                   article.subtitle,
-                  style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  context: context,
+                  color: Colors.grey.shade600,
                 ),
               ),
             ],
