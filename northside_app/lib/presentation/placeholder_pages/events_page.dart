@@ -5,7 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:get/get.dart';
 import 'dart:collection';
 import '../../models/article.dart';
-import '../../widgets/article_detail_sheet.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
 import '../../core/theme/app_theme.dart';
@@ -180,9 +180,11 @@ class _EventsPageState extends State<EventsPage> {
             children: value.map((article) => GestureDetector(
               onTap: () {
                 Get.bottomSheet(
-                  ArticleDetailSheet(article: article),
+                  ArticleDetailDraggableSheet(article: article),
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
+                  useRootNavigator: false,
+                  enableDrag: true,
                 );
               },
               child: _EventDetailCard(article: article),

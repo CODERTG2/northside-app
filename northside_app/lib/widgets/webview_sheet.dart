@@ -36,17 +36,30 @@ class _WebViewSheetState extends State<WebViewSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      minChildSize: 0.5,
-      maxChildSize: 0.9,
-      builder: (_, controller) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFFF2F2F7),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar devices
+    
+    // Get safe area padding to respect notch/status bar
+    final EdgeInsets padding = MediaQuery.of(context).padding;
+    
+    // Adaptive sizing based on screen dimensions
+    final double initialChildSize = isNarrowScreen ? 0.85 : 0.9;
+    final double minChildSize = isNarrowScreen ? 0.4 : 0.5;
+    final double maxChildSize = isNarrowScreen ? 0.85 : 0.9;
+    
+    return Padding(
+      padding: EdgeInsets.only(top: padding.top),
+      child: DraggableScrollableSheet(
+        initialChildSize: initialChildSize,
+        minChildSize: minChildSize,
+        maxChildSize: maxChildSize,
+        builder: (_, controller) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFFF2F2F7),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
             children: [
               // Drag handle
               Container(
@@ -70,9 +83,10 @@ class _WebViewSheetState extends State<WebViewSheet> {
                 ),
               ),
             ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }

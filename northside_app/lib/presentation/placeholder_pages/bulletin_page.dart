@@ -139,6 +139,8 @@ class _BulletinPageState extends State<BulletinPage> {
       )),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useRootNavigator: false,
+      enableDrag: true,
     );
   }
 
@@ -382,6 +384,8 @@ class _BulletinEventCard extends StatelessWidget {
       )),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useRootNavigator: false,
+      enableDrag: true,
     );
   }
 

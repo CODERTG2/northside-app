@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/article.dart';
-import '../../widgets/article_detail_sheet.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../core/utils/app_colors.dart';
 
 class HoofBeatPage extends StatelessWidget {
@@ -36,18 +36,18 @@ class HoofBeatPage extends StatelessWidget {
 
   void _showArticleSheet(Article article) {
     Get.bottomSheet(
-      SafeArea(
-        child: ArticleDetailSheet(
-          article: Article(
-            title: article.title,
-            subtitle: article.subtitle,
-            imagePath: article.imagePath,
-            content: article.content,
-          ),
+      ArticleDetailDraggableSheet(
+        article: Article(
+          title: article.title,
+          subtitle: article.subtitle,
+          imagePath: article.imagePath,
+          content: article.content,
         ),
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useRootNavigator: false,
+      enableDrag: true,
     );
   }
 
