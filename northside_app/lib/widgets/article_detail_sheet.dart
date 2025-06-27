@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import '../models/article.dart';
 
 class ArticleDetailSheet extends StatelessWidget {
-  const ArticleDetailSheet({super.key, required this.article});
-
+  const ArticleDetailSheet({super.key, required this.article, this.scrollController});
+  final ScrollController? scrollController;
   final Article article;
 
   @override
