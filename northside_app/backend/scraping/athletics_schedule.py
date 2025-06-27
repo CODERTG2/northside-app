@@ -14,6 +14,8 @@ def update_athletics_schedule():
     Scrapes the athletics schedule from the Northside Prep Athletics website
     and updates the database with new events.
     """
+
+    print("Updating athletics schedule...")
     try:
         load_dotenv()
         connect(host=os.environ['MONGODB_URL'])

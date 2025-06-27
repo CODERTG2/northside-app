@@ -10,11 +10,14 @@ from mongoengine import connect
 from dotenv import load_dotenv
 
 def update_submissions():
+    
+    print("Updating submissions...")
     try:
         load_dotenv()
         connect(host=os.environ['MONGODB_URL'])
     except Exception as e:
         print(f"Error connecting to the database: {e}")
+        return
 
     worksheet = sheet.get_worksheet(0)
     data = worksheet.get_all_values()

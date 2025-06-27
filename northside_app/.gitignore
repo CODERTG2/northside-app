@@ -49,3 +49,4 @@ app.*.map.json
 /backend/models/__pycache__/
 /backend/gsheets/credentials.json
 /backend/gsheets/__pycache__/
+/backend/scraping/__pycache__/

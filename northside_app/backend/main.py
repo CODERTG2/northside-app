@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import threading
-from dataUpdate import update_data
+# from dataUpdate import update_data
 from mongoengine import connect
 import os
 from dotenv import load_dotenv
@@ -98,7 +98,7 @@ def announcements():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    tdataupdate = threading.Thread(target=update_data)
-    tdataupdate.start()
+    # tdataupdate = threading.Thread(target=update_data)
+    # tdataupdate.start()
 
-    app.run(debug=True)
+    app.run()
