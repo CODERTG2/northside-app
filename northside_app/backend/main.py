@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from models.Athlete import Athlete
 from models.AthleticsSchedule import AthleticsSchedule
 from models.GeneralEvent import GeneralEvent
+from models.Announcement import Announcement
 
 app = Flask(__name__)
 CORS(app)
@@ -79,6 +80,20 @@ def general_schedule():
         
         events = GeneralEvent.objects(**query).to_json()
         return events
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/announcements', methods=['GET'])
+def announcements():
+    try:
+        date = request.args.get('date')
+
+        query = {}
+        if date:
+            query['date'] = date
+        
+        announcements = Announcement.objects(**query).to_json()
+        return announcements
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
