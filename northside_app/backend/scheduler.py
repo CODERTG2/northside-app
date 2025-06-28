@@ -19,6 +19,7 @@ schedule.every().day.at("07:30").do(update_submissions)
 
 counter = 0
 
+print("Scheduler started!")
 while True:
     schedule.run_pending()
     counter += 1
