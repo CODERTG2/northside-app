@@ -25,9 +25,9 @@ print("Schedule configured")
 
 counter = 0
 
-print("Scheduler started!")
+print("=== SCHEDULER CONFIGURED ===")
 while True:
-    print(f"{counter}")
+    # print(f"{counter}")
     schedule.run_pending()
     counter += 1
     if counter % 60 == 0:
