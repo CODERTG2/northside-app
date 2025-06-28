@@ -10,37 +10,7 @@ class ApiService {
   
   // Instance methods for controller compatibility
   Future<List<Announcement>> getAnnouncements({String? date}) async {
-    try {
-      return await fetchAnnouncements(date: date);
-    } catch (e) {
-      // Fallback data for demonstration purposes
-      return [
-        Announcement(
-          id: '1',
-          date: '6/27/2025',
-          title: 'Summer!',
-          description: 'Enjoy your summer break and stay safe!',
-          createdBy: 'Admin',
-          createdAt: DateTime(2025, 6, 27),
-        ),
-        Announcement(
-          id: '2',
-          date: '6/29/2025',
-          title: 'Upcoming Fall Semester',
-          description: 'Get ready for an exciting fall semester! Registration opens soon.',
-          createdBy: 'Academic Office',
-          createdAt: DateTime(2025, 6, 29),
-        ),
-        Announcement(
-          id: '3',
-          date: '7/1/2025',
-          title: 'Summer Sports Camp',
-          description: 'Join us for our annual summer sports camp starting July 1st.',
-          createdBy: 'Athletics',
-          createdAt: DateTime(2025, 7, 1),
-        ),
-      ];
-    }
+    return await fetchAnnouncements(date: date);
   }
   
   Future<List<Athlete>> getRoster({
@@ -51,7 +21,8 @@ class ApiService {
     try {
       return await fetchRoster(sport: sport, gender: gender, level: level);
     } catch (e) {
-      return []; // Fallback to empty list
+      // Return fallback data when API fails
+      return [];
     }
   }
   
@@ -65,7 +36,8 @@ class ApiService {
     try {
       return await fetchAthleticsSchedule(sport: sport, team: team, date: date, time: time, home: home);
     } catch (e) {
-      return []; // Fallback to empty list
+      // Return fallback data when API fails
+      return [];
     }
   }
   
@@ -77,25 +49,27 @@ class ApiService {
     try {
       return await fetchGeneralEvents(date: date, time: time, name: name);
     } catch (e) {
-      // Fallback data for demonstration purposes
+      // Return fallback data when API fails
       return [
         GeneralEvent(
           id: '1',
-          name: 'Orientation Week',
-          date: '8/15/2025',
+          name: 'Welcome Back Assembly',
+          date: '6/30/2025',
           time: '9:00 AM',
-          location: 'Main Campus',
-          description: 'Welcome new students to campus!',
-          createdAt: DateTime(2025, 8, 15),
+          location: 'Main Auditorium',
+          description: 'Welcome back students for the new semester!',
+          createdBy: 'Admin',
+          createdAt: DateTime(2025, 6, 30),
         ),
         GeneralEvent(
           id: '2',
-          name: 'Homecoming Game',
-          date: '10/12/2025',
-          time: '7:00 PM',
-          location: 'Stadium',
-          description: 'Annual homecoming football game',
-          createdAt: DateTime(2025, 10, 12),
+          name: 'Summer Festival',
+          date: '7/4/2025',
+          time: '6:00 PM',
+          location: 'School Grounds',
+          description: 'Join us for our annual summer festival celebration.',
+          createdBy: 'Events Team',
+          createdAt: DateTime(2025, 7, 4),
         ),
       ];
     }

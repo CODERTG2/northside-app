@@ -42,7 +42,7 @@ class Announcement {
 
     return Announcement(
       id: json['_id']?['\$oid'] ?? json['\$oid'] ?? json['_id']?.toString() ?? '',
-      date: json['date'] ?? '',
+      date: json['date'] ?? json['start_date'] ?? json['end_date'] ?? '',
       title: json['title'] ?? '',
       description: json['description'],
       createdBy: json['createdBy'] ?? '',
