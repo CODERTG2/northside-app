@@ -16,10 +16,10 @@ load_dotenv()
 connect(host=os.environ.get('MONGODB_URL'))
 print("Database connected")
 
-schedule.every().day.at("06:00").do(update_athletics_schedule)
-schedule.every().day.at("06:30").do(update_athletics_roster)
-schedule.every().day.at("07:00").do(update_general_events)
-schedule.every().day.at("07:30").do(update_submissions)
+schedule.every().hour.do(update_athletics_schedule)
+schedule.every().hour.do(update_athletics_roster)
+schedule.every().hour.do(update_general_events)
+schedule.every().hour.do(update_submissions)
 
 counter = 0
 
