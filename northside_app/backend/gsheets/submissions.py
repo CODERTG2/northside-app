@@ -63,7 +63,8 @@ def update_submissions():
             elif row[3] == "Announcement":
 
                 existing_announcement = Announcement.objects(
-                    date=row[0].split()[0],
+                    start_date=row[columns.index("Start day of appearance")],
+                    end_date=row[columns.index("End day of appearance")],
                     title=row[columns.index("Announcement Title")],
                     description=row[columns.index("Text")],
                     createdBy=row[columns.index("Announcement by who?")]
@@ -71,7 +72,8 @@ def update_submissions():
 
                 if not existing_announcement:
                     announcement = Announcement(
-                        date=row[0].split()[0],
+                        start_date=row[columns.index("Start day of appearance")],
+                        end_date=row[columns.index("End day of appearance")],
                         title=row[columns.index("Announcement Title")],
                         description=row[columns.index("Text")],
                         createdBy=row[columns.index("Announcement by who?")]

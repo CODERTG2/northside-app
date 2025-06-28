@@ -2,7 +2,8 @@ from mongoengine import Document, StringField, DateTimeField, BooleanField
 from datetime import datetime
 
 class Announcement(Document):
-    date = StringField(required=True)
+    start_date = StringField(required=True)
+    end_date = StringField(required=True)
     title = StringField(required=True)
     description = StringField(required=False)
     createdBy = StringField(required=True)
@@ -11,6 +12,6 @@ class Announcement(Document):
     meta = {
         'collection': 'announcements',
         'indexes': [
-            {'fields': ['date', 'title', 'description', 'createdBy', 'createdAt'], 'unique': True}
+            {'fields': ['start_date', 'end_date', 'title', 'description', 'createdBy', 'createdAt'], 'unique': True}
         ]
     }

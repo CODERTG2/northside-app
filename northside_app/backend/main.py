@@ -90,7 +90,7 @@ def announcements():
 
         query = {}
         if date:
-            query['date'] = date
+            query['start_date'] = date
         
         announcements = Announcement.objects(**query).to_json()
         return announcements
