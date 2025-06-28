@@ -10,7 +10,7 @@ from mongoengine import connect
 from dotenv import load_dotenv
 
 def update_athletics_roster():
-    
+
     print("Updating athletics roster...")
     try:
         load_dotenv()
@@ -39,9 +39,8 @@ def update_athletics_roster():
         for gender in genders:
             for season in seasons:
                 for level in levels:
-                    # for future me: uncomment the next line to scrape the current season
-                    # url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/roster/"
-                    url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/24-25/roster/"
+                    url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/roster/"
+                    # url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/24-25/roster/"
                     response = requests.get(url)
                     html_content = response.text
                     soup = BeautifulSoup(html_content, 'html.parser')
