@@ -1,3 +1,5 @@
+// lib/controllers/bulletin_controller.dart
+
 import 'package:get/get.dart';
 import '../models/bulletin_post.dart';
 import '../models/announcement.dart';
@@ -5,12 +7,16 @@ import '../models/general_event.dart';
 import '../api.dart';
 
 class BulletinController extends GetxController {
-  // Observable lists for real data
-  final RxList<BulletinPost> allPosts = <BulletinPost>[].obs;
-  final RxList<Announcement> announcements = <Announcement>[].obs;
-  final RxList<GeneralEvent> generalEvents = <GeneralEvent>[].obs;
-  final RxBool isLoading = false.obs;
-  final RxString error = ''.obs;
+  final ApiService _apiService = ApiService();
+
+  // Observable lists for reactive UI
+  final RxList<BulletinPost> _allPosts = <BulletinPost>[].obs;
+  final RxBool _isLoading = false.obs;
+
+  // Getters
+  List<BulletinPost> get allPosts => _allPosts;
+  RxList<BulletinPost> get allPostsRx => _allPosts;
+  bool get isLoading => _isLoading.value;
 
   @override
   void onInit() {
@@ -18,114 +24,108 @@ class BulletinController extends GetxController {
     loadData();
   }
 
-  // Load all data from the API
+  // Load and combine data from all sources
   Future<void> loadData() async {
-    isLoading.value = true;
-    error.value = '';
-    
     try {
-      // Fetch data concurrently
-      await Future.wait([
-        loadAnnouncements(),
-        loadGeneralEvents(),
-      ]);
+      _isLoading.value = true;
       
+      // Load data from both sources
+      final announcements = await _loadAnnouncements();
+      final generalEvents = await _loadGeneralEvents();
+
       // Combine into bulletin posts
-      _updateAllPosts();
+      final bulletinPosts = _createBulletinPosts(announcements, generalEvents);
+      
+      // Update the observable list
+      _allPosts.assignAll(bulletinPosts);
     } catch (e) {
-      error.value = 'Failed to load data: $e';
       print('Error loading bulletin data: $e');
-      // Use fallback data if API fails
-      _loadFallbackData();
     } finally {
-      isLoading.value = false;
+      _isLoading.value = false;
     }
   }
 
-  // Load announcements from API
-  Future<void> loadAnnouncements() async {
+  // Load announcements
+  Future<List<Announcement>> _loadAnnouncements() async {
     try {
-      final fetchedAnnouncements = await ApiService.fetchAnnouncements();
-      announcements.assignAll(fetchedAnnouncements);
+      final fetchedAnnouncements = await _apiService.getAnnouncements();
+      return fetchedAnnouncements;
     } catch (e) {
       print('Error loading announcements: $e');
+      return [];
     }
   }
 
-  // Load general events from API
-  Future<void> loadGeneralEvents() async {
+  // Load general events
+  Future<List<GeneralEvent>> _loadGeneralEvents() async {
     try {
-      final fetchedEvents = await ApiService.fetchGeneralEvents();
-      generalEvents.assignAll(fetchedEvents);
+      final fetchedEvents = await _apiService.getGeneralEvents();
+      return fetchedEvents;
     } catch (e) {
       print('Error loading general events: $e');
+      return [];
     }
   }
 
-  // Combine all data sources into bulletin posts
-  void _updateAllPosts() {
+  // Create bulletin posts from announcements and events
+  List<BulletinPost> _createBulletinPosts(List<Announcement> announcements, List<GeneralEvent> generalEvents) {
     final List<BulletinPost> combinedPosts = [];
     
     // Convert announcements to bulletin posts
     for (final announcement in announcements) {
-      combinedPosts.add(announcement.toBulletinPost());
+      final bulletinPost = announcement.toBulletinPost();
+      combinedPosts.add(bulletinPost);
     }
     
     // Convert general events to bulletin posts
     for (final event in generalEvents) {
-      combinedPosts.add(event.toBulletinPost());
+      final bulletinPost = event.toBulletinPost();
+      combinedPosts.add(bulletinPost);
     }
     
     // Sort by date (newest first)
     combinedPosts.sort((a, b) => b.date.compareTo(a.date));
     
-    allPosts.assignAll(combinedPosts);
-  }
-
-  // Fallback data when API is unavailable
-  void _loadFallbackData() {
-    allPosts.assignAll([
-      BulletinPost(
-        title: 'Homecoming Tickets on Sale!',
-        subtitle: 'Get them before they sell out!',
-        date: DateTime.now().add(const Duration(days: 2)),
-        imagePath: 'assets/images/homecoming_bg.png',
-        isPinned: true,
-      ),
-      BulletinPost(
-        title: 'Spirit Week Next Week',
-        subtitle: 'Show your school spirit!',
-        date: DateTime.now().add(const Duration(days: 1)),
-        imagePath: 'assets/images/homecoming_bg.png',
-        isPinned: true,
-      ),
-      BulletinPost(
-        title: 'Parent-Teacher Conferences',
-        subtitle: 'Sign-ups are open',
-        date: DateTime.now(),
-        imagePath: 'assets/images/homecoming_bg.png',
-      ),
-      BulletinPost(
-        title: 'Soccer Team Wins!',
-        subtitle: 'A thrilling victory',
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        imagePath: 'assets/images/homecoming_bg.png',
-      ),
-    ]);
+    return combinedPosts;
   }
 
   // Refresh data
-  Future<void> refreshData() async {
+  Future<void> refresh() async {
     await loadData();
   }
 
-  // Utility: get only today and future events, sorted by date
+  // Get upcoming events (future events only) for home screen carousel
   List<BulletinPost> get upcomingEvents {
     final now = DateTime.now();
-    return allPosts.where((post) => !post.date.isBefore(DateTime(now.year, now.month, now.day))).toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+    final todayStart = DateTime(now.year, now.month, now.day);
+    
+    // Filter events that are today or in the future
+    final upcoming = allPosts.where((post) {
+      return !post.date.isBefore(todayStart);
+    }).toList();
+    
+    // Sort by date (earliest first for carousel)
+    upcoming.sort((a, b) => a.date.compareTo(b.date));
+    
+    return upcoming.take(10).toList(); // Limit to 10 for performance
   }
 
-  // Utility: get pinned posts
+  @override
+  void onReady() {
+    super.onReady();
+    loadData();
+  }
+
+  // Get pinned posts
   List<BulletinPost> get pinnedPosts => allPosts.where((post) => post.isPinned).toList();
+
+  // Get recent posts (last 3 days)
+  List<BulletinPost> get recentPosts {
+    final now = DateTime.now();
+    final threeDaysAgo = now.subtract(const Duration(days: 3));
+    
+    final recent = allPosts.where((post) => !post.date.isBefore(threeDaysAgo)).toList();
+    
+    return recent;
+  }
 }

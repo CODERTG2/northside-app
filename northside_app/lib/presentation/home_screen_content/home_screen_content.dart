@@ -42,7 +42,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height for consistent spacing
               _buildQuickActions(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.04), // 4% of screen height
-              _buildEventsCarousel(bulletinController),
+              Obx(() => _buildEventsCarousel(bulletinController)),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height
               Obx(() => _buildPageIndicator(bulletinController)),
             ],
@@ -79,6 +79,48 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
 
   Widget _buildEventsCarousel(BulletinController bulletinController) {
     final events = bulletinController.upcomingEvents;
+    
+    if (events.isEmpty) {
+      return SizedBox(
+        height: 350,
+        child: Center(
+          child: bulletinController.isLoading 
+            ? const CircularProgressIndicator()
+            : Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.announcement_outlined, size: 48, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'No Recent Announcements',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Check back later for updates!',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+        ),
+      );
+    }
+    
     return SizedBox(
       height: 350,
       child: PageView.builder(

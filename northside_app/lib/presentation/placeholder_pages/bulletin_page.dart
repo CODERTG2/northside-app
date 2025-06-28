@@ -53,6 +53,13 @@ class _BulletinPageState extends State<BulletinPage> {
   void initState() {
     super.initState();
     _buildGroupedList();
+    
+    // Listen to changes in the bulletin controller data
+    ever(controller.allPostsRx, (_) {
+      print('📰 Bulletin: Controller data changed, rebuilding grouped list...');
+      _buildGroupedList();
+    });
+    
     // Add listener to sheet controller for immediate scroll to Today
     _sheetController.addListener(_onSheetExtentChanged);
     _scheduleMidnightUpdate();
@@ -80,6 +87,17 @@ class _BulletinPageState extends State<BulletinPage> {
   void _buildGroupedList() {
     final today = DateTime.now();
     final nonPinnedPosts = controller.allPosts.where((post) => !post.isPinned).toList();
+    
+    print('📰 Bulletin: Building grouped list...');
+    print('📰 Bulletin: Total allPosts: ${controller.allPosts.length}');
+    print('📰 Bulletin: Non-pinned posts: ${nonPinnedPosts.length}');
+    print('📰 Bulletin: Today is: $today');
+    
+    for (int i = 0; i < nonPinnedPosts.length && i < 5; i++) {
+      final post = nonPinnedPosts[i];
+      print('📰 Bulletin: Post $i: "${post.title}" on ${post.date}');
+    }
+    
     nonPinnedPosts.sort((a, b) => a.date.compareTo(b.date));
     final Map<String, List<BulletinPost>> grouped = {};
     for (var post in nonPinnedPosts) {
@@ -91,6 +109,12 @@ class _BulletinPageState extends State<BulletinPage> {
       if (grouped[dateHeader] == null) grouped[dateHeader] = [];
       grouped[dateHeader]!.add(post);
     }
+    
+    print('📰 Bulletin: Grouped sections: ${grouped.keys.toList()}');
+    for (String key in grouped.keys) {
+      print('📰 Bulletin: Section "$key": ${grouped[key]!.length} posts');
+    }
+    
     setState(() => _groupedPosts = grouped);
     // Find the index of 'Today' in the keys
     final keys = grouped.keys.toList();
