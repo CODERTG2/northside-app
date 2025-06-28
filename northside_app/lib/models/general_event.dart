@@ -86,18 +86,20 @@ class GeneralEvent {
         if (date.isEmpty) return createdAt;
         
         // Try to parse formats like "1/4/2025", "2/28/2025", etc.
-        // Note: API sometimes returns "0/1/2025" which is invalid, so we need to handle this
+        // Note: Backend scraper uses 0-based months (0=Jan, 11=Dec)
         final parts = date.split('/');
         if (parts.length == 3) {
           int month = int.tryParse(parts[0]) ?? 1;
           int day = int.tryParse(parts[1]) ?? 1;
           int year = int.tryParse(parts[2]) ?? DateTime.now().year;
           
-          // Fix invalid month "0" to "12" (December)
-          if (month == 0) month = 12;
+          // Handle 0-based month indexing from backend scraper (0 = January, 11 = December)
+          if (month >= 0 && month <= 11) {
+            month = month + 1; // Convert 0-11 to 1-12
+          }
           
           // Validate ranges
-          if (month > 12) month = 12;
+          if (month < 1 || month > 12) month = 1;
           if (day < 1) day = 1;
           if (day > 31) day = 31;
           
@@ -117,6 +119,7 @@ class GeneralEvent {
       subtitle: '$time${location != null ? ' - $location' : ''}',
       date: parseEventDate(),
       content: description ?? name,
+      imagePath: 'assets/images/grades_icon.png', // Default image for events
       isPinned: false,
     );
   }

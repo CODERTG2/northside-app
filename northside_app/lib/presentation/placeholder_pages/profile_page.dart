@@ -28,7 +28,7 @@ class ProfileOption {
 const Article appInfoArticle = Article(
   title: 'App Info',
   subtitle: 'Version, credits, and more',
-  content: 'Northside App\nVersion 1.0.0\n\nDeveloped by the Northside Team.\n\nSpecial thanks to all contributors and the school community.',
+  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors and the school community."
 );
 
 class ProfilePage extends StatelessWidget {
@@ -51,11 +51,6 @@ class ProfilePage extends StatelessWidget {
       subtitle: 'Login with your athletic account',
       actionType: ProfileActionType.link,
       url: 'https://ncp-ar.rschooltoday.com/oar',
-    ),
-    ProfileOption(
-      title: 'Flex Account',
-      subtitle: 'Link your flex account to pick flexes',
-      actionType: ProfileActionType.login,
     ),
   ];
 

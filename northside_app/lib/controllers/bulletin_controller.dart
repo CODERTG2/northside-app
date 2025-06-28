@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../models/bulletin_post.dart';
 import '../models/announcement.dart';
 import '../models/general_event.dart';
+import '../models/athletics_schedule.dart';
 import '../api.dart';
 
 class BulletinController extends GetxController {
@@ -29,12 +30,13 @@ class BulletinController extends GetxController {
     try {
       _isLoading.value = true;
       
-      // Load data from both sources
+      // Load data from all sources
       final announcements = await _loadAnnouncements();
       final generalEvents = await _loadGeneralEvents();
+      final athleticsEvents = await _loadAthleticsEvents();
 
       // Combine into bulletin posts
-      final bulletinPosts = _createBulletinPosts(announcements, generalEvents);
+      final bulletinPosts = _createBulletinPosts(announcements, generalEvents, athleticsEvents);
       
       // Update the observable list
       _allPosts.assignAll(bulletinPosts);
@@ -48,7 +50,7 @@ class BulletinController extends GetxController {
   // Load announcements
   Future<List<Announcement>> _loadAnnouncements() async {
     try {
-      final fetchedAnnouncements = await _apiService.getAnnouncements();
+      final fetchedAnnouncements = await ApiService.getAnnouncements();
       return fetchedAnnouncements;
     } catch (e) {
       print('Error loading announcements: $e');
@@ -59,7 +61,7 @@ class BulletinController extends GetxController {
   // Load general events
   Future<List<GeneralEvent>> _loadGeneralEvents() async {
     try {
-      final fetchedEvents = await _apiService.getGeneralEvents();
+      final fetchedEvents = await ApiService.getGeneralEvents();
       return fetchedEvents;
     } catch (e) {
       print('Error loading general events: $e');
@@ -67,8 +69,19 @@ class BulletinController extends GetxController {
     }
   }
 
-  // Create bulletin posts from announcements and events
-  List<BulletinPost> _createBulletinPosts(List<Announcement> announcements, List<GeneralEvent> generalEvents) {
+  // Load athletics events
+  Future<List<AthleticsSchedule>> _loadAthleticsEvents() async {
+    try {
+      final fetchedEvents = await ApiService.getAthleticsSchedule();
+      return fetchedEvents;
+    } catch (e) {
+      print('Error loading athletics events: $e');
+      return [];
+    }
+  }
+
+  // Create bulletin posts from announcements, events, and athletics
+  List<BulletinPost> _createBulletinPosts(List<Announcement> announcements, List<GeneralEvent> generalEvents, List<AthleticsSchedule> athleticsEvents) {
     final List<BulletinPost> combinedPosts = [];
     
     // Convert announcements to bulletin posts
@@ -79,6 +92,12 @@ class BulletinController extends GetxController {
     
     // Convert general events to bulletin posts
     for (final event in generalEvents) {
+      final bulletinPost = event.toBulletinPost();
+      combinedPosts.add(bulletinPost);
+    }
+    
+    // Convert athletics events to bulletin posts
+    for (final event in athleticsEvents) {
       final bulletinPost = event.toBulletinPost();
       combinedPosts.add(bulletinPost);
     }

@@ -16,6 +16,15 @@ class EventsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('EventsController initialized');
+    loadData();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    print('EventsController ready');
+    // Refresh data when controller is ready
     loadData();
   }
 
@@ -40,8 +49,15 @@ class EventsController extends GetxController {
   // Load general events from API
   Future<void> loadGeneralEvents() async {
     try {
-      final fetchedEvents = await ApiService.fetchGeneralEvents();
+      final fetchedEvents = await ApiService.getGeneralEvents();
       generalEvents.assignAll(fetchedEvents);
+      print('Loaded ${generalEvents.length} general events');
+      // Debug: print first few items
+      if (generalEvents.isNotEmpty) {
+        for (int i = 0; i < generalEvents.length && i < 3; i++) {
+          print('General Event $i: ${generalEvents[i].date} - ${generalEvents[i].name}');
+        }
+      }
     } catch (e) {
       print('Error loading general events: $e');
     }
@@ -50,8 +66,15 @@ class EventsController extends GetxController {
   // Load athletics events from API
   Future<void> loadAthleticsEvents() async {
     try {
-      final fetchedEvents = await ApiService.fetchAthleticsSchedule();
+      final fetchedEvents = await ApiService.getAthleticsSchedule();
       athleticsEvents.assignAll(fetchedEvents);
+      print('Loaded ${athleticsEvents.length} athletics events');
+      // Debug: print first few items
+      if (athleticsEvents.isNotEmpty) {
+        for (int i = 0; i < athleticsEvents.length && i < 3; i++) {
+          print('Athletics Event $i: ${athleticsEvents[i].date} - ${athleticsEvents[i].sport} - ${athleticsEvents[i].opponent}');
+        }
+      }
     } catch (e) {
       print('Error loading athletics events: $e');
     }
@@ -59,18 +82,90 @@ class EventsController extends GetxController {
 
   // Get events for a specific date
   List<Article> getEventsForDay(DateTime date) {
-    final dateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     final events = <Article>[];
 
     // Add general events for this date
-    final dayGeneralEvents = generalEvents.where((event) => event.date == dateString);
+    final dayGeneralEvents = generalEvents.where((event) {
+      try {
+        final eventDate = _parseEventDate(event.date);
+        return eventDate != null && _isSameDay(eventDate, date);
+      } catch (e) {
+        return false;
+      }
+    });
     events.addAll(dayGeneralEvents.map((event) => event.toArticle()));
 
     // Add athletics events for this date
-    final dayAthleticsEvents = athleticsEvents.where((event) => event.date == dateString);
+    final dayAthleticsEvents = athleticsEvents.where((event) {
+      try {
+        final eventDate = _parseEventDate(event.date);
+        return eventDate != null && _isSameDay(eventDate, date);
+      } catch (e) {
+        return false;
+      }
+    });
     events.addAll(dayAthleticsEvents.map((event) => event.toArticle()));
 
     return events;
+  }
+
+  // Helper method to parse various date formats
+  DateTime? _parseEventDate(String dateString) {
+    if (dateString.isEmpty) return null;
+    
+    try {
+      // Try parsing M/D/YYYY format first (most common in our data)
+      if (dateString.contains('/')) {
+        final parts = dateString.split('/');
+        if (parts.length == 3) {
+          int month = int.tryParse(parts[0]) ?? 1;
+          final day = int.tryParse(parts[1]) ?? 1;
+          final year = int.tryParse(parts[2]) ?? DateTime.now().year;
+          
+          // Handle 0-based month indexing from backend scraper (0 = January, 11 = December)
+          if (month >= 0 && month <= 11) {
+            month = month + 1; // Convert 0-11 to 1-12
+          }
+          
+          // Validate month range
+          if (month < 1 || month > 12) month = 1;
+          
+          return DateTime(year, month, day);
+        }
+      }
+      
+      // Try parsing "Aug 26 2025" format (athletics schedule format)
+      if (dateString.contains(' ') && !dateString.contains('/') && !dateString.contains('-')) {
+        final parts = dateString.split(' ');
+        if (parts.length == 3) {
+          final monthStr = parts[0];
+          final day = int.tryParse(parts[1]) ?? 1;
+          final year = int.tryParse(parts[2]) ?? DateTime.now().year;
+          
+          // Map month abbreviations to numbers
+          final monthMap = {
+            'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+            'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+          };
+          
+          final month = monthMap[monthStr] ?? 1;
+          return DateTime(year, month, day);
+        }
+      }
+      
+      // Try parsing ISO format (YYYY-MM-DD)
+      return DateTime.parse(dateString);
+    } catch (e) {
+      print('Error parsing date: $dateString - $e');
+      return null;
+    }
+  }
+
+  // Helper method to check if two dates are on the same day
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year && 
+           date1.month == date2.month && 
+           date1.day == date2.day;
   }
 
   // Get all events as a map for calendar
@@ -80,28 +175,32 @@ class EventsController extends GetxController {
     // Add general events
     for (final event in generalEvents) {
       try {
-        final date = DateTime.parse(event.date);
-        final dayKey = DateTime(date.year, date.month, date.day);
-        if (eventsMap[dayKey] == null) {
-          eventsMap[dayKey] = [];
+        final date = _parseEventDate(event.date);
+        if (date != null) {
+          final dayKey = DateTime(date.year, date.month, date.day);
+          if (eventsMap[dayKey] == null) {
+            eventsMap[dayKey] = [];
+          }
+          eventsMap[dayKey]!.add(event.toArticle());
         }
-        eventsMap[dayKey]!.add(event.toArticle());
       } catch (e) {
-        print('Error parsing date for general event: ${event.date}');
+        print('Error parsing date for general event: ${event.date} - $e');
       }
     }
 
     // Add athletics events
     for (final event in athleticsEvents) {
       try {
-        final date = DateTime.parse(event.date);
-        final dayKey = DateTime(date.year, date.month, date.day);
-        if (eventsMap[dayKey] == null) {
-          eventsMap[dayKey] = [];
+        final date = _parseEventDate(event.date);
+        if (date != null) {
+          final dayKey = DateTime(date.year, date.month, date.day);
+          if (eventsMap[dayKey] == null) {
+            eventsMap[dayKey] = [];
+          }
+          eventsMap[dayKey]!.add(event.toArticle());
         }
-        eventsMap[dayKey]!.add(event.toArticle());
       } catch (e) {
-        print('Error parsing date for athletics event: ${event.date}');
+        print('Error parsing date for athletics event: ${event.date} - $e');
       }
     }
 
@@ -117,8 +216,8 @@ class EventsController extends GetxController {
     // Add upcoming general events
     final upcomingGeneral = generalEvents.where((event) {
       try {
-        final eventDate = DateTime.parse(event.date);
-        return eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
+        final eventDate = _parseEventDate(event.date);
+        return eventDate != null && eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
       } catch (e) {
         return false;
       }
@@ -128,8 +227,8 @@ class EventsController extends GetxController {
     // Add upcoming athletics events
     final upcomingAthletics = athleticsEvents.where((event) {
       try {
-        final eventDate = DateTime.parse(event.date);
-        return eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
+        final eventDate = _parseEventDate(event.date);
+        return eventDate != null && eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
       } catch (e) {
         return false;
       }
@@ -143,6 +242,21 @@ class EventsController extends GetxController {
     });
 
     return upcomingEvents;
+  }
+
+  // Get all events (for debugging and testing)
+  List<Article> getAllEvents() {
+    final allEvents = <Article>[];
+    
+    // Add all general events
+    allEvents.addAll(generalEvents.map((event) => event.toArticle()));
+    
+    // Add all athletics events
+    allEvents.addAll(athleticsEvents.map((event) => event.toArticle()));
+    
+    print('Total events: ${allEvents.length} (${generalEvents.length} general + ${athleticsEvents.length} athletics)');
+    
+    return allEvents;
   }
 
   // Refresh data

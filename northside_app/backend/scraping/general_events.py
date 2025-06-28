@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 def update_general_events():
     print("Updating general events...")
-    
+
     try:
         load_dotenv()
         connect(host=os.environ['MONGODB_URL'])
@@ -23,9 +23,9 @@ def update_general_events():
     existing_count = 0
     origin = "Northside Prep School Calendar"
     
-    for month_num in range(0, 12):
+    for month_num in range(1, 13):
         for year_num in range(2025, 2027):
-            url = f"https://www.northsideprep.org/apps/events/view_calendar.jsp?id=0&m={month_num}&y={year_num}"
+            url = f"https://www.northsideprep.org/apps/events/view_calendar.jsp?id=0&m={month_num-1}&y={year_num}"
             response = requests.get(url)
             html_content = response.content
 

@@ -95,6 +95,7 @@ class Announcement {
       subtitle: description ?? 'Posted by $createdBy',
       date: parseAnnouncementDate(),
       content: description ?? title,
+      imagePath: 'assets/images/flexes_icon.png', // Default image for announcements
       isPinned: false,
     );
   }

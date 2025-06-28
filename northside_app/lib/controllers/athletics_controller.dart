@@ -40,7 +40,7 @@ class AthleticsController extends GetxController {
   // Load athletes/roster from API
   Future<void> loadAthletes() async {
     try {
-      final fetchedAthletes = await ApiService.fetchRoster();
+      final fetchedAthletes = await ApiService.getRoster();
       athletes.assignAll(fetchedAthletes);
     } catch (e) {
       print('Error loading athletes: $e');
@@ -50,8 +50,15 @@ class AthleticsController extends GetxController {
   // Load athletics schedule from API
   Future<void> loadSchedule() async {
     try {
-      final fetchedSchedule = await ApiService.fetchAthleticsSchedule();
+      final fetchedSchedule = await ApiService.getAthleticsSchedule();
       schedule.assignAll(fetchedSchedule);
+      print('Loaded ${schedule.length} athletics schedule items');
+      // Debug: print first few items
+      if (schedule.isNotEmpty) {
+        for (int i = 0; i < schedule.length && i < 3; i++) {
+          print('Athletics Schedule $i: ${schedule[i].date} - ${schedule[i].sport} - ${schedule[i].opponent}');
+        }
+      }
     } catch (e) {
       print('Error loading athletics schedule: $e');
     }
@@ -93,8 +100,8 @@ class AthleticsController extends GetxController {
     
     final upcomingGames = schedule.where((event) {
       try {
-        final eventDate = DateTime.parse(event.date);
-        return eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
+        final eventDate = _parseEventDate(event.date);
+        return eventDate != null && eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
       } catch (e) {
         return false;
       }
@@ -104,19 +111,62 @@ class AthleticsController extends GetxController {
     return upcomingGames.map((game) => game.toArticle()).toList();
   }
 
+  // Helper method to parse various date formats
+  DateTime? _parseEventDate(String dateString) {
+    if (dateString.isEmpty) return null;
+    
+    try {
+      // Try parsing M/D/YYYY format first (most common in our data)
+      if (dateString.contains('/')) {
+        final parts = dateString.split('/');
+        if (parts.length == 3) {
+          final month = int.tryParse(parts[0]) ?? 1;
+          final day = int.tryParse(parts[1]) ?? 1;
+          final year = int.tryParse(parts[2]) ?? DateTime.now().year;
+          return DateTime(year, month, day);
+        }
+      }
+      
+      // Try parsing "Aug 26 2025" format (athletics schedule format)
+      if (dateString.contains(' ') && !dateString.contains('/') && !dateString.contains('-')) {
+        final parts = dateString.split(' ');
+        if (parts.length == 3) {
+          final monthStr = parts[0];
+          final day = int.tryParse(parts[1]) ?? 1;
+          final year = int.tryParse(parts[2]) ?? DateTime.now().year;
+          
+          // Map month abbreviations to numbers
+          final monthMap = {
+            'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+            'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+          };
+          
+          final month = monthMap[monthStr] ?? 1;
+          return DateTime(year, month, day);
+        }
+      }
+      
+      // Try parsing ISO format (YYYY-MM-DD)
+      return DateTime.parse(dateString);
+    } catch (e) {
+      print('Error parsing date: $dateString - $e');
+      return null;
+    }
+  }
+
   // Get athletics news from recent games and events
   List<Article> getRecentAthleticsNews() {
     final now = DateTime.now();
     final recentGames = schedule.where((game) {
-      final gameDate = DateTime.tryParse(game.date);
+      final gameDate = _parseEventDate(game.date);
       if (gameDate == null) return false;
       // Include games from the last 30 days and upcoming games
       return gameDate.isAfter(now.subtract(const Duration(days: 30)));
     }).toList();
 
     recentGames.sort((a, b) {
-      final dateA = DateTime.tryParse(a.date);
-      final dateB = DateTime.tryParse(b.date);
+      final dateA = _parseEventDate(a.date);
+      final dateB = _parseEventDate(b.date);
       if (dateA == null && dateB == null) return 0;
       if (dateA == null) return 1;
       if (dateB == null) return -1;

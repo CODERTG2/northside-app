@@ -6,10 +6,8 @@ import 'home_screen_content_controller.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
 import '../../models/article.dart';
-import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/shared_header.dart';
-import '../../core/theme/app_theme.dart';
 import '../../controllers/bulletin_controller.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
@@ -171,7 +169,33 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
           children: [
             Expanded(
               flex: 3,
-              child: Image.asset(article.imagePath!, fit: BoxFit.cover),
+              child: article.imagePath != null 
+                ? Image.asset(
+                    article.imagePath!, 
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade300,
+                        child: const Center(
+                          child: Icon(
+                            Icons.event,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    color: Colors.grey.shade300,
+                    child: const Center(
+                      child: Icon(
+                        Icons.event,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
             ),
             Expanded(
               flex: 2,
@@ -227,8 +251,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(events.length, (index) {
-        // Add null check for currentPageIndex with fallback to 0
-        final currentIndex = controller.currentPageIndex.value ?? 0;
+        final currentIndex = controller.currentPageIndex.value;
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
           width: 8.0,
