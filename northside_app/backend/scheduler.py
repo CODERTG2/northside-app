@@ -21,9 +21,10 @@ counter = 0
 
 print("Scheduler started!")
 while True:
+    print("{counter}")
     schedule.run_pending()
     counter += 1
-    if counter % 300 == 0:
+    if counter % 60 == 0:
         current_time = time.strftime("%Y-%m-%d %H:%M:%S")
         print(f"Heartbeat: {current_time} - Scheduler running for approximately {counter} seconds")
     time.sleep(1)
