@@ -16,7 +16,13 @@ schedule.every().day.at("06:00").do(update_athletics_schedule)
 schedule.every().day.at("06:30").do(update_athletics_roster)
 schedule.every().day.at("07:00").do(update_general_events)
 schedule.every().day.at("07:30").do(update_submissions)
-    
+
+counter = 0
+
 while True:
     schedule.run_pending()
+    counter += 1
+    if counter % 300 == 0:
+        current_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Heartbeat: {current_time} - Scheduler running for approximately {counter} seconds")
     time.sleep(1)
