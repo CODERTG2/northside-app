@@ -7,21 +7,10 @@ import 'dart:collection';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/shared_header.dart';
-import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
+import '../../core/utils/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/text_helper.dart';
-
-final kEvents = LinkedHashMap<DateTime, List<Article>>(
-  equals: isSameDay,
-  hashCode: (key) => key.day * 1000000 + key.month * 10000 + key.year,
-)..addAll({
-  DateTime.now().subtract(const Duration(days: 2)): [const Article(title: 'Team Meeting', subtitle: '3:00 PM - Room 101', content: 'Planning session for the upcoming season.')],
-  DateTime.now(): [
-    const Article(title: 'Parent-Teacher Conference', subtitle: 'All Day', content: 'Scheduled conferences to discuss student progress.'),
-    const Article(title: 'Soccer Game @ 7PM', subtitle: 'Varsity Field', content: 'Our team takes on the Taft Eagles. Come out and support!')
-  ],
-  DateTime.now().add(const Duration(days: 5)): [const Article(title: 'School Play Auditions', subtitle: 'Auditorium', content: 'Auditions for the spring production of "Hamlet" will be held after school.')],
-});
+import '../../controllers/events_controller.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -31,15 +20,44 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
+  final EventsController eventsController = Get.put(EventsController());
   late final ValueNotifier<List<Article>> _selectedEvents;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  LinkedHashMap<DateTime, List<Article>> _kEvents = LinkedHashMap<DateTime, List<Article>>();
 
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    _loadEventsData();
+  }
+
+  void _loadEventsData() {
+    // Listen to events controller changes
+    ever(eventsController.generalEvents, (_) => _updateEventsMap());
+    ever(eventsController.athleticsEvents, (_) => _updateEventsMap());
+    
+    // Initial load
+    _updateEventsMap();
+  }
+
+  void _updateEventsMap() {
+    _kEvents = LinkedHashMap<DateTime, List<Article>>(
+      equals: isSameDay,
+      hashCode: (key) => key.day * 1000000 + key.month * 10000 + key.year,
+    );
+
+    final eventsMap = eventsController.getAllEventsMap();
+    _kEvents.addAll(eventsMap);
+
+    // Update selected events for current day
+    _selectedEvents.value = _getEventsForDay(_selectedDay!);
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -49,7 +67,7 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   List<Article> _getEventsForDay(DateTime day) {
-    return kEvents[day] ?? [];
+    return _kEvents[day] ?? [];
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -68,18 +86,24 @@ class _EventsPageState extends State<EventsPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      body: ListView(
-        padding: EdgeInsets.only(bottom: screenHeight * 0.12),
-        children: [
-          const SharedHeader(title: 'Events'),
-          SizedBox(height: screenHeight * 0.02),
-          _buildFilterButton(context),
-          SizedBox(height: screenHeight * 0.02),
-          _buildCalendar(context),
-          SizedBox(height: screenHeight * 0.03),
-          _buildEventList(context),
-        ],
-      ),
+      body: Obx(() {
+        if (eventsController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        return ListView(
+          padding: EdgeInsets.only(bottom: screenHeight * 0.12),
+          children: [
+            const SharedHeader(title: 'Events'),
+            SizedBox(height: screenHeight * 0.02),
+            _buildFilterButton(context),
+            SizedBox(height: screenHeight * 0.02),
+            _buildCalendar(context),
+            SizedBox(height: screenHeight * 0.03),
+            _buildEventList(context),
+          ],
+        );
+      }),
     );
   }
 

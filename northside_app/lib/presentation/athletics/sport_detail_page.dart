@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
+import '../../core/utils/app_colors.dart';
+import '../../controllers/athletics_controller.dart';
+import '../../models/athlete.dart';
+import '../../models/athletics_schedule.dart';
 
 class GameSchedule {
   const GameSchedule({required this.date, required this.time, required this.event, required this.opponent, required this.location, required this.score, required this.result});
@@ -32,20 +35,72 @@ class SportDetailPage extends StatefulWidget {
 }
 
 class _SportDetailPageState extends State<SportDetailPage> {
+  final AthleticsController athleticsController = Get.put(AthleticsController());
   String _selectedLevel = 'All';
-  final List<String> _levels = ['All', 'JV', 'Varsity'];
+  List<String> _levels = ['All'];
+  List<GameSchedule> _schedules = [];
+  List<Player> _roster = [];
 
-  final List<GameSchedule> _schedules = const [
-    GameSchedule(date: '8/24', time: '11:30AM', event: 'Red North', opponent: 'Chicago (Lane)', location: 'CPS Hansen Field', score: '0-5', result: 'L'),
-    GameSchedule(date: '8/24', time: '11:30AM', event: 'Red North', opponent: 'Chicago (Taft)', location: 'CPS Hansen Field', score: '3-1', result: 'W'),
-    GameSchedule(date: '8/24', time: '11:30AM', event: 'Red North', opponent: 'Chicago (Whitney Young)', location: 'Northeastern Illinois', score: '0-5', result: 'L'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadSportData();
+  }
 
-  final List<Player> _roster = const [
-    Player(name: 'John Appleseed', number: '10', position: 'Forward', grade: '12'),
-    Player(name: 'Mac Pineapple', number: '7', position: 'Midfield', grade: '11'),
-    Player(name: 'Peter Parker', number: '1', position: 'Goalkeeper', grade: '12'),
-  ];
+  void _loadSportData() {
+    // Extract sport name (remove gender prefix if present)
+    String sportName = widget.sportName;
+    String? gender;
+    
+    if (sportName.startsWith("Men's ")) {
+      sportName = sportName.substring(6);
+      gender = 'boys';
+    } else if (sportName.startsWith("Women's ")) {
+      sportName = sportName.substring(8);
+      gender = 'girls';
+    }
+
+    // Get available levels for this sport
+    final allAthletes = athleticsController.getAthletesBySport(sport: sportName, gender: gender);
+    final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
+    levels.sort();
+    _levels = ['All', ...levels];
+
+    // Get schedule for this sport
+    final schedule = athleticsController.getScheduleBySport(sportName);
+    _schedules = schedule.map((event) => event.toGameSchedule()).toList();
+
+    // Load initial roster
+    _updateRoster();
+    
+    setState(() {});
+  }
+
+  void _updateRoster() {
+    String sportName = widget.sportName;
+    String? gender;
+    String? level;
+    
+    if (sportName.startsWith("Men's ")) {
+      sportName = sportName.substring(6);
+      gender = 'boys';
+    } else if (sportName.startsWith("Women's ")) {
+      sportName = sportName.substring(8);
+      gender = 'girls';
+    }
+
+    if (_selectedLevel != 'All') {
+      level = _selectedLevel.toLowerCase();
+    }
+
+    final athletes = athleticsController.getAthletesBySport(
+      sport: sportName,
+      gender: gender,
+      level: level,
+    );
+
+    _roster = athletes.map((athlete) => athlete.toPlayer()).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,19 +120,41 @@ class _SportDetailPageState extends State<SportDetailPage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
         ),
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-            child: _buildTeamLevelTabs(context),
-          ),
-          SizedBox(height: screenHeight * 0.03),
-          _buildTableContainer(context, 'Schedules and Scores', _buildScheduleTable(context)),
-          SizedBox(height: screenHeight * 0.03),
-          _buildTableContainer(context, 'Rosters', _buildRosterTable(context)),
-          SizedBox(height: screenHeight * 0.05),
-        ],
-      ),
+      body: Obx(() {
+        if (athleticsController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (athleticsController.error.value.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: ${athleticsController.error.value}'),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => athleticsController.refreshData(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+              child: _buildTeamLevelTabs(context),
+            ),
+            SizedBox(height: screenHeight * 0.03),
+            _buildTableContainer(context, 'Schedules and Scores', _buildScheduleTable(context)),
+            SizedBox(height: screenHeight * 0.03),
+            _buildTableContainer(context, 'Rosters', _buildRosterTable(context)),
+            SizedBox(height: screenHeight * 0.05),
+          ],
+        );
+      }),
     );
   }
 
@@ -94,7 +171,12 @@ class _SportDetailPageState extends State<SportDetailPage> {
           final isSelected = _selectedLevel == level;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _selectedLevel = level),
+              onTap: () {
+                setState(() {
+                  _selectedLevel = level;
+                  _updateRoster(); // Update roster when level changes
+                });
+              },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
                 decoration: BoxDecoration(

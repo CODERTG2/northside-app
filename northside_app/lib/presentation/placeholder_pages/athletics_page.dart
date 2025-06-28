@@ -10,12 +10,13 @@ import '../athletics/sport_detail_page.dart';
 import '../../widgets/shared_header.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_colors.dart';
-import '../../core/utils/text_helper.dart'; // Add this import
+import '../../core/utils/text_helper.dart';
+import '../../controllers/athletics_controller.dart';
 
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});
 
-  final List<Article> _athleticsArticles = const [
+  static const List<Article> _fallbackArticles = [
     Article(
       title: 'Girls Softball make it to state',
       subtitle: 'For the first time in 2 years...',
@@ -32,27 +33,34 @@ class AthleticsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AthleticsController athleticsController = Get.put(AthleticsController());
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.only(bottom: screenHeight * 0.12),
-          children: [
-            const SharedHeader(
-              title: 'Athletics',
-            ),
-            SizedBox(height: screenHeight * 0.02),
-            _buildNewsCarousel(context),
-            SizedBox(height: screenHeight * 0.04),
-            _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-            SizedBox(height: screenHeight * 0.02),
-            _buildSportsGrid(context),
-            SizedBox(height: screenHeight * 0.03),
-            _buildRegisterButton(context),
-          ],
-        ),
+        child: Obx(() {
+          if (athleticsController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          return ListView(
+            padding: EdgeInsets.only(bottom: screenHeight * 0.12),
+            children: [
+              const SharedHeader(
+                title: 'Athletics',
+              ),
+              SizedBox(height: screenHeight * 0.02),
+              _buildNewsCarousel(context, athleticsController),
+              SizedBox(height: screenHeight * 0.04),
+              _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
+              SizedBox(height: screenHeight * 0.02),
+              _buildSportsGrid(context),
+              SizedBox(height: screenHeight * 0.03),
+              _buildRegisterButton(context),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -98,11 +106,15 @@ class AthleticsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNewsCarousel(BuildContext context) {
+  Widget _buildNewsCarousel(BuildContext context, AthleticsController athleticsController) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar devices
     // Adjust card height for smaller screens
     final double cardHeight = isNarrowScreen ? screenWidth * 0.65 : screenWidth * 0.7;
+    
+    // Get real athletics news from the controller
+    final athleticsNews = athleticsController.getAthleticsNews();
+    final articlesToShow = athleticsNews.isNotEmpty ? athleticsNews : _fallbackArticles;
     
     return SizedBox(
       height: cardHeight,
@@ -111,9 +123,9 @@ class AthleticsPage extends StatelessWidget {
           viewportFraction: isNarrowScreen ? 0.8 : 0.85, // Reduce card width on smaller screens
         ),
         clipBehavior: Clip.none,
-        itemCount: _athleticsArticles.length,
+        itemCount: articlesToShow.length,
         itemBuilder: (context, index) {
-          final article = _athleticsArticles[index];
+          final article = articlesToShow[index];
           return GestureDetector(
             onTap: () {
               Get.bottomSheet(
