@@ -130,7 +130,7 @@ class AthleticsPage extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Check back later for game updates!',
+                  'Check back later for updates!',
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
@@ -264,10 +264,25 @@ class _NewsCard extends StatelessWidget {
                 width: double.infinity,
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
-                  child: Image.asset(
-                    article.imagePath!,
-                    fit: BoxFit.cover,
-                  ),
+                  child: article.imagePath != null 
+                    ? Image.asset(
+                        article.imagePath!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                              child: Icon(Icons.sports_basketball, size: 48, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: Icon(Icons.sports_basketball, size: 48, color: Colors.grey),
+                        ),
+                      ),
                 ),
               ),
               Expanded(

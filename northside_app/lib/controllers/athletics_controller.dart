@@ -94,21 +94,32 @@ class AthleticsController extends GetxController {
 
   // Get recent athletics news (upcoming games as articles)
   List<Article> getAthleticsNews() {
-    // Get upcoming games in the next 7 days
+    // Get all upcoming games (future games only)
     final now = DateTime.now();
-    final weekFromNow = now.add(const Duration(days: 7));
+    final today = DateTime(now.year, now.month, now.day);
     
     final upcomingGames = schedule.where((event) {
       try {
         final eventDate = _parseEventDate(event.date);
-        return eventDate != null && eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
+        // Include games that are today or in the future
+        return eventDate != null && !eventDate.isBefore(today);
       } catch (e) {
         return false;
       }
-    }).take(5).toList();
+    }).toList();
 
-    // Return articles from real data or empty list (no fallback articles)
-    return upcomingGames.map((game) => game.toArticle()).toList();
+    // Sort by date (earliest first)
+    upcomingGames.sort((a, b) {
+      final dateA = _parseEventDate(a.date);
+      final dateB = _parseEventDate(b.date);
+      if (dateA == null && dateB == null) return 0;
+      if (dateA == null) return 1;
+      if (dateB == null) return -1;
+      return dateA.compareTo(dateB);
+    });
+
+    // Return articles from real data (take first 10 upcoming games)
+    return upcomingGames.take(10).map((game) => game.toArticle()).toList();
   }
 
   // Helper method to parse various date formats

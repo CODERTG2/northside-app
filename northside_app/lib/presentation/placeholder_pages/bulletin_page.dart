@@ -307,7 +307,7 @@ class _BulletinPageState extends State<BulletinPage> {
               controller: _sheetController,
               initialChildSize: minSheetExtent, // dynamically calculated
               minChildSize: minSheetExtent,     // dynamically calculated
-              maxChildSize: 0.9,
+              maxChildSize: 0.75,
               expand: false, // Allow sheet to retract from any scroll position
               builder: (context, scrollController) {
                 _draggableSheetController = scrollController;
@@ -385,7 +385,7 @@ class _BulletinPageState extends State<BulletinPage> {
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
-                          padding: const EdgeInsets.only(top: 0, bottom: 24),
+                          padding: EdgeInsets.only(top: 0, bottom: 150 + MediaQuery.of(context).viewPadding.bottom),
                           itemCount: dateKeys.length,
                           itemBuilder: (context, index) {
                             final date = dateKeys[index];

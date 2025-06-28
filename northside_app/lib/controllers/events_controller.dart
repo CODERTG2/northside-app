@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../models/general_event.dart';
 import '../models/athletics_schedule.dart';
 import '../models/article.dart';
+import '../models/bulletin_post.dart';
 import '../api.dart';
 
 class EventsController extends GetxController {
@@ -118,17 +119,15 @@ class EventsController extends GetxController {
       if (dateString.contains('/')) {
         final parts = dateString.split('/');
         if (parts.length == 3) {
-          int month = int.tryParse(parts[0]) ?? 1;
+          final month = int.tryParse(parts[0]) ?? 1;
           final day = int.tryParse(parts[1]) ?? 1;
           final year = int.tryParse(parts[2]) ?? DateTime.now().year;
           
-          // Handle 0-based month indexing from backend scraper (0 = January, 11 = December)
-          if (month >= 0 && month <= 11) {
-            month = month + 1; // Convert 0-11 to 1-12
+          // Validate month range (now using standard 1-12 format)
+          if (month < 1 || month > 12) {
+            print('Invalid month in date: $dateString');
+            return null;
           }
-          
-          // Validate month range
-          if (month < 1 || month > 12) month = 1;
           
           return DateTime(year, month, day);
         }
@@ -207,41 +206,120 @@ class EventsController extends GetxController {
     return eventsMap;
   }
 
-  // Get upcoming events (next 7 days)
+  // Get upcoming events (10 most recent)
   List<Article> getUpcomingEvents() {
     final now = DateTime.now();
-    final weekFromNow = now.add(const Duration(days: 7));
-    final upcomingEvents = <Article>[];
+    final upcomingEventsWithDates = <Map<String, dynamic>>[];
 
-    // Add upcoming general events
-    final upcomingGeneral = generalEvents.where((event) {
+    // Add upcoming general events with their parsed dates
+    for (final event in generalEvents) {
       try {
         final eventDate = _parseEventDate(event.date);
-        return eventDate != null && eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
+        if (eventDate != null && eventDate.isAfter(now)) {
+          upcomingEventsWithDates.add({
+            'article': event.toArticle(),
+            'date': eventDate,
+            'type': 'general'
+          });
+        }
       } catch (e) {
-        return false;
+        // Skip events with invalid dates
       }
-    });
-    upcomingEvents.addAll(upcomingGeneral.map((event) => event.toArticle()));
+    }
 
-    // Add upcoming athletics events
-    final upcomingAthletics = athleticsEvents.where((event) {
+    // Add upcoming athletics events with their parsed dates
+    for (final event in athleticsEvents) {
       try {
         final eventDate = _parseEventDate(event.date);
-        return eventDate != null && eventDate.isAfter(now) && eventDate.isBefore(weekFromNow);
+        if (eventDate != null && eventDate.isAfter(now)) {
+          upcomingEventsWithDates.add({
+            'article': event.toArticle(),
+            'date': eventDate,
+            'type': 'athletics'
+          });
+        }
       } catch (e) {
-        return false;
+        // Skip events with invalid dates
       }
-    });
-    upcomingEvents.addAll(upcomingAthletics.map((event) => event.toArticle()));
+    }
 
-    // Sort by date
-    upcomingEvents.sort((a, b) {
-      // Since Article doesn't have date, we'll use the subtitle which should contain time info
-      return a.subtitle.compareTo(b.subtitle);
-    });
+    // Sort by date (earliest first)
+    upcomingEventsWithDates.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
 
-    return upcomingEvents;
+    // Take the first 10 events and return just the articles
+    return upcomingEventsWithDates
+        .take(10)
+        .map((eventData) => eventData['article'] as Article)
+        .toList();
+  }
+
+  // Get upcoming events as pinned bulletin posts (10 most recent)
+  List<BulletinPost> getUpcomingEventsAsPinnedPosts() {
+    final now = DateTime.now();
+    final upcomingEventsWithDates = <Map<String, dynamic>>[];
+
+    // Add upcoming general events with their parsed dates
+    for (final event in generalEvents) {
+      try {
+        final eventDate = _parseEventDate(event.date);
+        if (eventDate != null && eventDate.isAfter(now)) {
+          // Create a pinned bulletin post
+          final bulletinPost = event.toBulletinPost();
+          final pinnedPost = BulletinPost(
+            title: bulletinPost.title,
+            subtitle: bulletinPost.subtitle,
+            date: bulletinPost.date,
+            content: bulletinPost.content,
+            imagePath: bulletinPost.imagePath,
+            isPinned: true, // Pin this event
+          );
+          
+          upcomingEventsWithDates.add({
+            'post': pinnedPost,
+            'date': eventDate,
+            'type': 'general'
+          });
+        }
+      } catch (e) {
+        // Skip events with invalid dates
+      }
+    }
+
+    // Add upcoming athletics events with their parsed dates
+    for (final event in athleticsEvents) {
+      try {
+        final eventDate = _parseEventDate(event.date);
+        if (eventDate != null && eventDate.isAfter(now)) {
+          // Create a pinned bulletin post
+          final bulletinPost = event.toBulletinPost();
+          final pinnedPost = BulletinPost(
+            title: bulletinPost.title,
+            subtitle: bulletinPost.subtitle,
+            date: bulletinPost.date,
+            content: bulletinPost.content,
+            imagePath: bulletinPost.imagePath,
+            isPinned: true, // Pin this event
+          );
+          
+          upcomingEventsWithDates.add({
+            'post': pinnedPost,
+            'date': eventDate,
+            'type': 'athletics'
+          });
+        }
+      } catch (e) {
+        // Skip events with invalid dates
+      }
+    }
+
+    // Sort by date (earliest first)
+    upcomingEventsWithDates.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
+
+    // Take the first 10 events and return as pinned bulletin posts
+    return upcomingEventsWithDates
+        .take(10)
+        .map((eventData) => eventData['post'] as BulletinPost)
+        .toList();
   }
 
   // Get all events (for debugging and testing)
@@ -262,5 +340,52 @@ class EventsController extends GetxController {
   // Refresh data
   Future<void> refreshData() async {
     await loadData();
+  }
+
+  // Get all events as bulletin posts with upcoming events pinned
+  List<BulletinPost> getAllEventsAsBulletinPosts({bool includeUpcomingAsPinned = true}) {
+    final bulletinPosts = <BulletinPost>[];
+
+    // Add all general events as bulletin posts
+    for (final event in generalEvents) {
+      bulletinPosts.add(event.toBulletinPost());
+    }
+
+    // Add all athletics events as bulletin posts  
+    for (final event in athleticsEvents) {
+      bulletinPosts.add(event.toBulletinPost());
+    }
+
+    if (includeUpcomingAsPinned) {
+      // Get upcoming events as pinned posts
+      final upcomingPinnedPosts = getUpcomingEventsAsPinnedPosts();
+      
+      // Remove any duplicate events that might already be in the list
+      final now = DateTime.now();
+      bulletinPosts.removeWhere((post) => 
+        post.date.isAfter(now) && 
+        upcomingPinnedPosts.any((pinnedPost) => 
+          pinnedPost.title == post.title && 
+          pinnedPost.date.day == post.date.day &&
+          pinnedPost.date.month == post.date.month &&
+          pinnedPost.date.year == post.date.year
+        )
+      );
+      
+      // Add the pinned upcoming events
+      bulletinPosts.addAll(upcomingPinnedPosts);
+    }
+
+    // Sort by date (newest first) but keep pinned items at the top
+    bulletinPosts.sort((a, b) {
+      // Pinned items first
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      
+      // Then sort by date (newest first)
+      return b.date.compareTo(a.date);
+    });
+
+    return bulletinPosts;
   }
 }

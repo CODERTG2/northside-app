@@ -8,11 +8,13 @@ import '../models/athletics_schedule.dart';
 import '../api.dart';
 
 class BulletinController extends GetxController {
-  final ApiService _apiService = ApiService();
-
   // Observable lists for reactive UI
   final RxList<BulletinPost> _allPosts = <BulletinPost>[].obs;
   final RxBool _isLoading = false.obs;
+  
+  // Store original announcements for home carousel (not included in bulletin posts)
+  List<Announcement> _announcements = [];
+  List<AthleticsSchedule> _athleticsEvents = [];
 
   // Getters
   List<BulletinPost> get allPosts => _allPosts;
@@ -35,7 +37,11 @@ class BulletinController extends GetxController {
       final generalEvents = await _loadGeneralEvents();
       final athleticsEvents = await _loadAthleticsEvents();
 
-      // Combine into bulletin posts
+      // Store original data for home carousel
+      _announcements = announcements;
+      _athleticsEvents = athleticsEvents;
+
+      // Combine into bulletin posts (excluding athletics)
       final bulletinPosts = _createBulletinPosts(announcements, generalEvents, athleticsEvents);
       
       // Update the observable list
@@ -80,13 +86,13 @@ class BulletinController extends GetxController {
     }
   }
 
-  // Create bulletin posts from announcements, events, and athletics
+  // Create bulletin posts from announcements and events (excluding athletics)
   List<BulletinPost> _createBulletinPosts(List<Announcement> announcements, List<GeneralEvent> generalEvents, List<AthleticsSchedule> athleticsEvents) {
     final List<BulletinPost> combinedPosts = [];
     
-    // Convert announcements to bulletin posts
+    // Convert announcements to bulletin posts (using start_date for bulletin display)
     for (final announcement in announcements) {
-      final bulletinPost = announcement.toBulletinPost();
+      final bulletinPost = announcement.toBulletinPost(useEndDate: false);
       combinedPosts.add(bulletinPost);
     }
     
@@ -96,11 +102,8 @@ class BulletinController extends GetxController {
       combinedPosts.add(bulletinPost);
     }
     
-    // Convert athletics events to bulletin posts
-    for (final event in athleticsEvents) {
-      final bulletinPost = event.toBulletinPost();
-      combinedPosts.add(bulletinPost);
-    }
+    // Note: Athletics events are excluded from bulletin posts
+    // They appear only on the athletics page
     
     // Sort by date (newest first)
     combinedPosts.sort((a, b) => b.date.compareTo(a.date));
@@ -113,20 +116,44 @@ class BulletinController extends GetxController {
     await loadData();
   }
 
-  // Get upcoming events (future events only) for home screen carousel
+  // Get upcoming events (future events only) for home screen carousel (includes athletics and announcements)
   List<BulletinPost> get upcomingEvents {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
     
-    // Filter events that are today or in the future
-    final upcoming = allPosts.where((post) {
-      return !post.date.isBefore(todayStart);
-    }).toList();
+    // Create combined posts including athletics for home carousel
+    final List<BulletinPost> homeCarouselPosts = [];
+    
+    // Add general events (filter out announcements from allPosts)
+    final generalEventPosts = allPosts.where((post) => 
+        post.imagePath != 'assets/images/flexes_icon.png').toList();
+    
+    for (final post in generalEventPosts) {
+      if (!post.date.isBefore(todayStart)) {
+        homeCarouselPosts.add(post);
+      }
+    }
+    
+    // Add announcements using end_date for home carousel relevance
+    for (final announcement in _announcements) {
+      final bulletinPost = announcement.toBulletinPost(useEndDate: true);
+      if (!bulletinPost.date.isBefore(todayStart)) {
+        homeCarouselPosts.add(bulletinPost);
+      }
+    }
+    
+    // Add athletics events for home carousel
+    for (final event in _athleticsEvents) {
+      final bulletinPost = event.toBulletinPost();
+      if (!bulletinPost.date.isBefore(todayStart)) {
+        homeCarouselPosts.add(bulletinPost);
+      }
+    }
     
     // Sort by date (earliest first for carousel)
-    upcoming.sort((a, b) => a.date.compareTo(b.date));
+    homeCarouselPosts.sort((a, b) => a.date.compareTo(b.date));
     
-    return upcoming.take(10).toList(); // Limit to 10 for performance
+    return homeCarouselPosts.take(10).toList(); // Limit to 10 for performance
   }
 
   @override
@@ -135,16 +162,50 @@ class BulletinController extends GetxController {
     loadData();
   }
 
-  // Get pinned posts
-  List<BulletinPost> get pinnedPosts => allPosts.where((post) => post.isPinned).toList();
-
-  // Get recent posts (last 3 days)
-  List<BulletinPost> get recentPosts {
+  // Get pinned posts (5 most recent announcements and events for today or near future)
+  List<BulletinPost> get pinnedPosts {
     final now = DateTime.now();
-    final threeDaysAgo = now.subtract(const Duration(days: 3));
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final nearFuture = now.add(const Duration(days: 7)); // Next 7 days
     
-    final recent = allPosts.where((post) => !post.date.isBefore(threeDaysAgo)).toList();
+    // Get posts that are today or in the near future
+    final recentAndUpcoming = allPosts.where((post) {
+      return !post.date.isBefore(todayStart) && post.date.isBefore(nearFuture);
+    }).toList();
     
-    return recent;
+    // Sort by date (earliest first)
+    recentAndUpcoming.sort((a, b) => a.date.compareTo(b.date));
+    
+    // Take top 5 and mark as pinned
+    return recentAndUpcoming.take(5).map((post) => BulletinPost(
+      title: post.title,
+      subtitle: post.subtitle,
+      date: post.date,
+      content: post.content,
+      imagePath: post.imagePath,
+      isPinned: true,
+    )).toList();
+  }
+
+  // Get future posts (beyond the next 7 days)
+  List<BulletinPost> get futurePosts {
+    final now = DateTime.now();
+    final nearFuture = now.add(const Duration(days: 7));
+    
+    final future = allPosts.where((post) => !post.date.isBefore(nearFuture)).toList();
+    future.sort((a, b) => a.date.compareTo(b.date)); // Earliest first
+    
+    return future;
+  }
+
+  // Get past posts (before today)
+  List<BulletinPost> get pastPosts {
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    
+    final past = allPosts.where((post) => post.date.isBefore(todayStart)).toList();
+    past.sort((a, b) => b.date.compareTo(a.date)); // Most recent first
+    
+    return past;
   }
 }
