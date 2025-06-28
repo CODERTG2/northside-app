@@ -178,46 +178,109 @@ class _BulletinPageState extends State<BulletinPage> {
 
   @override
   Widget build(BuildContext context) {
-    final pinnedPosts = controller.pinnedPosts;
-    final dateKeys = _groupedPosts.keys.toList();
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double topSpacer = 24;
-    final double betweenSpacer = 0; // Set to 0 to remove gap
+    return Obx(() {
+      final pinnedPosts = controller.pinnedPosts;
+      final dateKeys = _groupedPosts.keys.toList();
+      final double screenHeight = MediaQuery.of(context).size.height;
+      final double screenWidth = MediaQuery.of(context).size.width;
+      final double topSpacer = 24;
+      final double betweenSpacer = 0; // Set to 0 to remove gap
 
-    // After first frame, measure and set the sheet extent
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (pinnedPosts.isNotEmpty) {
-        final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
-        final sectionHeaderBox = _sectionHeaderKey.currentContext?.findRenderObject() as RenderBox?;
-        final carouselBox = _carouselKey.currentContext?.findRenderObject() as RenderBox?;
-        if (headerBox != null && sectionHeaderBox != null && carouselBox != null) {
-          final double totalHeight =
-            headerBox.size.height +
-            topSpacer +
-            sectionHeaderBox.size.height +
-            carouselBox.size.height;
-          final double minSheetExtent = (totalHeight / screenHeight).clamp(0.1, 0.9);
-          if (_calculatedSheetExtent != minSheetExtent) {
-            setState(() {
-              _calculatedSheetExtent = minSheetExtent;
-            });
-            // Force the sheet to snap to the new min extent so it never covers the carousel
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _sheetController.jumpTo(minSheetExtent);
-            });
+      // Show loading indicator
+      if (controller.isLoading) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF2F2F7),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SharedHeader(title: 'Bulletin'),
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // Show empty state if no posts
+      if (controller.allPosts.isEmpty) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF2F2F7),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SharedHeader(title: 'Bulletin'),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.article_outlined,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No posts available',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Check back later for announcements and events',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // After first frame, measure and set the sheet extent
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (pinnedPosts.isNotEmpty) {
+          final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
+          final sectionHeaderBox = _sectionHeaderKey.currentContext?.findRenderObject() as RenderBox?;
+          final carouselBox = _carouselKey.currentContext?.findRenderObject() as RenderBox?;
+          if (headerBox != null && sectionHeaderBox != null && carouselBox != null) {
+            final double totalHeight =
+              headerBox.size.height +
+              topSpacer +
+              sectionHeaderBox.size.height +
+              carouselBox.size.height;
+            final double minSheetExtent = (totalHeight / screenHeight).clamp(0.1, 0.9);
+            if (_calculatedSheetExtent != minSheetExtent) {
+              setState(() {
+                _calculatedSheetExtent = minSheetExtent;
+              });
+              // Force the sheet to snap to the new min extent so it never covers the carousel
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _sheetController.jumpTo(minSheetExtent);
+              });
+            }
           }
         }
-      }
-    });
+      });
 
-    double minSheetExtent;
-    // Always use a minimal fallback until real heights are measured
-    if (pinnedPosts.isNotEmpty && _calculatedSheetExtent != null) {
-      minSheetExtent = _calculatedSheetExtent!;
-    } else {
-      minSheetExtent = 0.1; // Minimal fallback, will be updated after layout
-    }
+      double minSheetExtent;
+      // Always use a minimal fallback until real heights are measured
+      if (pinnedPosts.isNotEmpty && _calculatedSheetExtent != null) {
+        minSheetExtent = _calculatedSheetExtent!;
+      } else {
+        minSheetExtent = 0.1; // Minimal fallback, will be updated after layout
+      }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
@@ -345,6 +408,7 @@ class _BulletinPageState extends State<BulletinPage> {
         ],
       ),
     );
+    }); // End of Obx wrapper
   }
 
   Widget _buildSectionHeader(String title, {Key? key}) {

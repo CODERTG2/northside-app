@@ -219,16 +219,23 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
   }
 
   Widget _buildPageIndicator(BulletinController bulletinController) {
+    final events = bulletinController.upcomingEvents;
+    if (events.isEmpty) {
+      return const SizedBox.shrink(); // Don't show indicator if no events
+    }
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(bulletinController.upcomingEvents.length, (index) {
+      children: List.generate(events.length, (index) {
+        // Add null check for currentPageIndex with fallback to 0
+        final currentIndex = controller.currentPageIndex.value ?? 0;
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
           width: 8.0,
           height: 8.0,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: controller.currentPageIndex.value == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
+            color: currentIndex == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
           ),
         );
       }),
