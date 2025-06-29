@@ -28,7 +28,7 @@ class ProfileOption {
 const Article appInfoArticle = Article(
   title: 'App Info',
   subtitle: 'Version, credits, and more',
-  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors, the school community, Claude, and Gemini."
+  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors, the school community, Claude, and Gemini.\n\nContact us:\n- Email: stampede.ncp@gmail.com\n- Github: https://github.com/CODERTG2/northside-app\n- Instagram: @ncpstampede",
 );
 
 class ProfilePage extends StatelessWidget {
