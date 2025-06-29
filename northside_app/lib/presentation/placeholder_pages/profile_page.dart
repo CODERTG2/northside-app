@@ -28,7 +28,7 @@ class ProfileOption {
 const Article appInfoArticle = Article(
   title: 'App Info',
   subtitle: 'Version, credits, and more',
-  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors and the school community."
+  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors, the school community, Claude, and Gemini."
 );
 
 class ProfilePage extends StatelessWidget {
@@ -126,9 +126,9 @@ class ProfilePage extends StatelessWidget {
           child: Icon(Icons.person, size: iconSize, color: Colors.black),
         ),
         SizedBox(height: screenWidth * 0.04),
-        Text('John', style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+        Text('User', style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
         SizedBox(height: screenWidth * 0.01),
-        Text('60546723', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+        Text('ID', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
         SizedBox(height: screenWidth * 0.01),
         Text('Northside College Prep', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
       ],
