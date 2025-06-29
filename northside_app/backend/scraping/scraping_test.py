@@ -10,14 +10,87 @@ import requests
 # from dotenv import load_dotenv
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 import time
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
+import platform
+import os
 
-firefox_options = Options()
+# Setup for Firefox
+firefox_options = FirefoxOptions()
 firefox_options.add_argument("--headless")
-service = Service(executable_path="/usr/local/bin/geckodriver", log_path='/dev/null')
+firefox_options.add_argument("--no-sandbox")
+firefox_options.add_argument("--disable-dev-shm-usage")
+
+# Setup for Chrome (fallback)
+chrome_options = ChromeOptions()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
+
+# Determine paths based on system
+system = platform.system().lower()
+machine = platform.machine().lower()
+
+if system == "linux" and ("arm" in machine or "aarch64" in machine):
+    # Raspberry Pi paths
+    firefox_driver_path = "/usr/local/bin/geckodriver"
+    chrome_driver_path = "/usr/local/bin/chromedriver"
+else:
+    # macOS/other paths
+    firefox_driver_path = "/usr/local/bin/geckodriver"
+    chrome_driver_path = "/usr/local/bin/chromedriver"
+
+def create_webdriver():
+    """Try to create a webdriver, with fallbacks"""
+    
+    # Try Firefox first
+    try:
+        print("Trying Firefox WebDriver...")
+        if os.path.exists(firefox_driver_path):
+            service = FirefoxService(executable_path=firefox_driver_path, log_path='/dev/null')
+            driver = webdriver.Firefox(options=firefox_options, service=service)
+            print("Firefox WebDriver created successfully")
+            return driver
+        else:
+            print(f"Firefox driver not found at {firefox_driver_path}")
+    except Exception as e:
+        print(f"Firefox WebDriver failed: {e}")
+    
+    # Try Chrome as fallback
+    try:
+        print("Trying Chrome WebDriver...")
+        if os.path.exists(chrome_driver_path):
+            service = ChromeService(executable_path=chrome_driver_path)
+            driver = webdriver.Chrome(options=chrome_options, service=service)
+            print("Chrome WebDriver created successfully")
+            return driver
+        else:
+            print(f"Chrome driver not found at {chrome_driver_path}")
+    except Exception as e:
+        print(f"Chrome WebDriver failed: {e}")
+    
+    # Try system-installed drivers
+    try:
+        print("Trying system Chrome...")
+        driver = webdriver.Chrome(options=chrome_options)
+        print("System Chrome WebDriver created successfully")
+        return driver
+    except Exception as e:
+        print(f"System Chrome failed: {e}")
+    
+    try:
+        print("Trying system Firefox...")
+        driver = webdriver.Firefox(options=firefox_options)
+        print("System Firefox WebDriver created successfully")
+        return driver
+    except Exception as e:
+        print(f"System Firefox failed: {e}")
+    
+    raise Exception("No WebDriver could be created")
 
 def update_athletics_schedule():
     """
@@ -32,19 +105,30 @@ def update_athletics_schedule():
     # except Exception as e:
     #     print(f"Error connecting to the database: {e}")
     #     return
-
-    driver = webdriver.Firefox(options=firefox_options, service=service)
-    driver.get("https://www.northsideprepathletics.com/schedule?year=2025-2026")
-
+    
+    try:
+        print("Attempting to create WebDriver...")
+        driver = create_webdriver()
+        print("WebDriver created successfully")
+        
+        print("Navigating to URL...")
+        driver.get("https://www.northsideprepathletics.com/schedule?year=2025-2026")
+        print("driver set up")
+    except Exception as e:
+        print(f"Error setting up WebDriver: {e}")
+        print("Please install a web driver (Firefox geckodriver or Chrome chromedriver)")
+        return
     last_height = driver.execute_script("return document.body.scrollHeight")
-
+    print("starting while loop")
     while True:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         time.sleep(5)
+        print("scrolling down")
 
         new_height = driver.execute_script("return document.body.scrollHeight")
         if new_height == last_height:
+            print("Reached the bottom of the page")
             break
         last_height = new_height
 
