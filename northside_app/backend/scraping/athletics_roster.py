@@ -53,6 +53,7 @@ def update_athletics_roster():
                         primary_tds = soup.find_all("td", class_="primary")
                         grades = []
                         positions = []
+                        numbers = []
                         for td in primary_tds:
                             grade_td = td.find_next_sibling("td")
                             if grade_td:
@@ -62,12 +63,19 @@ def update_athletics_roster():
                                     positions.append(position_td.get_text(strip=True))
                                 else:
                                     positions.append("N/A")
-                        
+                                number_td = td.find_previous_sibling("td")
+                                if number_td:
+                                    number = number_td.get_text(strip=True)
+                                    numbers.append(int(number) if number.isdigit() else 0)
+                                else:
+                                    numbers.append(0)
+
                         # print(grades)
                         # print(positions)
                         for player in players:
                             existing_athlete = Athlete.objects(
                                 name=player,
+                                number=numbers[players.index(player)],
                                 sport=sport,
                                 level=level,
                                 gender=gender,
@@ -77,6 +85,7 @@ def update_athletics_roster():
                             if not existing_athlete:
                                 athlete = Athlete(
                                     name=player,
+                                    number=numbers[players.index(player)],
                                     sport=sport,
                                     level=level,
                                     gender=gender,
@@ -90,4 +99,4 @@ def update_athletics_roster():
 
     print(f"Added {added_count} athletes, existing {existing_count} athletes.")
 
-# update_athletics_roster()
+update_athletics_roster()

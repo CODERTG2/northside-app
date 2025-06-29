@@ -8,9 +8,7 @@ import '../../widgets/webview_sheet.dart';
 import '../athletics/all_sports_page.dart';
 import '../athletics/sport_detail_page.dart';
 import '../../widgets/shared_header.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_colors.dart';
-import '../../core/utils/text_helper.dart';
 import '../../controllers/athletics_controller.dart';
 
 class AthleticsPage extends StatelessWidget {
@@ -247,7 +245,6 @@ class _NewsCard extends StatelessWidget {
         final double cardHeight = constraints.maxHeight;
         // More text space for narrow screens
         final double imageHeight = isNarrowScreen ? cardHeight * 0.55 : cardHeight * 0.58;
-        final double textHeight = isNarrowScreen ? cardHeight * 0.45 : cardHeight * 0.42;
         
         return Container(
           margin: EdgeInsets.only(right: screenWidth * 0.04),

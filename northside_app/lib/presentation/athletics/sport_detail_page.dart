@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
-import '../../models/athlete.dart';
-import '../../models/athletics_schedule.dart';
+import '../../api.dart';
 
 class GameSchedule {
   const GameSchedule({required this.date, required this.time, required this.event, required this.opponent, required this.location, required this.score, required this.result});
@@ -40,6 +39,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
   List<String> _levels = ['All'];
   List<GameSchedule> _schedules = [];
   List<Player> _roster = [];
+  bool _isLoadingRoster = false;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
     _loadSportData();
   }
 
-  void _loadSportData() {
+  void _loadSportData() async {
     // Extract sport name (remove gender prefix if present)
     String sportName = widget.sportName;
     String? gender;
@@ -60,15 +60,32 @@ class _SportDetailPageState extends State<SportDetailPage> {
       gender = 'girls';
     }
 
-    // Get available levels for this sport
-    final allAthletes = athleticsController.getAthletesBySport(sport: sportName, gender: gender);
-    final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
-    levels.sort();
-    _levels = ['All', ...levels];
+    // Convert sport name to lowercase for API compatibility
+    sportName = sportName.toLowerCase();
+
+    // Load all athletes for this sport/gender to get available levels
+    try {
+      final allAthletes = await ApiService.getRoster(
+        sport: sportName,
+        gender: gender,
+      );
+      final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
+      levels.sort();
+      _levels = ['All', ...levels];
+      print('Available levels for $sportName ($gender): $_levels');
+    } catch (e) {
+      print('Error loading levels: $e');
+      // Fallback to controller data
+      final allAthletes = athleticsController.getAthletesBySport(sport: sportName, gender: gender);
+      final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
+      levels.sort();
+      _levels = ['All', ...levels];
+    }
 
     // Get schedule for this sport
     final schedule = athleticsController.getScheduleBySport(sportName);
     _schedules = schedule.map((event) => event.toGameSchedule()).toList();
+    print('Found ${_schedules.length} schedule items for sport: $sportName');
 
     // Load initial roster
     _updateRoster();
@@ -76,7 +93,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
     setState(() {});
   }
 
-  void _updateRoster() {
+  void _updateRoster() async {
     String sportName = widget.sportName;
     String? gender;
     String? level;
@@ -89,17 +106,45 @@ class _SportDetailPageState extends State<SportDetailPage> {
       gender = 'girls';
     }
 
+    // Convert sport name to lowercase for API compatibility
+    sportName = sportName.toLowerCase();
+
     if (_selectedLevel != 'All') {
       level = _selectedLevel.toLowerCase();
     }
 
-    final athletes = athleticsController.getAthletesBySport(
-      sport: sportName,
-      gender: gender,
-      level: level,
-    );
+    print('Updating roster with filters: sport=$sportName, gender=$gender, level=$level, selectedLevel=$_selectedLevel');
 
-    _roster = athletes.map((athlete) => athlete.toPlayer()).toList();
+    setState(() {
+      _isLoadingRoster = true;
+    });
+
+    // Load roster dynamically from API with filters
+    try {
+      final athletes = await ApiService.getRoster(
+        sport: sportName,
+        gender: gender,
+        level: level,
+      );
+      _roster = athletes.map((athlete) => athlete.toPlayer()).toList();
+      print('Loaded ${_roster.length} athletes from API for sport: $sportName, gender: $gender, level: $level');
+    } catch (e) {
+      print('Error loading filtered roster: $e');
+      // Fallback to client-side filtering
+      final athletes = athleticsController.getAthletesBySport(
+        sport: sportName,
+        gender: gender,
+        level: level,
+      );
+      _roster = athletes.map((athlete) => athlete.toPlayer()).toList();
+      print('Loaded ${_roster.length} athletes from controller fallback for sport: $sportName, gender: $gender, level: $level');
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoadingRoster = false;
+      });
+    }
   }
 
   @override
@@ -243,8 +288,18 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
 
-  DataTable _buildRosterTable(BuildContext context) {
+  Widget _buildRosterTable(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    
+    if (_isLoadingRoster) {
+      return Container(
+        padding: EdgeInsets.all(screenWidth * 0.1),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
     return DataTable(
       columnSpacing: screenWidth * 0.08,
       columns: ['NAME', '#', 'POSITION', 'GRADE'].map((h) => DataColumn(label: _headerText(h, screenWidth))).toList(),

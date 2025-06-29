@@ -50,12 +50,18 @@ class ApiService {
       }
       
       final fullUrl = "$baseUrl$url";
+      print('Making API request to: $fullUrl');
+      
       final response = await http.get(Uri.parse(fullUrl));
+      print('API Response status: ${response.statusCode}');
+      print('API Response body length: ${response.body.length}');
       
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
+        print('Parsed ${jsonList.length} athletes from API');
         return jsonList.map((json) => Athlete.fromJson(json)).toList();
       } else {
+        print('API Error response body: ${response.body}');
         throw Exception('Failed to load roster: ${response.statusCode}');
       }
     } catch (e) {
