@@ -27,6 +27,11 @@ dependencies:
   sticky_headers: ^0.3.0+2
   sliver_tools: ^0.2.12
 
+flutter_icons:
+  image_path: "assets/images/icon.png"
+  android: true
+  ios: true  
+
 
 dev_dependencies:
   flutter_test:
