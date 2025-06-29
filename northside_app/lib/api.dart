@@ -8,41 +8,31 @@ import 'models/general_event.dart';
 class ApiService {
   static const String baseUrl = "https://b8c7-2600-1700-67d0-50a0-00-46.ngrok-free.app/api";
   
-  // Generic method to fetch data from any endpoint
-  static Future<String> fetchData(String url) async {
-    try {
-      final fullUrl = "$baseUrl$url";
-      final response = await http.get(Uri.parse(fullUrl));
-      
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        throw Exception('Failed to load data: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
-
   // Fetch announcements
-  static Future<List<Announcement>> fetchAnnouncements({String? date}) async {
+  static Future<List<Announcement>> getAnnouncements({String? date}) async {
     try {
       String url = '/announcements';
       if (date != null) {
         url += '?date=$date';
       }
       
-      final responseBody = await fetchData(url);
-      final List<dynamic> jsonList = json.decode(responseBody);
-      return jsonList.map((json) => Announcement.fromJson(json)).toList();
+      final fullUrl = "$baseUrl$url";
+      final response = await http.get(Uri.parse(fullUrl));
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => Announcement.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load announcements: ${response.statusCode}');
+      }
     } catch (e) {
       print('Error fetching announcements: $e');
-      return [];
+      throw e;
     }
   }
 
   // Fetch athletes/roster
-  static Future<List<Athlete>> fetchRoster({
+  static Future<List<Athlete>> getRoster({
     String? sport,
     String? gender,
     String? level,
@@ -59,17 +49,29 @@ class ApiService {
         url += '?${params.join('&')}';
       }
       
-      final responseBody = await fetchData(url);
-      final List<dynamic> jsonList = json.decode(responseBody);
-      return jsonList.map((json) => Athlete.fromJson(json)).toList();
+      final fullUrl = "$baseUrl$url";
+      print('Making API request to: $fullUrl');
+      
+      final response = await http.get(Uri.parse(fullUrl));
+      print('API Response status: ${response.statusCode}');
+      print('API Response body length: ${response.body.length}');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        print('Parsed ${jsonList.length} athletes from API');
+        return jsonList.map((json) => Athlete.fromJson(json)).toList();
+      } else {
+        print('API Error response body: ${response.body}');
+        throw Exception('Failed to load roster: ${response.statusCode}');
+      }
     } catch (e) {
       print('Error fetching roster: $e');
-      return [];
+      throw e;
     }
   }
 
   // Fetch athletics schedule
-  static Future<List<AthleticsSchedule>> fetchAthleticsSchedule({
+  static Future<List<AthleticsSchedule>> getAthleticsSchedule({
     String? sport,
     String? team,
     String? date,
@@ -90,17 +92,23 @@ class ApiService {
         url += '?${params.join('&')}';
       }
       
-      final responseBody = await fetchData(url);
-      final List<dynamic> jsonList = json.decode(responseBody);
-      return jsonList.map((json) => AthleticsSchedule.fromJson(json)).toList();
+      final fullUrl = "$baseUrl$url";
+      final response = await http.get(Uri.parse(fullUrl));
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => AthleticsSchedule.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load athletics schedule: ${response.statusCode}');
+      }
     } catch (e) {
       print('Error fetching athletics schedule: $e');
-      return [];
+      throw e;
     }
   }
 
   // Fetch general events
-  static Future<List<GeneralEvent>> fetchGeneralEvents({
+  static Future<List<GeneralEvent>> getGeneralEvents({
     String? date,
     String? time,
     String? name,
@@ -117,17 +125,18 @@ class ApiService {
         url += '?${params.join('&')}';
       }
       
-      final responseBody = await fetchData(url);
-      final List<dynamic> jsonList = json.decode(responseBody);
-      return jsonList.map((json) => GeneralEvent.fromJson(json)).toList();
+      final fullUrl = "$baseUrl$url";
+      final response = await http.get(Uri.parse(fullUrl));
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => GeneralEvent.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load general events: ${response.statusCode}');
+      }
     } catch (e) {
       print('Error fetching general events: $e');
-      return [];
+      throw e;
     }
   }
-}
-
-// Legacy function for backward compatibility
-Future<String> fetchdata(String url) async {
-  return ApiService.fetchData(url);
 }

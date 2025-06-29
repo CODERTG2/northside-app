@@ -36,8 +36,14 @@ class _EventsPageState extends State<EventsPage> {
 
   void _loadEventsData() {
     // Listen to events controller changes
-    ever(eventsController.generalEvents, (_) => _updateEventsMap());
-    ever(eventsController.athleticsEvents, (_) => _updateEventsMap());
+    ever(eventsController.generalEvents, (_) {
+      print('General events updated: ${eventsController.generalEvents.length}');
+      _updateEventsMap();
+    });
+    ever(eventsController.athleticsEvents, (_) {
+      print('Athletics events updated: ${eventsController.athleticsEvents.length}');
+      _updateEventsMap();
+    });
     
     // Initial load
     _updateEventsMap();
@@ -51,6 +57,9 @@ class _EventsPageState extends State<EventsPage> {
 
     final eventsMap = eventsController.getAllEventsMap();
     _kEvents.addAll(eventsMap);
+    
+    print('Events map updated with ${_kEvents.length} days containing events');
+    print('Total events across all days: ${_kEvents.values.fold(0, (sum, events) => sum + events.length)}');
 
     // Update selected events for current day
     _selectedEvents.value = _getEventsForDay(_selectedDay!);
@@ -82,7 +91,6 @@ class _EventsPageState extends State<EventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),

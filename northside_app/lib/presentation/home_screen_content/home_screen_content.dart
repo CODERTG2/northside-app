@@ -6,10 +6,8 @@ import 'home_screen_content_controller.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
 import '../../models/article.dart';
-import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/shared_header.dart';
-import '../../core/theme/app_theme.dart';
 import '../../controllers/bulletin_controller.dart';
 
 class HomeScreenContent extends GetView<HomeScreenContentController> {
@@ -42,7 +40,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height for consistent spacing
               _buildQuickActions(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.04), // 4% of screen height
-              _buildEventsCarousel(bulletinController),
+              Obx(() => _buildEventsCarousel(bulletinController)),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height
               Obx(() => _buildPageIndicator(bulletinController)),
             ],
@@ -79,6 +77,48 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
 
   Widget _buildEventsCarousel(BulletinController bulletinController) {
     final events = bulletinController.upcomingEvents;
+    
+    if (events.isEmpty) {
+      return SizedBox(
+        height: 350,
+        child: Center(
+          child: bulletinController.isLoading 
+            ? const CircularProgressIndicator()
+            : Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.announcement_outlined, size: 48, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'No Recent Announcements',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Check back later for updates!',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+        ),
+      );
+    }
+    
     return SizedBox(
       height: 350,
       child: PageView.builder(
@@ -129,7 +169,33 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
           children: [
             Expanded(
               flex: 3,
-              child: Image.asset(article.imagePath!, fit: BoxFit.cover),
+              child: article.imagePath != null 
+                ? Image.asset(
+                    article.imagePath!, 
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade300,
+                        child: const Center(
+                          child: Icon(
+                            Icons.event,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    color: Colors.grey.shade300,
+                    child: const Center(
+                      child: Icon(
+                        Icons.event,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
             ),
             Expanded(
               flex: 2,
@@ -177,16 +243,22 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
   }
 
   Widget _buildPageIndicator(BulletinController bulletinController) {
+    final events = bulletinController.upcomingEvents;
+    if (events.isEmpty) {
+      return const SizedBox.shrink(); // Don't show indicator if no events
+    }
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(bulletinController.upcomingEvents.length, (index) {
+      children: List.generate(events.length, (index) {
+        final currentIndex = controller.currentPageIndex.value;
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
           width: 8.0,
           height: 8.0,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: controller.currentPageIndex.value == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
+            color: currentIndex == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
           ),
         );
       }),

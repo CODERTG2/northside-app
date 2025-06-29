@@ -1,16 +1,25 @@
+// lib/controllers/bulletin_controller.dart
+
 import 'package:get/get.dart';
 import '../models/bulletin_post.dart';
 import '../models/announcement.dart';
 import '../models/general_event.dart';
+import '../models/athletics_schedule.dart';
 import '../api.dart';
 
 class BulletinController extends GetxController {
-  // Observable lists for real data
-  final RxList<BulletinPost> allPosts = <BulletinPost>[].obs;
-  final RxList<Announcement> announcements = <Announcement>[].obs;
-  final RxList<GeneralEvent> generalEvents = <GeneralEvent>[].obs;
-  final RxBool isLoading = false.obs;
-  final RxString error = ''.obs;
+  // Observable lists for reactive UI
+  final RxList<BulletinPost> _allPosts = <BulletinPost>[].obs;
+  final RxBool _isLoading = false.obs;
+  
+  // Store original announcements for home carousel (not included in bulletin posts)
+  List<Announcement> _announcements = [];
+  List<AthleticsSchedule> _athleticsEvents = [];
+
+  // Getters
+  List<BulletinPost> get allPosts => _allPosts;
+  RxList<BulletinPost> get allPostsRx => _allPosts;
+  bool get isLoading => _isLoading.value;
 
   @override
   void onInit() {
@@ -18,114 +27,185 @@ class BulletinController extends GetxController {
     loadData();
   }
 
-  // Load all data from the API
+  // Load and combine data from all sources
   Future<void> loadData() async {
-    isLoading.value = true;
-    error.value = '';
-    
     try {
-      // Fetch data concurrently
-      await Future.wait([
-        loadAnnouncements(),
-        loadGeneralEvents(),
-      ]);
+      _isLoading.value = true;
       
-      // Combine into bulletin posts
-      _updateAllPosts();
+      // Load data from all sources
+      final announcements = await _loadAnnouncements();
+      final generalEvents = await _loadGeneralEvents();
+      final athleticsEvents = await _loadAthleticsEvents();
+
+      // Store original data for home carousel
+      _announcements = announcements;
+      _athleticsEvents = athleticsEvents;
+
+      // Combine into bulletin posts (excluding athletics)
+      final bulletinPosts = _createBulletinPosts(announcements, generalEvents, athleticsEvents);
+      
+      // Update the observable list
+      _allPosts.assignAll(bulletinPosts);
     } catch (e) {
-      error.value = 'Failed to load data: $e';
       print('Error loading bulletin data: $e');
-      // Use fallback data if API fails
-      _loadFallbackData();
     } finally {
-      isLoading.value = false;
+      _isLoading.value = false;
     }
   }
 
-  // Load announcements from API
-  Future<void> loadAnnouncements() async {
+  // Load announcements
+  Future<List<Announcement>> _loadAnnouncements() async {
     try {
-      final fetchedAnnouncements = await ApiService.fetchAnnouncements();
-      announcements.assignAll(fetchedAnnouncements);
+      final fetchedAnnouncements = await ApiService.getAnnouncements();
+      return fetchedAnnouncements;
     } catch (e) {
       print('Error loading announcements: $e');
+      return [];
     }
   }
 
-  // Load general events from API
-  Future<void> loadGeneralEvents() async {
+  // Load general events
+  Future<List<GeneralEvent>> _loadGeneralEvents() async {
     try {
-      final fetchedEvents = await ApiService.fetchGeneralEvents();
-      generalEvents.assignAll(fetchedEvents);
+      final fetchedEvents = await ApiService.getGeneralEvents();
+      return fetchedEvents;
     } catch (e) {
       print('Error loading general events: $e');
+      return [];
     }
   }
 
-  // Combine all data sources into bulletin posts
-  void _updateAllPosts() {
+  // Load athletics events
+  Future<List<AthleticsSchedule>> _loadAthleticsEvents() async {
+    try {
+      final fetchedEvents = await ApiService.getAthleticsSchedule();
+      return fetchedEvents;
+    } catch (e) {
+      print('Error loading athletics events: $e');
+      return [];
+    }
+  }
+
+  // Create bulletin posts from announcements and events (excluding athletics)
+  List<BulletinPost> _createBulletinPosts(List<Announcement> announcements, List<GeneralEvent> generalEvents, List<AthleticsSchedule> athleticsEvents) {
     final List<BulletinPost> combinedPosts = [];
     
-    // Convert announcements to bulletin posts
+    // Convert announcements to bulletin posts (using start_date for bulletin display)
     for (final announcement in announcements) {
-      combinedPosts.add(announcement.toBulletinPost());
+      final bulletinPost = announcement.toBulletinPost(useEndDate: false);
+      combinedPosts.add(bulletinPost);
     }
     
     // Convert general events to bulletin posts
     for (final event in generalEvents) {
-      combinedPosts.add(event.toBulletinPost());
+      final bulletinPost = event.toBulletinPost();
+      combinedPosts.add(bulletinPost);
     }
+    
+    // Note: Athletics events are excluded from bulletin posts
+    // They appear only on the athletics page
     
     // Sort by date (newest first)
     combinedPosts.sort((a, b) => b.date.compareTo(a.date));
     
-    allPosts.assignAll(combinedPosts);
-  }
-
-  // Fallback data when API is unavailable
-  void _loadFallbackData() {
-    allPosts.assignAll([
-      BulletinPost(
-        title: 'Homecoming Tickets on Sale!',
-        subtitle: 'Get them before they sell out!',
-        date: DateTime.now().add(const Duration(days: 2)),
-        imagePath: 'assets/images/homecoming_bg.png',
-        isPinned: true,
-      ),
-      BulletinPost(
-        title: 'Spirit Week Next Week',
-        subtitle: 'Show your school spirit!',
-        date: DateTime.now().add(const Duration(days: 1)),
-        imagePath: 'assets/images/homecoming_bg.png',
-        isPinned: true,
-      ),
-      BulletinPost(
-        title: 'Parent-Teacher Conferences',
-        subtitle: 'Sign-ups are open',
-        date: DateTime.now(),
-        imagePath: 'assets/images/homecoming_bg.png',
-      ),
-      BulletinPost(
-        title: 'Soccer Team Wins!',
-        subtitle: 'A thrilling victory',
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        imagePath: 'assets/images/homecoming_bg.png',
-      ),
-    ]);
+    return combinedPosts;
   }
 
   // Refresh data
-  Future<void> refreshData() async {
+  Future<void> refresh() async {
     await loadData();
   }
 
-  // Utility: get only today and future events, sorted by date
+  // Get upcoming events (future events only) for home screen carousel (includes athletics and announcements)
   List<BulletinPost> get upcomingEvents {
     final now = DateTime.now();
-    return allPosts.where((post) => !post.date.isBefore(DateTime(now.year, now.month, now.day))).toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+    final todayStart = DateTime(now.year, now.month, now.day);
+    
+    // Create combined posts including athletics for home carousel
+    final List<BulletinPost> homeCarouselPosts = [];
+    
+    // Add general events (filter out announcements from allPosts)
+    final generalEventPosts = allPosts.where((post) => 
+        post.imagePath != 'assets/images/flexes_icon.png').toList();
+    
+    for (final post in generalEventPosts) {
+      if (!post.date.isBefore(todayStart)) {
+        homeCarouselPosts.add(post);
+      }
+    }
+    
+    // Add announcements using end_date for home carousel relevance
+    for (final announcement in _announcements) {
+      final bulletinPost = announcement.toBulletinPost(useEndDate: true);
+      if (!bulletinPost.date.isBefore(todayStart)) {
+        homeCarouselPosts.add(bulletinPost);
+      }
+    }
+    
+    // Add athletics events for home carousel
+    for (final event in _athleticsEvents) {
+      final bulletinPost = event.toBulletinPost();
+      if (!bulletinPost.date.isBefore(todayStart)) {
+        homeCarouselPosts.add(bulletinPost);
+      }
+    }
+    
+    // Sort by date (earliest first for carousel)
+    homeCarouselPosts.sort((a, b) => a.date.compareTo(b.date));
+    
+    return homeCarouselPosts.take(10).toList(); // Limit to 10 for performance
   }
 
-  // Utility: get pinned posts
-  List<BulletinPost> get pinnedPosts => allPosts.where((post) => post.isPinned).toList();
+  @override
+  void onReady() {
+    super.onReady();
+    loadData();
+  }
+
+  // Get pinned posts (5 most recent announcements and events for today or near future)
+  List<BulletinPost> get pinnedPosts {
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final nearFuture = now.add(const Duration(days: 7)); // Next 7 days
+    
+    // Get posts that are today or in the near future
+    final recentAndUpcoming = allPosts.where((post) {
+      return !post.date.isBefore(todayStart) && post.date.isBefore(nearFuture);
+    }).toList();
+    
+    // Sort by date (earliest first)
+    recentAndUpcoming.sort((a, b) => a.date.compareTo(b.date));
+    
+    // Take top 5 and mark as pinned
+    return recentAndUpcoming.take(5).map((post) => BulletinPost(
+      title: post.title,
+      subtitle: post.subtitle,
+      date: post.date,
+      content: post.content,
+      imagePath: post.imagePath,
+      isPinned: true,
+    )).toList();
+  }
+
+  // Get future posts (beyond the next 7 days)
+  List<BulletinPost> get futurePosts {
+    final now = DateTime.now();
+    final nearFuture = now.add(const Duration(days: 7));
+    
+    final future = allPosts.where((post) => !post.date.isBefore(nearFuture)).toList();
+    future.sort((a, b) => a.date.compareTo(b.date)); // Earliest first
+    
+    return future;
+  }
+
+  // Get past posts (before today)
+  List<BulletinPost> get pastPosts {
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    
+    final past = allPosts.where((post) => post.date.isBefore(todayStart)).toList();
+    past.sort((a, b) => b.date.compareTo(a.date)); // Most recent first
+    
+    return past;
+  }
 }

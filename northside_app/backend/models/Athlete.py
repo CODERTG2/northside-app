@@ -1,8 +1,9 @@
-from mongoengine import Document, StringField, DateTimeField, BooleanField
+from mongoengine import Document, StringField, DateTimeField, IntField
 from datetime import datetime
 
 class Athlete(Document):
     name = StringField(required=True)
+    number = IntField(required=True)
     sport = StringField(required=True)
     level = StringField(required=True, enum=['varsity', 'jv', 'freshman'])
     gender = StringField(required=True, enum=["girls", "boys"])
@@ -13,6 +14,6 @@ class Athlete(Document):
     meta = {
         'collection': 'athletes',
         'indexes': [
-            {'fields': ['name', 'sport', 'level', 'gender', 'grade', 'position'], 'unique': True}
+            {'fields': ['name', 'number', 'sport', 'level', 'gender', 'grade', 'position'], 'unique': True}
         ]
     }

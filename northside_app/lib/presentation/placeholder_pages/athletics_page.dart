@@ -8,28 +8,11 @@ import '../../widgets/webview_sheet.dart';
 import '../athletics/all_sports_page.dart';
 import '../athletics/sport_detail_page.dart';
 import '../../widgets/shared_header.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_colors.dart';
-import '../../core/utils/text_helper.dart';
 import '../../controllers/athletics_controller.dart';
 
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});
-
-  static const List<Article> _fallbackArticles = [
-    Article(
-      title: 'Girls Softball make it to state',
-      subtitle: 'For the first time in 2 years...',
-      imagePath: 'assets/images/softball_image.png',
-      content: 'An incredible season culminates in a historic state championship appearance. The team\'s hard work and dedication have paid off, inspiring the entire school community. Go Mustangs!',
-    ),
-    Article(
-      title: 'Soccer Team Wins City Finals',
-      subtitle: 'A thrilling 2-1 victory!',
-      imagePath: 'assets/images/softball_image.png',
-      content: 'In a nail-biting final match, our varsity soccer team clinched the city championship with a goal in the final minutes. Congratulations to the players and coaches!',
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +97,46 @@ class AthleticsPage extends StatelessWidget {
     
     // Get real athletics news from the controller
     final athleticsNews = athleticsController.getAthleticsNews();
-    final articlesToShow = athleticsNews.isNotEmpty ? athleticsNews : _fallbackArticles;
+    
+    // If no real data, show empty state message instead of fallback articles
+    if (athleticsNews.isEmpty) {
+      return SizedBox(
+        height: cardHeight,
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.sports_outlined, size: 48, color: Colors.grey),
+                SizedBox(height: 16),
+                Text(
+                  'No Recent Athletics News',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Check back later for updates!',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     
     return SizedBox(
       height: cardHeight,
@@ -123,9 +145,9 @@ class AthleticsPage extends StatelessWidget {
           viewportFraction: isNarrowScreen ? 0.8 : 0.85, // Reduce card width on smaller screens
         ),
         clipBehavior: Clip.none,
-        itemCount: articlesToShow.length,
+        itemCount: athleticsNews.length,
         itemBuilder: (context, index) {
-          final article = articlesToShow[index];
+          final article = athleticsNews[index];
           return GestureDetector(
             onTap: () {
               Get.bottomSheet(
@@ -223,7 +245,6 @@ class _NewsCard extends StatelessWidget {
         final double cardHeight = constraints.maxHeight;
         // More text space for narrow screens
         final double imageHeight = isNarrowScreen ? cardHeight * 0.55 : cardHeight * 0.58;
-        final double textHeight = isNarrowScreen ? cardHeight * 0.45 : cardHeight * 0.42;
         
         return Container(
           margin: EdgeInsets.only(right: screenWidth * 0.04),
@@ -240,10 +261,25 @@ class _NewsCard extends StatelessWidget {
                 width: double.infinity,
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
-                  child: Image.asset(
-                    article.imagePath!,
-                    fit: BoxFit.cover,
-                  ),
+                  child: article.imagePath != null 
+                    ? Image.asset(
+                        article.imagePath!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                              child: Icon(Icons.sports_basketball, size: 48, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: Icon(Icons.sports_basketball, size: 48, color: Colors.grey),
+                        ),
+                      ),
                 ),
               ),
               Expanded(
