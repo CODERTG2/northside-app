@@ -13,9 +13,11 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 
 firefox_options = Options()
 firefox_options.add_argument("--headless")
+service = Service(executable_path="/usr/local/bin/geckodriver", log_path='/dev/null')
 
 def update_athletics_schedule():
     """
@@ -31,7 +33,7 @@ def update_athletics_schedule():
     #     print(f"Error connecting to the database: {e}")
     #     return
 
-    driver = webdriver.Firefox(options=firefox_options)
+    driver = webdriver.Firefox(options=firefox_options, service=service)
     driver.get("https://www.northsideprepathletics.com/schedule?year=2025-2026")
 
     last_height = driver.execute_script("return document.body.scrollHeight")
