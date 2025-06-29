@@ -28,7 +28,7 @@ dependencies:
   flutter_lints:
 
 flutter_icons:
-  image_path: "assets/icon.png"
+  image_path: "assets/images/icon.png"
   android: true
   ios: true  
 
