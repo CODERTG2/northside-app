@@ -34,45 +34,47 @@ def update_athletics_schedule():
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
     
-    # print("Page loaded, starting to scroll...")
-    last_height = driver.execute_script("return document.body.scrollHeight")
+    time.sleep(5)
     
-    while True:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)
-        
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            # print("Reached bottom of page")
-            break
-        last_height = new_height
+    print("Page loaded, starting to scroll...")
     
-    last_height = driver.execute_script("return document.body.scrollHeight")
-
-    while True:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)
+    previous_event_count = 0
+    no_new_content_count = 0
+    max_scroll_attempts = 20
+    scroll_attempt = 0
+    
+    while scroll_attempt < max_scroll_attempts:
+        current_events = driver.find_elements("css selector", "h2.mb-1.font-heading.text-xl")
+        current_event_count = len(current_events)
         
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            # print("Reached bottom of page")
-            break
-        last_height = new_height
-
-    last_height = driver.execute_script("return document.body.scrollHeight")
-
-    while True:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)
+        print(f"Scroll attempt {scroll_attempt + 1}: Found {current_event_count} events")
         
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            # print("Reached bottom of page")
-            break
-        last_height = new_height
+        driver.execute_script("window.scrollBy(0, 1000);")
+        time.sleep(2)
+        
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(5)
+        
+        new_events = driver.find_elements("css selector", "h2.mb-1.font-heading.text-xl")
+        new_event_count = len(new_events)
+        
+        if new_event_count == current_event_count:
+            no_new_content_count += 1
+            print(f"No new content loaded (attempt {no_new_content_count})")
+            
+            if no_new_content_count >= 3:
+                print("No new content for 3 attempts, assuming all content loaded")
+                break
+        else:
+            no_new_content_count = 0
+            print(f"New content loaded: {new_event_count - current_event_count} new events")
+        
+        previous_event_count = new_event_count
+        scroll_attempt += 1
+    
+    print(f"Finished scrolling after {scroll_attempt} attempts. Final event count: {len(driver.find_elements('css selector', 'h2.mb-1.font-heading.text-xl'))}")
     
     time.sleep(5)
-    # print("Getting page source...")
     html_content = driver.page_source
     driver.quit()
 
@@ -153,6 +155,6 @@ def update_athletics_schedule():
             existing_count += 1
 
     print(f"Athletics schedule updated: {added_count} new events added, {existing_count} events already existed")
-    print(schedule)
+    # print(schedule)
 
 update_athletics_schedule()
