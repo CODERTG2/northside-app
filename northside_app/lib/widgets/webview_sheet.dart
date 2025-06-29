@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/utils/logger.dart';
 
 class WebViewSheet extends StatefulWidget {
@@ -33,6 +34,35 @@ class _WebViewSheetState extends State<WebViewSheet> {
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+  }
+
+  Future<void> _launchInExternalBrowser() async {
+    try {
+      final uri = Uri.parse(widget.url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        AppLogger.warning('Could not launch URL: ${widget.url}');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to open link in external browser'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      AppLogger.error('Error launching URL in external browser', e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error opening link in external browser'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -70,6 +100,36 @@ class _WebViewSheetState extends State<WebViewSheet> {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              // Header with external browser button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Web View',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _launchInExternalBrowser,
+                      icon: const Icon(Icons.open_in_new),
+                      tooltip: 'Open in external browser',
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue,
+                        elevation: 2,
+                        shadowColor: Colors.black.withOpacity(0.1),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // Use a Stack to show a loading indicator over the WebView

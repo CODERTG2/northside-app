@@ -28,7 +28,7 @@ class ProfileOption {
 const Article appInfoArticle = Article(
   title: 'App Info',
   subtitle: 'Version, credits, and more',
-  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors, the school community, Claude, and Gemini."
+  content: "Stampede: Northside App\nVersion 1.0.0\n\nDeveloped by the Sarveshwaraan Swaminathan ('26) & Tanmay Garg ('26).\n\nSpecial thanks to all contributors, the school community, Claude, and Gemini.\n\nIf you encounter any bugs or would like to suggest anything please do so [here](https://forms.gle/sQKcGmnXk2KFjkC79)."
 );
 
 class ProfilePage extends StatelessWidget {
@@ -41,10 +41,10 @@ class ProfilePage extends StatelessWidget {
       actionType: ProfileActionType.info,
     ),
     ProfileOption(
-      title: 'Your Athletic Profile',
-      subtitle: 'Apply to sports teams with your profile',
+      title: 'Events & Announcement Submissions',
+      subtitle: 'Submit events and announcements',
       actionType: ProfileActionType.link,
-      url: 'https://www.google.com',
+      url: 'https://forms.gle/Ff6RoPK9WqQhBEyu9',
     ),
     ProfileOption(
       title: 'Your Athletic Account',
