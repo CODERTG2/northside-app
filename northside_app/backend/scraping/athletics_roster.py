@@ -42,7 +42,7 @@ def update_athletics_roster():
                     url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/roster/"
                     # url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/24-25/roster/"
                     try:
-                        response = requests.get(url)
+                        response = requests.get(url, timeout=(10, 30))
                         response.raise_for_status()
                     except requests.RequestException as e:
                         print(f"Error fetching {url}: {e}")
