@@ -60,10 +60,25 @@ def use_selenium_fallback():
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--disable-gpu")
-        firefox_options.add_argument("--window-size=1920,1080")
+        firefox_options.add_argument("--window-size=1280,720")  # Smaller window
         firefox_options.add_argument("--disable-extensions")
         firefox_options.add_argument("--disable-plugins")
         firefox_options.add_argument("--disable-images")  # Save memory
+        firefox_options.add_argument("--disable-javascript")  # Try without JS first
+        firefox_options.add_argument("--disable-web-security")
+        firefox_options.add_argument("--disable-features=VizDisplayCompositor")
+        firefox_options.add_argument("--memory-pressure-off")
+        
+        # Set Firefox preferences for low memory usage
+        firefox_options.set_preference("dom.ipc.plugins.enabled.libflashplayer.so", False)
+        firefox_options.set_preference("dom.ipc.plugins.flash.subprocess.crashreporter.enabled", False)
+        firefox_options.set_preference("dom.disable_beforeunload", True)
+        firefox_options.set_preference("browser.tabs.remote.autostart", False)
+        firefox_options.set_preference("browser.sessionstore.max_tabs_undo", 0)
+        firefox_options.set_preference("browser.sessionstore.max_windows_undo", 0)
+        firefox_options.set_preference("browser.cache.disk.enable", False)
+        firefox_options.set_preference("browser.cache.memory.enable", False)
+        firefox_options.set_preference("network.http.use-cache", False)
         
         # Try different geckodriver paths
         possible_paths = [
@@ -78,19 +93,40 @@ def use_selenium_fallback():
             try:
                 print(f"Trying geckodriver at: {path}")
                 if path == "geckodriver" or os.path.exists(path):
+                    print(f"Path exists, creating service...")
+                    
                     if path == "geckodriver":
                         # Try system path
                         service = FirefoxService(log_path='/dev/null')
                     else:
                         service = FirefoxService(executable_path=path, log_path='/dev/null')
                     
-                    driver = webdriver.Firefox(options=firefox_options, service=service)
-                    print(f"Successfully created driver with {path}")
-                    break
+                    print(f"Service created, attempting to start Firefox...")
+                    
+                    # Add timeout to prevent hanging
+                    import signal
+                    
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("Firefox startup timed out")
+                    
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(30)  # 30 second timeout
+                    
+                    try:
+                        driver = webdriver.Firefox(options=firefox_options, service=service)
+                        signal.alarm(0)  # Cancel timeout
+                        print(f"Successfully created driver with {path}")
+                        break
+                    except TimeoutError:
+                        print(f"Timeout creating driver with {path}")
+                        signal.alarm(0)
+                        continue
+                    
                 else:
                     print(f"Path does not exist: {path}")
             except Exception as e:
                 print(f"Failed with {path}: {e}")
+                print(f"Error type: {type(e).__name__}")
                 continue
         
         if not driver:
