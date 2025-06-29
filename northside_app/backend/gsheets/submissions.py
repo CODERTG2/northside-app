@@ -10,7 +10,10 @@ from mongoengine import connect
 from dotenv import load_dotenv
 
 def update_submissions():
-
+    if not sheet:
+        print("Google Sheets connection not established. Please check your credentials.")
+        return
+    
     print("Updating submissions...")
     try:
         load_dotenv()

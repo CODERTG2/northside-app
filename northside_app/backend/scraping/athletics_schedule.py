@@ -24,7 +24,12 @@ def update_athletics_schedule():
         return
     
     url = "https://www.northsideprepathletics.com/schedule?year=2025-2026"
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"Error fetching the athletics schedule: {e}")
+        return
     html_content = response.text
 
     soup = BeautifulSoup(html_content, 'html.parser')

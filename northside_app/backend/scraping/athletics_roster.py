@@ -41,7 +41,13 @@ def update_athletics_roster():
                 for level in levels:
                     url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/roster/"
                     # url = f"https://www.maxpreps.com/il/chicago/northside-mustangs/{sport}/{gender}/{level}/{season}/24-25/roster/"
-                    response = requests.get(url)
+                    try:
+                        response = requests.get(url)
+                        response.raise_for_status()
+                    except requests.RequestException as e:
+                        print(f"Error fetching {url}: {e}")
+                        continue
+
                     html_content = response.text
                     soup = BeautifulSoup(html_content, 'html.parser')
 

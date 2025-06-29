@@ -26,7 +26,13 @@ def update_general_events():
     for month_num in range(1, 13):
         for year_num in range(2025, 2027):
             url = f"https://www.northsideprep.org/apps/events/view_calendar.jsp?id=0&m={month_num-1}&y={year_num}"
-            response = requests.get(url)
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+            except requests.RequestException as e:
+                print(f"Error fetching {url}: {e}")
+                continue
+
             html_content = response.content
 
             soup = BeautifulSoup(html_content, 'html.parser')
