@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:northside_app/presentation/app_shell/app_shell_binding.dart';
-import 'package:northside_app/presentation/app_shell/app_shell_screen.dart';
+import '../../presentation/app_shell/app_shell_binding.dart';
+import '../../presentation/app_shell/app_shell_screen.dart';
 
 class AppRoutes {
   // Define a name for our shell route.
