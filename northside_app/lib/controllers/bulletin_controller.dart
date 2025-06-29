@@ -166,7 +166,6 @@ class BulletinController extends GetxController {
   List<BulletinPost> get pinnedPosts {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    final nearFuture = now.add(const Duration(days: 7)); // Next 7 days
     
     final List<BulletinPost> candidatePosts = [];
     
@@ -175,7 +174,7 @@ class BulletinController extends GetxController {
         post.imagePath != 'assets/images/flexes_icon.png').toList();
     
     for (final post in generalEventPosts) {
-      if (!post.date.isBefore(todayStart) && post.date.isBefore(nearFuture)) {
+      if (!post.date.isBefore(todayStart)) {
         candidatePosts.add(post);
       }
     }
@@ -183,7 +182,7 @@ class BulletinController extends GetxController {
     // Add announcements using end_date for pinned post relevance
     for (final announcement in _announcements) {
       final bulletinPost = announcement.toBulletinPost(useEndDate: true);
-      if (!bulletinPost.date.isBefore(todayStart) && bulletinPost.date.isBefore(nearFuture)) {
+      if (!bulletinPost.date.isBefore(todayStart)) {
         candidatePosts.add(bulletinPost);
       }
     }
