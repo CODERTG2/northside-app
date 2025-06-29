@@ -1,19 +1,12 @@
 import SwiftUI
 import Flutter
 
-/// Full App Flutter Preview for Xcode Previews
-/// This renders the complete Northside app with all navigation
-struct FullAppFlutterPreview: UIViewControllerRepresentable {
-    let arguments: [String: Any]?
-    
-    init(arguments: [String: Any]? = nil) {
-        self.arguments = arguments
-    }
-    
+// Full Northside App Preview for Xcode
+struct NorthsideAppPreview: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> FlutterViewController {
-        let flutterEngine = FlutterEngine(name: "FullAppPreviewEngine")
+        let flutterEngine = FlutterEngine(name: "NorthsideAppPreviewEngine")
         
-        // Use the main_preview.dart entry point which runs the full app
+        // Use main_preview.dart which runs the full app
         let dartEntrypoint = DartProject.default().dartEntrypointForBundle(Bundle.main)
         let entrypointArgs = DartEntrypoint(dartEntrypoint: dartEntrypoint)
         entrypointArgs.dartEntrypoint = "main_preview"
@@ -22,40 +15,27 @@ struct FullAppFlutterPreview: UIViewControllerRepresentable {
         
         let controller = FlutterViewController(engine: flutterEngine, nibName: nil, bundle: nil)
         
-        // Setup preview communication channel for any preview-specific configuration
+        // Optional: Setup communication channel for preview-specific features
         let channel = FlutterMethodChannel(
             name: "preview_channel",
             binaryMessenger: flutterEngine.binaryMessenger
         )
         
-        // Send preview configuration if needed
-        if let args = arguments {
-            channel.invokeMethod("configurePreview", arguments: args)
-        }
+        channel.invokeMethod("enablePreviewMode", arguments: [
+            "mockData": true,
+            "debugMode": true
+        ])
         
         return controller
     }
     
     func updateUIViewController(_ uiViewController: FlutterViewController, context: Context) {
-        // Handle updates if needed
+        // Updates can be handled here if needed
     }
 }
 
-/// Northside App Preview with full navigation
-struct NorthsideAppPreview: View {
-    var body: some View {
-        FullAppFlutterPreview(
-            arguments: [
-                "mode": "preview",
-                "enableMockData": true,
-                "startPage": "home" // Start on home page
-            ]
-        )
-    }
-}
-
-/// Preview provider for SwiftUI previews
-struct FullAppPreview_Previews: PreviewProvider {
+// Preview provider for Xcode previews with full app and multiple devices
+struct NorthsideAppPreview_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NorthsideAppPreview()
@@ -63,12 +43,16 @@ struct FullAppPreview_Previews: PreviewProvider {
                 .previewDisplayName("Northside App - iPhone 15 Pro")
             
             NorthsideAppPreview()
-                .previewDevice("iPhone 15 Pro Max")  
+                .previewDevice("iPhone 15 Pro Max")
                 .previewDisplayName("Northside App - iPhone 15 Pro Max")
             
             NorthsideAppPreview()
                 .previewDevice("iPhone SE (3rd generation)")
                 .previewDisplayName("Northside App - iPhone SE")
+                
+            NorthsideAppPreview()
+                .previewDevice("iPad Pro (12.9-inch) (6th generation)")
+                .previewDisplayName("Northside App - iPad Pro")
         }
     }
 }

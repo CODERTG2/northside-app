@@ -43,7 +43,7 @@ class _BulletinPageState extends State<BulletinPage> {
   final GlobalKey _headerKey = GlobalKey();
   final GlobalKey _sectionHeaderKey = GlobalKey();
   final GlobalKey _carouselKey = GlobalKey();
-  double? _calculatedSheetExtent;
+  double? _calculatedMinExtent;
 
   bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
@@ -71,10 +71,21 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   void _onSheetExtentChanged() {
-    // If sheet is at min extent, immediately scroll to Today (no animation)
-    if ((_sheetController.size - _initialSheetExtent).abs() < 0.01) {
+    // If sheet is at the snap-back extent, immediately scroll to Today (no animation)
+    final snapBackExtent = _getSnapBackExtent();
+    if ((_sheetController.size - snapBackExtent).abs() < 0.01) {
       _scrollToTodaySection(animate: false);
     }
+  }
+
+  double _getSnapBackExtent() {
+    // Use calculated min extent if available, otherwise use initial extent
+    if (_calculatedMinExtent != null) {
+      // If calculated min is higher than initial, use max(calculatedMin, initial)
+      // This ensures we never cover pinned content but prefer the middle position
+      return _calculatedMinExtent! > _initialSheetExtent ? _calculatedMinExtent! : _initialSheetExtent;
+    }
+    return _initialSheetExtent;
   }
 
   void _buildGroupedList() {
@@ -92,9 +103,45 @@ class _BulletinPageState extends State<BulletinPage> {
       grouped[dateHeader]!.add(post);
     }
     setState(() => _groupedPosts = grouped);
-    // Find the index of 'Today' in the keys
+    
+    // Find the most relevant section to show (Today, or closest to today)
     final keys = grouped.keys.toList();
-    _todaySectionIndex = keys.indexOf('Today');
+    int? targetSectionIndex;
+    
+    // First try to find 'Today'
+    targetSectionIndex = keys.indexOf('Today');
+    
+    // If no 'Today', try 'Tomorrow'
+    if (targetSectionIndex == -1) {
+      targetSectionIndex = keys.indexOf('Tomorrow');
+    }
+    
+    // If no 'Tomorrow', try 'Yesterday'
+    if (targetSectionIndex == -1) {
+      targetSectionIndex = keys.indexOf('Yesterday');
+    }
+    
+    // If none of the above, find the section with date closest to today
+    if (targetSectionIndex == -1 && keys.isNotEmpty) {
+      int closestIndex = 0;
+      Duration closestDifference = Duration.zero;
+      
+      for (int i = 0; i < keys.length; i++) {
+        final sectionPosts = grouped[keys[i]]!;
+        if (sectionPosts.isNotEmpty) {
+          final sectionDate = sectionPosts.first.date;
+          final difference = sectionDate.difference(today).abs();
+          
+          if (i == 0 || difference < closestDifference) {
+            closestIndex = i;
+            closestDifference = difference;
+          }
+        }
+      }
+      targetSectionIndex = closestIndex;
+    }
+    
+    _todaySectionIndex = targetSectionIndex;
   }
 
   void _onScroll() {
@@ -110,13 +157,17 @@ class _BulletinPageState extends State<BulletinPage> {
     if (_draggableSheetController == null) return;
     double offset = 0;
     final keys = _groupedPosts.keys.toList();
-    // Calculate offset so that the 'Today' section is at the very top
+    final double screenWidth = MediaQuery.of(context).size.width;
+    
+    // Calculate offset for the target section, but add some padding so the full card is visible
     for (int i = 0; i < _todaySectionIndex!; i++) {
       offset += 56; // Date header height
-      offset += (_groupedPosts[keys[i]]!.length) * (280 + 16); // Card height + card margin
+      offset += (_groupedPosts[keys[i]]!.length) * (screenWidth * 0.7 + screenWidth * 0.04); // Card height + card margin
     }
-    // Do NOT subtract any value here; this ensures 'Today' is at the top
-    if (offset < 0) offset = 0;
+    
+    // Add some padding so the first card is fully visible, not cut off at the top
+    offset = (offset - 20).clamp(0.0, double.infinity);
+    
     if (animate) {
       _isAutoScrolling = true;
       _draggableSheetController!.animateTo(
@@ -161,7 +212,7 @@ class _BulletinPageState extends State<BulletinPage> {
     final double topSpacer = 24;
     final double betweenSpacer = 0; // Set to 0 to remove gap
 
-    // After first frame, measure and set the sheet extent
+    // Calculate dynamic minimum extent to avoid covering pinned carousel
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (pinnedPosts.isNotEmpty) {
         final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
@@ -172,28 +223,27 @@ class _BulletinPageState extends State<BulletinPage> {
             headerBox.size.height +
             topSpacer +
             sectionHeaderBox.size.height +
-            carouselBox.size.height;
-          final double minSheetExtent = (totalHeight / screenHeight).clamp(0.1, 0.9);
-          if (_calculatedSheetExtent != minSheetExtent) {
+            carouselBox.size.height +
+            16; // Add small buffer
+          final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.8);
+          if (_calculatedMinExtent != calculatedMin) {
             setState(() {
-              _calculatedSheetExtent = minSheetExtent;
-            });
-            // Force the sheet to snap to the new min extent so it never covers the carousel
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _sheetController.jumpTo(minSheetExtent);
+              _calculatedMinExtent = calculatedMin;
             });
           }
+        }
+      } else {
+        // No pinned posts, can use the preferred initial extent
+        if (_calculatedMinExtent != null) {
+          setState(() {
+            _calculatedMinExtent = null;
+          });
         }
       }
     });
 
-    double minSheetExtent;
-    // Always use a minimal fallback until real heights are measured
-    if (pinnedPosts.isNotEmpty && _calculatedSheetExtent != null) {
-      minSheetExtent = _calculatedSheetExtent!;
-    } else {
-      minSheetExtent = 0.1; // Minimal fallback, will be updated after layout
-    }
+    final double effectiveMinExtent = _getSnapBackExtent();
+    final double effectiveInitialExtent = effectiveMinExtent;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
@@ -218,9 +268,9 @@ class _BulletinPageState extends State<BulletinPage> {
             alignment: Alignment.bottomCenter,
             child: DraggableScrollableSheet(
               controller: _sheetController,
-              initialChildSize: minSheetExtent, // dynamically calculated
-              minChildSize: minSheetExtent,     // dynamically calculated
-              maxChildSize: 0.75,
+              initialChildSize: effectiveInitialExtent,
+              minChildSize: effectiveMinExtent,
+              maxChildSize: 0.9,
               expand: false, // Allow sheet to retract from any scroll position
               builder: (context, scrollController) {
                 _draggableSheetController = scrollController;
@@ -250,7 +300,6 @@ class _BulletinPageState extends State<BulletinPage> {
                   );
                 }
                 return Container(
-                  // Remove the top margin to close the gap
                   decoration: const BoxDecoration(
                     color: Color(0xFFF2F2F7),
                     borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -268,16 +317,16 @@ class _BulletinPageState extends State<BulletinPage> {
                         onVerticalDragUpdate: (details) {
                           if (dragStartExtent != null) {
                             final dragDelta = details.primaryDelta ?? 0.0;
-                            final newExtent = (_sheetController.size - dragDelta / MediaQuery.of(context).size.height).clamp(minSheetExtent, 0.9);
+                            final newExtent = (_sheetController.size - dragDelta / MediaQuery.of(context).size.height).clamp(effectiveMinExtent, 0.9);
                             _sheetController.jumpTo(newExtent);
                           }
                         },
                         onVerticalDragEnd: (details) {
                           _isDraggingHandle = false;
                           dragStartExtent = null;
-                          // Snap to min extent if swiped down fast
+                          // Snap to snap-back extent if swiped down fast
                           if (details.primaryVelocity != null && details.primaryVelocity! > 500) {
-                            _sheetController.animateTo(minSheetExtent, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+                            _sheetController.animateTo(_getSnapBackExtent(), duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
                           }
                           // No need to trigger scrollToTodaySection here; handled by controller listener
                         },
@@ -298,7 +347,7 @@ class _BulletinPageState extends State<BulletinPage> {
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
-                          padding: EdgeInsets.only(top: 0, bottom: 150 + MediaQuery.of(context).viewPadding.bottom),
+                          padding: const EdgeInsets.only(top: 0, bottom: 150),
                           itemCount: dateKeys.length,
                           itemBuilder: (context, index) {
                             final date = dateKeys[index];
@@ -339,10 +388,9 @@ class _BulletinPageState extends State<BulletinPage> {
     final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.02, screenWidth * 0.06, screenWidth * 0.02),
+      padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.03, screenWidth * 0.06, screenWidth * 0.02),
       decoration: const BoxDecoration(
         color: Color(0xFFF2F2F7),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
       ),
       child: Text(
         date,
