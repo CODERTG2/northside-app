@@ -42,7 +42,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height for consistent spacing
               _buildQuickActions(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.04), // 4% of screen height
-              Obx(() => _buildEventsCarousel(bulletinController)),
+              _buildEventsCarousel(bulletinController),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height
               Obx(() => _buildPageIndicator(bulletinController)),
             ],
@@ -79,48 +79,6 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
 
   Widget _buildEventsCarousel(BulletinController bulletinController) {
     final events = bulletinController.upcomingEvents;
-    
-    if (events.isEmpty) {
-      return SizedBox(
-        height: 350,
-        child: Center(
-          child: bulletinController.isLoading 
-            ? const CircularProgressIndicator()
-            : Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24.0),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.announcement_outlined, size: 48, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text(
-                      'No Recent Announcements',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Check back later for updates!',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-        ),
-      );
-    }
-    
     return SizedBox(
       height: 350,
       child: PageView.builder(
@@ -219,23 +177,16 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
   }
 
   Widget _buildPageIndicator(BulletinController bulletinController) {
-    final events = bulletinController.upcomingEvents;
-    if (events.isEmpty) {
-      return const SizedBox.shrink(); // Don't show indicator if no events
-    }
-    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(events.length, (index) {
-        // Add null check for currentPageIndex with fallback to 0
-        final currentIndex = controller.currentPageIndex.value ?? 0;
+      children: List.generate(bulletinController.upcomingEvents.length, (index) {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
           width: 8.0,
           height: 8.0,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: currentIndex == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
+            color: controller.currentPageIndex.value == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
           ),
         );
       }),

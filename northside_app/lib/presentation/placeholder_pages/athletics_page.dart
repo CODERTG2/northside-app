@@ -16,6 +16,21 @@ import '../../controllers/athletics_controller.dart';
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});
 
+  static const List<Article> _fallbackArticles = [
+    Article(
+      title: 'Girls Softball make it to state',
+      subtitle: 'For the first time in 2 years...',
+      imagePath: 'assets/images/softball_image.png',
+      content: 'An incredible season culminates in a historic state championship appearance. The team\'s hard work and dedication have paid off, inspiring the entire school community. Go Mustangs!',
+    ),
+    Article(
+      title: 'Soccer Team Wins City Finals',
+      subtitle: 'A thrilling 2-1 victory!',
+      imagePath: 'assets/images/softball_image.png',
+      content: 'In a nail-biting final match, our varsity soccer team clinched the city championship with a goal in the final minutes. Congratulations to the players and coaches!',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final AthleticsController athleticsController = Get.put(AthleticsController());
@@ -99,46 +114,7 @@ class AthleticsPage extends StatelessWidget {
     
     // Get real athletics news from the controller
     final athleticsNews = athleticsController.getAthleticsNews();
-    
-    // If no real data, show empty state message instead of fallback articles
-    if (athleticsNews.isEmpty) {
-      return SizedBox(
-        height: cardHeight,
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24.0),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.sports_outlined, size: 48, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'No Recent Athletics News',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Check back later for game updates!',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    final articlesToShow = athleticsNews.isNotEmpty ? athleticsNews : _fallbackArticles;
     
     return SizedBox(
       height: cardHeight,
@@ -147,9 +123,9 @@ class AthleticsPage extends StatelessWidget {
           viewportFraction: isNarrowScreen ? 0.8 : 0.85, // Reduce card width on smaller screens
         ),
         clipBehavior: Clip.none,
-        itemCount: athleticsNews.length,
+        itemCount: articlesToShow.length,
         itemBuilder: (context, index) {
-          final article = athleticsNews[index];
+          final article = articlesToShow[index];
           return GestureDetector(
             onTap: () {
               Get.bottomSheet(

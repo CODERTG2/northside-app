@@ -100,7 +100,6 @@ class AthleticsController extends GetxController {
       }
     }).take(5).toList();
 
-    // Return articles from real data or empty list (no fallback articles)
     return upcomingGames.map((game) => game.toArticle()).toList();
   }
 
