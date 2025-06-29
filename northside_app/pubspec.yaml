@@ -25,6 +25,12 @@ dependencies:
   # FIX: Replaced the non-working packages with the correct one.
   sticky_headers: ^0.3.0+2
   sliver_tools:
+  flutter_lints:
+
+flutter_icons:
+  image_path: "assets/icon.png"
+  android: true
+  ios: true  
 
 
 dev_dependencies:
