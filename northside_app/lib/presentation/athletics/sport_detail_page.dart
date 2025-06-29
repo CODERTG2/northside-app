@@ -41,6 +41,39 @@ class _SportDetailPageState extends State<SportDetailPage> {
   List<Player> _roster = [];
   bool _isLoadingRoster = false;
 
+  // Helper function to format level names for display
+  String _formatLevelName(String level) {
+    switch (level.toLowerCase()) {
+      case 'varsity':
+        return 'Varsity';
+      case 'jv':
+        return 'JV';
+      case 'freshman':
+        return 'Freshman';
+      default:
+        return level;
+    }
+  }
+
+  // Helper function to sort levels in proper order
+  List<String> _sortLevels(List<String> levels) {
+    final levelOrder = ['varsity', 'jv', 'freshman'];
+    final otherLevels = levels.where((level) => level.toLowerCase() != 'all' && !levelOrder.contains(level.toLowerCase())).toList();
+    final orderedLevels = <String>[];
+    
+    for (String orderLevel in levelOrder) {
+      for (String level in levels) {
+        if (level.toLowerCase() == orderLevel) {
+          orderedLevels.add(level);
+          break;
+        }
+      }
+    }
+    
+    orderedLevels.addAll(otherLevels);
+    return ['All', ...orderedLevels];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -70,16 +103,14 @@ class _SportDetailPageState extends State<SportDetailPage> {
         gender: gender,
       );
       final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
-      levels.sort();
-      _levels = ['All', ...levels];
+      _levels = _sortLevels(levels);
       print('Available levels for $sportName ($gender): $_levels');
     } catch (e) {
       print('Error loading levels: $e');
       // Fallback to controller data
       final allAthletes = athleticsController.getAthletesBySport(sport: sportName, gender: gender);
       final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
-      levels.sort();
-      _levels = ['All', ...levels];
+      _levels = _sortLevels(levels);
     }
 
     // Get schedule for this sport
@@ -231,7 +262,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                 ),
                 child: Center(
                   child: Text(
-                    level,
+                    _formatLevelName(level),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,

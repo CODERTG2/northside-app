@@ -99,4 +99,4 @@ def update_athletics_roster():
 
     print(f"Added {added_count} athletes, existing {existing_count} athletes.")
 
-update_athletics_roster()
+# update_athletics_roster()
