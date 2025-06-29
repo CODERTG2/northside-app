@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../core/utils/logger.dart';
 
 class LoginSheet extends StatefulWidget {
   const LoginSheet({super.key});
@@ -37,7 +38,7 @@ class _LoginSheetState extends State<LoginSheet> {
     // ...and send it to your backend for authentication.
     
     // For now, we just print and close the sheet.
-    print('Logging in...');
+    AppLogger.debug('Logging in...');
     Get.back();
   }
 

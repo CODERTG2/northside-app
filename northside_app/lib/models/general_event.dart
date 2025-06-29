@@ -1,4 +1,5 @@
 // lib/models/general_event.dart
+import '../core/utils/logger.dart';
 
 import 'article.dart';
 import 'bulletin_post.dart';
@@ -40,7 +41,7 @@ class GeneralEvent {
         }
         return DateTime.now();
       } catch (e) {
-        print('Error parsing createdAt: $e');
+        AppLogger.warning('Error parsing createdAt: $e');
         return DateTime.now();
       }
     }
@@ -152,7 +153,7 @@ class GeneralEvent {
           
           // Validate ranges
           if (month < 1 || month > 12) {
-            print('Invalid month in date: $date');
+            AppLogger.warning('Invalid month in date: $date');
             return createdAt;
           }
           if (day < 1) day = 1;
@@ -164,7 +165,7 @@ class GeneralEvent {
         // Fallback to trying DateTime.parse
         return DateTime.parse(date);
       } catch (e) {
-        print('Error parsing event date "$date": $e');
+        AppLogger.warning('Error parsing event date "$date": $e');
         return createdAt;
       }
     }

@@ -4,6 +4,7 @@ import 'models/announcement.dart';
 import 'models/athlete.dart';
 import 'models/athletics_schedule.dart';
 import 'models/general_event.dart';
+import 'core/utils/logger.dart';
 
 class ApiService {
   static const String baseUrl = "https://b8c7-2600-1700-67d0-50a0-00-46.ngrok-free.app/api";
@@ -26,8 +27,8 @@ class ApiService {
         throw Exception('Failed to load announcements: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching announcements: $e');
-      throw e;
+      AppLogger.error('Error fetching announcements', e);
+      rethrow;
     }
   }
 
@@ -50,23 +51,23 @@ class ApiService {
       }
       
       final fullUrl = "$baseUrl$url";
-      print('Making API request to: $fullUrl');
+      AppLogger.info('Making API request to: $fullUrl');
       
       final response = await http.get(Uri.parse(fullUrl));
-      print('API Response status: ${response.statusCode}');
-      print('API Response body length: ${response.body.length}');
+      AppLogger.info('API Response status: ${response.statusCode}');
+      AppLogger.debug('API Response body length: ${response.body.length}');
       
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
-        print('Parsed ${jsonList.length} athletes from API');
+        AppLogger.info('Parsed ${jsonList.length} athletes from API');
         return jsonList.map((json) => Athlete.fromJson(json)).toList();
       } else {
-        print('API Error response body: ${response.body}');
+        AppLogger.warning('API Error response body: ${response.body}');
         throw Exception('Failed to load roster: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching roster: $e');
-      throw e;
+      AppLogger.error('Error fetching roster', e);
+      rethrow;
     }
   }
 
@@ -102,8 +103,8 @@ class ApiService {
         throw Exception('Failed to load athletics schedule: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching athletics schedule: $e');
-      throw e;
+      AppLogger.error('Error fetching athletics schedule', e);
+      rethrow;
     }
   }
 
@@ -135,8 +136,8 @@ class ApiService {
         throw Exception('Failed to load general events: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching general events: $e');
-      throw e;
+      AppLogger.error('Error fetching general events', e);
+      rethrow;
     }
   }
 }

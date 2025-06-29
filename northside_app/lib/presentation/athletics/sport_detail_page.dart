@@ -2,8 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/utils/app_colors.dart';
+import 'package:sizer/sizer.dart';
+
 import '../../controllers/athletics_controller.dart';
+import '../../models/athlete.dart';
+import '../../models/athletics_schedule.dart';
+import '../../widgets/shared_header.dart';
+import '../../core/utils/logger.dart';
+import '../../core/utils/app_colors.dart';
 import '../../api.dart';
 
 class GameSchedule {
@@ -104,9 +110,9 @@ class _SportDetailPageState extends State<SportDetailPage> {
       );
       final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
       _levels = _sortLevels(levels);
-      print('Available levels for $sportName ($gender): $_levels');
+      AppLogger.debug('Available levels for $sportName ($gender): $_levels');
     } catch (e) {
-      print('Error loading levels: $e');
+      AppLogger.debug('Error loading levels: $e');
       // Fallback to controller data
       final allAthletes = athleticsController.getAthletesBySport(sport: sportName, gender: gender);
       final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
@@ -116,7 +122,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
     // Get schedule for this sport
     final schedule = athleticsController.getScheduleBySport(sportName);
     _schedules = schedule.map((event) => event.toGameSchedule()).toList();
-    print('Found ${_schedules.length} schedule items for sport: $sportName');
+    AppLogger.debug('Found ${_schedules.length} schedule items for sport: $sportName');
 
     // Load initial roster
     _updateRoster();
@@ -144,7 +150,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
       level = _selectedLevel.toLowerCase();
     }
 
-    print('Updating roster with filters: sport=$sportName, gender=$gender, level=$level, selectedLevel=$_selectedLevel');
+    AppLogger.debug('Updating roster with filters: sport=$sportName, gender=$gender, level=$level, selectedLevel=$_selectedLevel');
 
     setState(() {
       _isLoadingRoster = true;
@@ -158,9 +164,9 @@ class _SportDetailPageState extends State<SportDetailPage> {
         level: level,
       );
       _roster = athletes.map((athlete) => athlete.toPlayer()).toList();
-      print('Loaded ${_roster.length} athletes from API for sport: $sportName, gender: $gender, level: $level');
+      AppLogger.debug('Loaded ${_roster.length} athletes from API for sport: $sportName, gender: $gender, level: $level');
     } catch (e) {
-      print('Error loading filtered roster: $e');
+      AppLogger.debug('Error loading filtered roster: $e');
       // Fallback to client-side filtering
       final athletes = athleticsController.getAthletesBySport(
         sport: sportName,
@@ -168,7 +174,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
         level: level,
       );
       _roster = athletes.map((athlete) => athlete.toPlayer()).toList();
-      print('Loaded ${_roster.length} athletes from controller fallback for sport: $sportName, gender: $gender, level: $level');
+      AppLogger.debug('Loaded ${_roster.length} athletes from controller fallback for sport: $sportName, gender: $gender, level: $level');
     }
 
     if (mounted) {

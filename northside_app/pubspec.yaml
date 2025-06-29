@@ -1,5 +1,5 @@
-name: northside_app
-description: "A new Flutter project."
+name: stampede
+description: "Stampede - Official mobile app for Northside High School - Stay connected with announcements, athletics, events, and school news."
 
 publish_to: 'none' 
 
@@ -18,13 +18,14 @@ dependencies:
   google_fonts: ^6.2.1
   http: ^1.2.1
   intl: ^0.19.0
+  logger: ^2.0.2+1
   
   webview_flutter: ^4.7.0
   webview_flutter_web: ^0.2.2
   
   # FIX: Replaced the non-working packages with the correct one.
   sticky_headers: ^0.3.0+2
-  sliver_tools:
+  sliver_tools: ^0.2.12
 
 
 dev_dependencies:

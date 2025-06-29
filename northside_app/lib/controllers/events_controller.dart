@@ -6,6 +6,7 @@ import '../models/athletics_schedule.dart';
 import '../models/article.dart';
 import '../models/bulletin_post.dart';
 import '../api.dart';
+import '../core/utils/logger.dart';
 
 class EventsController extends GetxController {
   // Observable lists for real data
@@ -17,14 +18,14 @@ class EventsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print('EventsController initialized');
+    AppLogger.info('EventsController initialized');
     loadData();
   }
 
   @override
   void onReady() {
     super.onReady();
-    print('EventsController ready');
+    AppLogger.info('EventsController ready');
     // Refresh data when controller is ready
     loadData();
   }
@@ -41,7 +42,7 @@ class EventsController extends GetxController {
       ]);
     } catch (e) {
       error.value = 'Failed to load events data: $e';
-      print('Error loading events data: $e');
+      AppLogger.info('Error loading events data: $e');
     } finally {
       isLoading.value = false;
     }
@@ -52,15 +53,15 @@ class EventsController extends GetxController {
     try {
       final fetchedEvents = await ApiService.getGeneralEvents();
       generalEvents.assignAll(fetchedEvents);
-      print('Loaded ${generalEvents.length} general events');
+      AppLogger.info('Loaded ${generalEvents.length} general events');
       // Debug: print first few items
       if (generalEvents.isNotEmpty) {
         for (int i = 0; i < generalEvents.length && i < 3; i++) {
-          print('General Event $i: ${generalEvents[i].date} - ${generalEvents[i].name}');
+          AppLogger.info('General Event $i: ${generalEvents[i].date} - ${generalEvents[i].name}');
         }
       }
     } catch (e) {
-      print('Error loading general events: $e');
+      AppLogger.info('Error loading general events: $e');
     }
   }
 
@@ -69,15 +70,15 @@ class EventsController extends GetxController {
     try {
       final fetchedEvents = await ApiService.getAthleticsSchedule();
       athleticsEvents.assignAll(fetchedEvents);
-      print('Loaded ${athleticsEvents.length} athletics events');
+      AppLogger.info('Loaded ${athleticsEvents.length} athletics events');
       // Debug: print first few items
       if (athleticsEvents.isNotEmpty) {
         for (int i = 0; i < athleticsEvents.length && i < 3; i++) {
-          print('Athletics Event $i: ${athleticsEvents[i].date} - ${athleticsEvents[i].sport} - ${athleticsEvents[i].opponent}');
+          AppLogger.info('Athletics Event $i: ${athleticsEvents[i].date} - ${athleticsEvents[i].sport} - ${athleticsEvents[i].opponent}');
         }
       }
     } catch (e) {
-      print('Error loading athletics events: $e');
+      AppLogger.info('Error loading athletics events: $e');
     }
   }
 
@@ -125,7 +126,7 @@ class EventsController extends GetxController {
           
           // Validate month range (now using standard 1-12 format)
           if (month < 1 || month > 12) {
-            print('Invalid month in date: $dateString');
+            AppLogger.info('Invalid month in date: $dateString');
             return null;
           }
           
@@ -155,7 +156,7 @@ class EventsController extends GetxController {
       // Try parsing ISO format (YYYY-MM-DD)
       return DateTime.parse(dateString);
     } catch (e) {
-      print('Error parsing date: $dateString - $e');
+      AppLogger.info('Error parsing date: $dateString - $e');
       return null;
     }
   }
@@ -183,7 +184,7 @@ class EventsController extends GetxController {
           eventsMap[dayKey]!.add(event.toArticle());
         }
       } catch (e) {
-        print('Error parsing date for general event: ${event.date} - $e');
+        AppLogger.info('Error parsing date for general event: ${event.date} - $e');
       }
     }
 
@@ -199,7 +200,7 @@ class EventsController extends GetxController {
           eventsMap[dayKey]!.add(event.toArticle());
         }
       } catch (e) {
-        print('Error parsing date for athletics event: ${event.date} - $e');
+        AppLogger.info('Error parsing date for athletics event: ${event.date} - $e');
       }
     }
 
@@ -332,7 +333,7 @@ class EventsController extends GetxController {
     // Add all athletics events
     allEvents.addAll(athleticsEvents.map((event) => event.toArticle()));
     
-    print('Total events: ${allEvents.length} (${generalEvents.length} general + ${athleticsEvents.length} athletics)');
+    AppLogger.info('Total events: ${allEvents.length} (${generalEvents.length} general + ${athleticsEvents.length} athletics)');
     
     return allEvents;
   }

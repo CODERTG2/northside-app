@@ -2,6 +2,7 @@
 
 // Import for Player class
 import '../presentation/athletics/sport_detail_page.dart';
+import '../core/utils/logger.dart';
 
 class Athlete {
   final String id;
@@ -42,7 +43,7 @@ class Athlete {
         }
         return DateTime.now();
       } catch (e) {
-        print('Error parsing createdAt: $e');
+        AppLogger.warning('Error parsing createdAt', e);
         return DateTime.now();
       }
     }

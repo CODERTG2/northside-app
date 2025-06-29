@@ -5,6 +5,7 @@ import '../models/athlete.dart';
 import '../models/athletics_schedule.dart';
 import '../models/article.dart';
 import '../api.dart';
+import '../core/utils/logger.dart';
 
 class AthleticsController extends GetxController {
   // Observable lists for real data
@@ -31,7 +32,7 @@ class AthleticsController extends GetxController {
       ]);
     } catch (e) {
       error.value = 'Failed to load athletics data: $e';
-      print('Error loading athletics data: $e');
+      AppLogger.error('Error loading athletics data', e);
     } finally {
       isLoading.value = false;
     }
@@ -43,7 +44,7 @@ class AthleticsController extends GetxController {
       final fetchedAthletes = await ApiService.getRoster();
       athletes.assignAll(fetchedAthletes);
     } catch (e) {
-      print('Error loading athletes: $e');
+      AppLogger.error('Error loading athletes', e);
     }
   }
 
@@ -52,15 +53,15 @@ class AthleticsController extends GetxController {
     try {
       final fetchedSchedule = await ApiService.getAthleticsSchedule();
       schedule.assignAll(fetchedSchedule);
-      print('Loaded ${schedule.length} athletics schedule items');
-      // Debug: print first few items
+      AppLogger.info('Loaded ${schedule.length} athletics schedule items');
+      // Debug: log first few items
       if (schedule.isNotEmpty) {
         for (int i = 0; i < schedule.length && i < 3; i++) {
-          print('Athletics Schedule $i: ${schedule[i].date} - ${schedule[i].sport} - ${schedule[i].opponent}');
+          AppLogger.debug('Athletics Schedule $i: ${schedule[i].date} - ${schedule[i].sport} - ${schedule[i].opponent}');
         }
       }
     } catch (e) {
-      print('Error loading athletics schedule: $e');
+      AppLogger.error('Error loading athletics schedule', e);
     }
   }
 
@@ -160,7 +161,7 @@ class AthleticsController extends GetxController {
       // Try parsing ISO format (YYYY-MM-DD)
       return DateTime.parse(dateString);
     } catch (e) {
-      print('Error parsing date: $dateString - $e');
+      AppLogger.warning('Error parsing date: $dateString', e);
       return null;
     }
   }

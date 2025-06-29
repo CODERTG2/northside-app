@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import '../core/utils/logger.dart';
 
 class WebViewSheet extends StatefulWidget {
   const WebViewSheet({super.key, required this.url});
@@ -27,7 +28,7 @@ class _WebViewSheetState extends State<WebViewSheet> {
           onPageFinished: (_) => setState(() => _isLoading = false),
           onWebResourceError: (error) {
             setState(() => _isLoading = false);
-            print('Webview Error: ${error.description}');
+            AppLogger.debug('Webview Error: ${error.description}');
           },
         ),
       )

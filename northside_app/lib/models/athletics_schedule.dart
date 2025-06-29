@@ -1,4 +1,5 @@
 // lib/models/athletics_schedule.dart
+import '../core/utils/logger.dart';
 
 import '../presentation/athletics/sport_detail_page.dart';
 import 'article.dart';
@@ -43,7 +44,7 @@ class AthleticsSchedule {
         }
         return DateTime.now();
       } catch (e) {
-        print('Error parsing createdAt: $e');
+        AppLogger.warning('Error parsing createdAt: $e');
         return DateTime.now();
       }
     }
@@ -182,7 +183,7 @@ class AthleticsSchedule {
 
             // Validate ranges (now using standard 1-12 format)
             if (month < 1 || month > 12) {
-              print('Invalid month in athletics date: $date');
+              AppLogger.warning('Invalid month in athletics date: $date');
               return createdAt;
             }
             if (day < 1) day = 1;
@@ -214,7 +215,7 @@ class AthleticsSchedule {
         // Fallback to trying DateTime.parse
         return DateTime.parse(date);
       } catch (e) {
-        print('Error parsing athletics schedule date "$date": $e');
+        AppLogger.warning('Error parsing athletics schedule date "$date": $e');
         return createdAt;
       }
     }

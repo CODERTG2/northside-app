@@ -1,13 +1,14 @@
 // lib/presentation/placeholder_pages/bulletin_page.dart
 
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 import '../../controllers/bulletin_controller.dart';
+import '../../core/utils/logger.dart';
 import '../../models/article.dart';
 import '../../models/bulletin_post.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
@@ -51,7 +52,7 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Listen to changes in the bulletin controller data
     ever(controller.allPostsRx, (_) {
-      print('📰 Bulletin: Controller data changed, rebuilding grouped list...');
+      AppLogger.debug('📰 Bulletin: Controller data changed, rebuilding grouped list...');
       _buildGroupedList();
     });
     
@@ -83,14 +84,14 @@ class _BulletinPageState extends State<BulletinPage> {
     final today = DateTime.now();
     final nonPinnedPosts = controller.allPosts.where((post) => !post.isPinned).toList();
     
-    print('📰 Bulletin: Building grouped list...');
-    print('📰 Bulletin: Total allPosts: ${controller.allPosts.length}');
-    print('📰 Bulletin: Non-pinned posts: ${nonPinnedPosts.length}');
-    print('📰 Bulletin: Today is: $today');
+    AppLogger.debug('📰 Bulletin: Building grouped list...');
+    AppLogger.debug('📰 Bulletin: Total allPosts: ${controller.allPosts.length}');
+    AppLogger.debug('📰 Bulletin: Non-pinned posts: ${nonPinnedPosts.length}');
+    AppLogger.debug('📰 Bulletin: Today is: $today');
     
     for (int i = 0; i < nonPinnedPosts.length && i < 5; i++) {
       final post = nonPinnedPosts[i];
-      print('📰 Bulletin: Post $i: "${post.title}" on ${post.date}');
+      AppLogger.debug('📰 Bulletin: Post $i: "${post.title}" on ${post.date}');
     }
     
     nonPinnedPosts.sort((a, b) => a.date.compareTo(b.date));
@@ -105,9 +106,9 @@ class _BulletinPageState extends State<BulletinPage> {
       grouped[dateHeader]!.add(post);
     }
     
-    print('📰 Bulletin: Grouped sections: ${grouped.keys.toList()}');
+    AppLogger.debug('📰 Bulletin: Grouped sections: ${grouped.keys.toList()}');
     for (String key in grouped.keys) {
-      print('📰 Bulletin: Section "$key": ${grouped[key]!.length} posts');
+      AppLogger.debug('📰 Bulletin: Section "$key": ${grouped[key]!.length} posts');
     }
     
     setState(() => _groupedPosts = grouped);

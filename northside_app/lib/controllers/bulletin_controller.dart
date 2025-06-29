@@ -6,6 +6,7 @@ import '../models/announcement.dart';
 import '../models/general_event.dart';
 import '../models/athletics_schedule.dart';
 import '../api.dart';
+import '../core/utils/logger.dart';
 
 class BulletinController extends GetxController {
   // Observable lists for reactive UI
@@ -47,7 +48,7 @@ class BulletinController extends GetxController {
       // Update the observable list
       _allPosts.assignAll(bulletinPosts);
     } catch (e) {
-      print('Error loading bulletin data: $e');
+      AppLogger.error('Error loading bulletin data', e);
     } finally {
       _isLoading.value = false;
     }
@@ -59,7 +60,7 @@ class BulletinController extends GetxController {
       final fetchedAnnouncements = await ApiService.getAnnouncements();
       return fetchedAnnouncements;
     } catch (e) {
-      print('Error loading announcements: $e');
+      AppLogger.error('Error loading announcements', e);
       return [];
     }
   }
@@ -70,7 +71,7 @@ class BulletinController extends GetxController {
       final fetchedEvents = await ApiService.getGeneralEvents();
       return fetchedEvents;
     } catch (e) {
-      print('Error loading general events: $e');
+      AppLogger.error('Error loading general events', e);
       return [];
     }
   }
@@ -81,7 +82,7 @@ class BulletinController extends GetxController {
       final fetchedEvents = await ApiService.getAthleticsSchedule();
       return fetchedEvents;
     } catch (e) {
-      print('Error loading athletics events: $e');
+      AppLogger.error('Error loading athletics events', e);
       return [];
     }
   }

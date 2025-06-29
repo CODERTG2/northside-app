@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Northside App',
+          title: 'Stampede',
 
           // FIX: Apply our new custom theme to the entire app.
           theme: AppTheme.lightTheme,

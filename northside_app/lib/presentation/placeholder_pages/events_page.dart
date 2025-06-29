@@ -1,16 +1,19 @@
 // lib/presentation/placeholder_pages/events_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:get/get.dart';
-import 'dart:collection';
-import '../../models/article.dart';
-import '../../widgets/article_detail_draggable_sheet.dart';
-import '../../widgets/shared_header.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:sizer/sizer.dart';
+
+import '../../controllers/events_controller.dart';
+import '../../models/general_event.dart';
+import '../../models/athletics_schedule.dart';
+import '../../core/utils/logger.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/text_helper.dart';
-import '../../controllers/events_controller.dart';
+import '../../widgets/article_detail_draggable_sheet.dart';
+import '../../widgets/shared_header.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -37,11 +40,11 @@ class _EventsPageState extends State<EventsPage> {
   void _loadEventsData() {
     // Listen to events controller changes
     ever(eventsController.generalEvents, (_) {
-      print('General events updated: ${eventsController.generalEvents.length}');
+      AppLogger.debug('General events updated: ${eventsController.generalEvents.length}');
       _updateEventsMap();
     });
     ever(eventsController.athleticsEvents, (_) {
-      print('Athletics events updated: ${eventsController.athleticsEvents.length}');
+      AppLogger.debug('Athletics events updated: ${eventsController.athleticsEvents.length}');
       _updateEventsMap();
     });
     
@@ -58,8 +61,8 @@ class _EventsPageState extends State<EventsPage> {
     final eventsMap = eventsController.getAllEventsMap();
     _kEvents.addAll(eventsMap);
     
-    print('Events map updated with ${_kEvents.length} days containing events');
-    print('Total events across all days: ${_kEvents.values.fold(0, (sum, events) => sum + events.length)}');
+    AppLogger.debug('Events map updated with ${_kEvents.length} days containing events');
+    AppLogger.debug('Total events across all days: ${_kEvents.values.fold(0, (sum, events) => sum + events.length)}');
 
     // Update selected events for current day
     _selectedEvents.value = _getEventsForDay(_selectedDay!);

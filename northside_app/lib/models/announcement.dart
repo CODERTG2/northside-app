@@ -1,6 +1,7 @@
 // lib/models/announcement.dart
 
 import 'bulletin_post.dart';
+import '../core/utils/logger.dart';
 
 class Announcement {
   final String id;
@@ -40,7 +41,7 @@ class Announcement {
         }
         return DateTime.now();
       } catch (e) {
-        print('Error parsing createdAt: $e');
+        AppLogger.warning('Error parsing createdAt', e);
         return DateTime.now();
       }
     }
@@ -94,7 +95,7 @@ class Announcement {
         // Fallback to trying DateTime.parse
         return DateTime.parse(dateStr);
       } catch (e) {
-        print('Error parsing announcement date "$dateStr": $e');
+        AppLogger.warning('Error parsing announcement date "$dateStr"', e);
         return createdAt;
       }
     }
