@@ -10,7 +10,6 @@ import requests
 # from dotenv import load_dotenv
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
@@ -32,19 +31,20 @@ def update_athletics_schedule():
     # except Exception as e:
     #     print(f"Error connecting to the database: {e}")
     #     return
-
     driver = webdriver.Firefox(options=firefox_options, service=service)
     driver.get("https://www.northsideprepathletics.com/schedule?year=2025-2026")
-
+    print("driver set up")
     last_height = driver.execute_script("return document.body.scrollHeight")
-
+    print("starting while loop")
     while True:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         time.sleep(5)
+        print("scrolling down")
 
         new_height = driver.execute_script("return document.body.scrollHeight")
         if new_height == last_height:
+            print("Reached the bottom of the page")
             break
         last_height = new_height
 
