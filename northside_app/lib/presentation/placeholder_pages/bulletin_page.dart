@@ -212,31 +212,22 @@ class _BulletinPageState extends State<BulletinPage> {
     final double topSpacer = 24;
     final double betweenSpacer = 0; // Set to 0 to remove gap
 
-    // Calculate dynamic minimum extent to avoid covering pinned carousel
+    // Calculate dynamic minimum extent to avoid covering pinned section (always present now)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (pinnedPosts.isNotEmpty) {
-        final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
-        final sectionHeaderBox = _sectionHeaderKey.currentContext?.findRenderObject() as RenderBox?;
-        final carouselBox = _carouselKey.currentContext?.findRenderObject() as RenderBox?;
-        if (headerBox != null && sectionHeaderBox != null && carouselBox != null) {
-          final double totalHeight =
-            headerBox.size.height +
-            topSpacer +
-            sectionHeaderBox.size.height +
-            carouselBox.size.height +
-            16; // Add small buffer
-          final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.8);
-          if (_calculatedMinExtent != calculatedMin) {
-            setState(() {
-              _calculatedMinExtent = calculatedMin;
-            });
-          }
-        }
-      } else {
-        // No pinned posts, can use the preferred initial extent
-        if (_calculatedMinExtent != null) {
+      final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
+      final sectionHeaderBox = _sectionHeaderKey.currentContext?.findRenderObject() as RenderBox?;
+      final carouselBox = _carouselKey.currentContext?.findRenderObject() as RenderBox?;
+      if (headerBox != null && sectionHeaderBox != null && carouselBox != null) {
+        final double totalHeight =
+          headerBox.size.height +
+          topSpacer +
+          sectionHeaderBox.size.height +
+          carouselBox.size.height +
+          16; // Add small buffer
+        final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.8);
+        if (_calculatedMinExtent != calculatedMin) {
           setState(() {
-            _calculatedMinExtent = null;
+            _calculatedMinExtent = calculatedMin;
           });
         }
       }
@@ -255,10 +246,11 @@ class _BulletinPageState extends State<BulletinPage> {
             children: [
               SharedHeader(key: _headerKey, title: 'Bulletin'),
               SizedBox(height: topSpacer),
-              if (pinnedPosts.isNotEmpty) ...[
-                _buildSectionHeader("Pinned", key: _sectionHeaderKey),
-                _buildPinnedCarousel(pinnedPosts, key: _carouselKey),
-              ],
+              _buildSectionHeader("Pinned", key: _sectionHeaderKey),
+              if (pinnedPosts.isNotEmpty) 
+                _buildPinnedCarousel(pinnedPosts, key: _carouselKey)
+              else
+                _buildEmptyPinnedSection(key: _carouselKey),
               // Remove the betweenSpacer from the layout
               // SizedBox(height: betweenSpacer),
             ],
@@ -413,6 +405,28 @@ class _BulletinPageState extends State<BulletinPage> {
         itemBuilder: (context, index) {
           return _PinnedPostCard(post: posts[index]);
         },
+      ),
+    );
+  }
+
+  Widget _buildEmptyPinnedSection({Key? key}) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double carouselHeight = screenWidth * 0.56; // Same height as regular carousel
+    return SizedBox(
+      key: key,
+      height: carouselHeight,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            'No pinned posts at this time',
+            style: TextStyle(
+              fontSize: screenWidth * 0.04,
+              color: Colors.grey.shade600,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
       ),
     );
   }

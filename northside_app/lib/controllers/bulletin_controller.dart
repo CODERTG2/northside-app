@@ -168,16 +168,31 @@ class BulletinController extends GetxController {
     final todayStart = DateTime(now.year, now.month, now.day);
     final nearFuture = now.add(const Duration(days: 7)); // Next 7 days
     
-    // Get posts that are today or in the near future
-    final recentAndUpcoming = allPosts.where((post) {
-      return !post.date.isBefore(todayStart) && post.date.isBefore(nearFuture);
-    }).toList();
+    final List<BulletinPost> candidatePosts = [];
+    
+    // Add general events (filter out announcements from allPosts - these use start_date)
+    final generalEventPosts = allPosts.where((post) => 
+        post.imagePath != 'assets/images/flexes_icon.png').toList();
+    
+    for (final post in generalEventPosts) {
+      if (!post.date.isBefore(todayStart) && post.date.isBefore(nearFuture)) {
+        candidatePosts.add(post);
+      }
+    }
+    
+    // Add announcements using end_date for pinned post relevance
+    for (final announcement in _announcements) {
+      final bulletinPost = announcement.toBulletinPost(useEndDate: true);
+      if (!bulletinPost.date.isBefore(todayStart) && bulletinPost.date.isBefore(nearFuture)) {
+        candidatePosts.add(bulletinPost);
+      }
+    }
     
     // Sort by date (earliest first)
-    recentAndUpcoming.sort((a, b) => a.date.compareTo(b.date));
+    candidatePosts.sort((a, b) => a.date.compareTo(b.date));
     
     // Take top 5 and mark as pinned
-    return recentAndUpcoming.take(5).map((post) => BulletinPost(
+    return candidatePosts.take(5).map((post) => BulletinPost(
       title: post.title,
       subtitle: post.subtitle,
       date: post.date,
