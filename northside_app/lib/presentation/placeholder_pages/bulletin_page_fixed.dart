@@ -506,7 +506,7 @@ class _BulletinEventCard extends StatelessWidget {
                   flex: 3,
                   child: Image.asset(
                     post.imagePath!,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     width: double.infinity,
                     errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[200]),
                   ),
@@ -598,7 +598,7 @@ class _PinnedPostCard extends StatelessWidget {
                 post.imagePath!,
                 height: imageHeight,
                 width: double.infinity,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[200]),
               ),
             ),

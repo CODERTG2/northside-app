@@ -278,7 +278,7 @@ class _HomecomingCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(cardRadius), topRight: Radius.circular(cardRadius)),
-                  child: Image.asset('assets/images/homecoming_bg.png', fit: BoxFit.cover),
+                  child: Image.asset('assets/images/homecoming_bg.png', fit: BoxFit.contain),
                 ),
                 Container(
                   decoration: BoxDecoration(

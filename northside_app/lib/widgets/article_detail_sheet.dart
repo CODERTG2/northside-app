@@ -40,7 +40,7 @@ class ArticleDetailSheet extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 24.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset(article.imagePath!, fit: BoxFit.cover),
+                      child: Image.asset(article.imagePath!, fit: BoxFit.contain),
                     ),
                   ),
                 // Title

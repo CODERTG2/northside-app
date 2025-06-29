@@ -172,7 +172,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
               child: article.imagePath != null 
                 ? Image.asset(
                     article.imagePath!, 
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.grey.shade300,
