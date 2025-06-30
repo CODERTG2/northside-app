@@ -88,9 +88,128 @@ class AthleticsController extends GetxController {
 
   // Get schedule by sport
   List<AthleticsSchedule> getScheduleBySport(String sport) {
-    return schedule.where((event) => 
-      event.sport.toLowerCase().contains(sport.toLowerCase())
-    ).toList();
+    // IMPORTANT: Let's see what exactly is being passed as the sport parameter
+    AppLogger.debug('=== SCHEDULE FILTERING DEBUG ===');
+    AppLogger.debug('Input sport parameter: "$sport"');
+    
+    // Extract gender prefix from sport name
+    String? genderFilter;
+    String actualSport = sport;
+    
+    if (sport.startsWith("Men's ")) {
+      genderFilter = 'boys';
+      actualSport = sport.substring(6);
+      AppLogger.debug('Detected Men\'s sport - genderFilter: $genderFilter, actualSport: $actualSport');
+    } else if (sport.startsWith("Women's ")) {
+      genderFilter = 'girls';
+      actualSport = sport.substring(8);
+      AppLogger.debug('Detected Women\'s sport - genderFilter: $genderFilter, actualSport: $actualSport');
+    } else {
+      AppLogger.debug('No gender prefix detected in sport name');
+    }
+    
+    AppLogger.debug('Total schedule items: ${schedule.length}');
+    
+    // Debug: Log some sample data to understand the format
+    if (schedule.isNotEmpty) {
+      for (int i = 0; i < schedule.length && i < 5; i++) {
+        AppLogger.debug('Sample data [$i]: sport="${schedule[i].sport}", gender="${schedule[i].gender}", level="${schedule[i].level}", opponent="${schedule[i].opponent}"');
+      }
+    }
+    
+    final filteredSchedule = schedule.where((event) {
+      // Check if the sport matches
+      bool sportMatches = event.sport.toLowerCase().contains(actualSport.toLowerCase());
+      
+      // If no gender filter, return all matches for the sport
+      if (genderFilter == null) {
+        AppLogger.debug('No gender filter, sportMatches: $sportMatches for ${event.sport}');
+        return sportMatches;
+      }
+      
+      // Check if the gender matches directly
+      bool genderMatches = false;
+      String eventGenderLower = event.gender.toLowerCase();
+      
+      if (genderFilter == 'boys') {
+        genderMatches = eventGenderLower == 'boys' || 
+                       eventGenderLower == 'men' || 
+                       eventGenderLower == 'male' ||
+                       eventGenderLower == 'm';
+      } else if (genderFilter == 'girls') {
+        genderMatches = eventGenderLower == 'girls' || 
+                       eventGenderLower == 'women' || 
+                       eventGenderLower == 'female' ||
+                       eventGenderLower == 'w';
+      }
+      
+      // Debug logging for each filter attempt
+      if (sportMatches) {
+        AppLogger.debug('Event: ${event.sport} ${event.gender} ${event.level}, sportMatches: $sportMatches, genderMatches: $genderMatches, eventGender: "${event.gender}"');
+      }
+      
+      return sportMatches && genderMatches;
+    }).toList();
+    
+    AppLogger.debug('Filtered schedule: found ${filteredSchedule.length} games for $sport');
+    
+    // Debug: Show what we're returning
+    if (filteredSchedule.isNotEmpty) {
+      for (int i = 0; i < filteredSchedule.length && i < 3; i++) {
+        AppLogger.debug('Returning game [$i]: ${filteredSchedule[i].sport} ${filteredSchedule[i].gender} ${filteredSchedule[i].level} vs ${filteredSchedule[i].opponent}');
+      }
+    }
+    
+    return filteredSchedule;
+  }
+
+  // Get schedule by sport, gender, and level (more specific filtering)
+  List<AthleticsSchedule> getScheduleByFilters({
+    String? sport,
+    String? gender,
+    String? level,
+  }) {
+    AppLogger.debug('Filtering schedule with: sport=$sport, gender=$gender, level=$level');
+    
+    final filteredSchedule = schedule.where((event) {
+      bool matches = true;
+      
+      if (sport != null && !event.sport.toLowerCase().contains(sport.toLowerCase())) {
+        matches = false;
+      }
+      
+      if (gender != null) {
+        String eventGenderLower = event.gender.toLowerCase();
+        String genderLower = gender.toLowerCase();
+        
+        // Handle different gender representations
+        bool genderMatches = false;
+        if (genderLower == 'boys' || genderLower == 'men' || genderLower == 'male') {
+          genderMatches = eventGenderLower == 'boys' || 
+                         eventGenderLower == 'men' || 
+                         eventGenderLower == 'male' ||
+                         eventGenderLower == 'm';
+        } else if (genderLower == 'girls' || genderLower == 'women' || genderLower == 'female') {
+          genderMatches = eventGenderLower == 'girls' || 
+                         eventGenderLower == 'women' || 
+                         eventGenderLower == 'female' ||
+                         eventGenderLower == 'w';
+        }
+        
+        if (!genderMatches) {
+          matches = false;
+        }
+      }
+      
+      if (level != null && !event.level.toLowerCase().contains(level.toLowerCase())) {
+        matches = false;
+      }
+      
+      return matches;
+    }).toList();
+    
+    AppLogger.debug('Filtered schedule: found ${filteredSchedule.length} games');
+    return filteredSchedule;
   }
 
   // Get recent athletics news (upcoming games as articles)

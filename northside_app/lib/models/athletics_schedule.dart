@@ -10,7 +10,8 @@ class AthleticsSchedule {
   final String date;
   final String time;
   final String sport;
-  final String team;
+  final String gender;
+  final String level;
   final String opponent;
   final String location;
   final bool home;
@@ -21,7 +22,8 @@ class AthleticsSchedule {
     required this.date,
     required this.time,
     required this.sport,
-    required this.team,
+    required this.gender,
+    required this.level,
     required this.opponent,
     required this.location,
     required this.home,
@@ -54,7 +56,8 @@ class AthleticsSchedule {
       date: (json['date'] ?? '').toString(),
       time: (json['time'] ?? '').toString(),
       sport: (json['sport'] ?? '').toString(),
-      team: (json['team'] ?? '').toString(),
+      gender: (json['gender'] ?? '').toString(),
+      level: (json['level'] ?? '').toString(),
       opponent: (json['opponent'] ?? '').toString(),
       location: (json['location'] ?? '').toString(),
       home: json['home'] ?? false,
@@ -67,7 +70,8 @@ class AthleticsSchedule {
       'date': date,
       'time': time,
       'sport': sport,
-      'team': team,
+      'gender': gender,
+      'level': level,
       'opponent': opponent,
       'location': location,
       'home': home,
@@ -77,10 +81,12 @@ class AthleticsSchedule {
 
   // Convert to GameSchedule for UI compatibility (sport_detail_page.dart)
   GameSchedule toGameSchedule() {
+    // Create a team name from gender and level
+    final teamName = '${gender.toUpperCase()} ${level.toUpperCase()}';
     return GameSchedule(
       date: date,
       time: time,
-      event: team,
+      event: teamName,
       opponent: opponent,
       location: location,
       score: '', // Score not available in schedule, only for completed games
@@ -91,10 +97,11 @@ class AthleticsSchedule {
   // Convert to Article for events display
   Article toArticle() {
     final homeAway = home ? 'vs' : 'at';
+    final teamName = '${gender.toUpperCase()} ${level.toUpperCase()}';
     return Article(
       title: '$sport $homeAway $opponent',
       subtitle: _buildArticleSubtitle(),
-      content: '$team $homeAway $opponent at $location on $date at $time.',
+      content: '$teamName $homeAway $opponent at $location on $date at $time.',
       imagePath: 'assets/images/flexes_icon.png', // Add image for athletics games
     );
   }
@@ -224,7 +231,7 @@ class AthleticsSchedule {
       title: '$sport ${home ? "vs" : "at"} $opponent',
       subtitle: _buildSubtitle(parseEventDate()),
       date: parseEventDate(),
-      content: '$team ${home ? "vs" : "at"} $opponent at $location on $date at $time.',
+      content: '${gender.toUpperCase()} ${level.toUpperCase()} ${home ? "vs" : "at"} $opponent at $location on $date at $time.',
       imagePath: 'assets/images/flexes_icon.png', // Default image for athletics
       isPinned: false,
     );

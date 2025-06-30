@@ -74,7 +74,8 @@ class ApiService {
   // Fetch athletics schedule
   static Future<List<AthleticsSchedule>> getAthleticsSchedule({
     String? sport,
-    String? team,
+    String? gender,
+    String? level,
     String? date,
     String? time,
     bool? home,
@@ -84,7 +85,8 @@ class ApiService {
       List<String> params = [];
       
       if (sport != null) params.add('sport=$sport');
-      if (team != null) params.add('team=$team');
+      if (gender != null) params.add('gender=$gender');
+      if (level != null) params.add('level=$level');
       if (date != null) params.add('date=$date');
       if (time != null) params.add('time=$time');
       if (home != null) params.add('home=$home');

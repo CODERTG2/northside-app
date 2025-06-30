@@ -97,9 +97,12 @@ def update_athletics_schedule():
     locations = [p.get_text(strip=True) for p in locations]
     # print(f"Found {len(locations)} locations")
 
-    teams = soup.select("div.text-sm.font-medium.text-core-contrast.text-opacity-80.xl\\:text-base[data-testid*='gender-level']")
-    teams = [p.get_text(strip=True) for p in teams]
+    levels = soup.select("div.text-sm.font-medium.text-core-contrast.text-opacity-80.xl\\:text-base[data-testid*='gender-level']")
+    levels = [p.get_text(strip=True).split()[1] for p in levels]
     # print(f"Found {len(teams)} teams")
+
+    genders = soup.select("div.text-sm.font-medium.text-core-contrast.text-opacity-80.xl\\:text-base[data-testid*='gender-level']")
+    genders = [p.get_text(strip=True).split()[0] for p in genders] 
 
     opponents = soup.select('h2.mb-1.font-heading.text-xl')
     opponents = [h2.get_text(strip=True).replace("vs ", "").replace("at ", "") for h2 in opponents]
@@ -110,7 +113,7 @@ def update_athletics_schedule():
     home = [item.lower() == "home" for item in home]
     # print(f"Found {len(home)} home/away indicators")
     
-    length = len(dates)  # Use shortest length to avoid index errors
+    length = len(dates)
     # print(f"Processing {length} events")
     added_count = 0
 
@@ -123,8 +126,9 @@ def update_athletics_schedule():
         event = AthleticsSchedule(
             date=dates[i],
             time=times[i],
+            gender=genders[i],
             sport=sports[i],
-            team=teams[i],
+            level=levels[i],
             opponent=opponents[i],
             location=locations[i],
             home=home[i]
@@ -135,4 +139,4 @@ def update_athletics_schedule():
     print(f"Athletics schedule updated: {added_count} new events added")
     # print(schedule)
 
-# update_athletics_schedule()
+update_athletics_schedule()

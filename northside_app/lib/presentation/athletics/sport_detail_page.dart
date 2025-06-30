@@ -119,10 +119,13 @@ class _SportDetailPageState extends State<SportDetailPage> {
       _levels = _sortLevels(levels);
     }
 
-    // Get schedule for this sport
-    final schedule = athleticsController.getScheduleBySport(sportName);
+    // Get schedule for this sport and gender
+    final schedule = athleticsController.getScheduleByFilters(
+      sport: sportName,
+      gender: gender,
+    );
     _schedules = schedule.map((event) => event.toGameSchedule()).toList();
-    AppLogger.debug('Found ${_schedules.length} schedule items for sport: $sportName');
+    AppLogger.debug('Found ${_schedules.length} schedule items for sport: $sportName, gender: $gender');
 
     // Load initial roster
     _updateRoster();
