@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
         childAspectRatio: childAspectRatio,
         children: [
           _QuickActionButton(iconWidget: Image.asset('assets/images/grades_icon.png', width: screenWidth * 0.08, height: screenWidth * 0.08), label: 'Grades', onTap: () {}),
-          _QuickActionButton(iconWidget: Icon(Icons.calendar_today_outlined, color: Colors.black54, size: screenWidth * 0.065), label: 'Events', onTap: () {}),
+          _QuickActionButton(iconWidget: Icon(Icons.calendar_today_outlined, color: Color(0xFF4285F4), size: screenWidth * 0.065), label: 'Events', onTap: () {}),
           _QuickActionButton(iconWidget: Image.asset('assets/images/hoofbeat_icon.png', width: screenWidth * 0.08, height: screenWidth * 0.08), label: 'HoofBeat', onTap: () {}),
           _QuickActionButton(iconWidget: Image.asset('assets/images/flexes_icon.png', width: screenWidth * 0.08, height: screenWidth * 0.08), label: 'Flexes', onTap: () {}),
         ],
