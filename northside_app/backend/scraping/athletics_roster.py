@@ -20,10 +20,15 @@ def update_athletics_roster():
         return
     
     url = "https://www.maxpreps.com/il/chicago/northside-mustangs/"
-    response = requests.get(url)
-    html_content = response.text
-
-    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    try:
+        response = requests.get(url)
+        html_content = response.text
+        soup = BeautifulSoup(html_content, 'html.parser')
+    except Exception as e:
+        print(f"Error parsing HTML content: {e}")
+        return
+    
     sports = soup.find_all('span', class_="sport-name")
     sports = [sport.get_text(strip=True).replace("& ", "").replace(" ", "-").lower() for sport in sports]
     sports = list(set(sports))
@@ -31,9 +36,6 @@ def update_athletics_roster():
     genders = ["girls", "boys"]
     seasons = ["fall", "winter", "spring"]
     levels = ["varsity", "jv", "freshman"]
-
-    added_count = 0
-    existing_count = 0
 
     roster = []
 
