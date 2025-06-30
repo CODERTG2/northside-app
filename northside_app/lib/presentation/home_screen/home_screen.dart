@@ -3,8 +3,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget  Widget _buildHeader(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontSize = screenWidth * 0.07;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.04),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),t HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();

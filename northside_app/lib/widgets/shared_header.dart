@@ -13,7 +13,7 @@ class SharedHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppShellController appShellController = Get.find();
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double titleFontSize = screenWidth * 0.07; // Responsive title size
+    final double titleFontSize = screenWidth * 0.07; // Match sport detail page styling
 
     return Padding(
       padding: EdgeInsets.only(

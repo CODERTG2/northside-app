@@ -105,13 +105,18 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
             SliverToBoxAdapter(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-                child: const Text(
-                  'Hoofbeat',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
-                  ),
+                child: Builder(
+                  builder: (context) {
+                    final double screenWidth = MediaQuery.of(context).size.width;
+                    return Text(
+                      'Hoofbeat',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.07,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                      ),
+                    );
+                  }
                 ),
               ),
             ),
