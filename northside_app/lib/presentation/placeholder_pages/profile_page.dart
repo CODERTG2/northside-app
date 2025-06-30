@@ -141,9 +141,9 @@ class ProfilePage extends StatelessWidget {
         SizedBox(height: screenWidth * 0.04),
         Text('User', style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
         SizedBox(height: screenWidth * 0.01),
-        Text('ID', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+        Text('ID', style: TextStyle(fontSize: infoFontSize, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
         SizedBox(height: screenWidth * 0.01),
-        Text('Northside College Prep', style: TextStyle(fontSize: infoFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+        Text('Northside College Prep', style: TextStyle(fontSize: infoFontSize, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
       ],
     );
   }
@@ -167,7 +167,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             Text(title, style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
             SizedBox(height: screenWidth * 0.01),
-            Text(subtitle, style: TextStyle(fontSize: subtitleFontSize, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(subtitle, style: TextStyle(fontSize: subtitleFontSize, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),

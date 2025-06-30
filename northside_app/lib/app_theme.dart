@@ -9,10 +9,10 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF007AFF)),
     scaffoldBackgroundColor: const Color(0xFFF2F2F7),
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-      titleMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
-      bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
-      bodySmall: TextStyle(fontSize: 14, color: Colors.grey),
+      headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+      titleMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.black),
+      bodyMedium: TextStyle(fontSize: 16, color: Colors.black),
+      bodySmall: TextStyle(fontSize: 14, color: Colors.black),
     ),
     cardTheme: CardThemeData(
       color: Colors.white,

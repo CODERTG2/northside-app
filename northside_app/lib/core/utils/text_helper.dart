@@ -48,7 +48,7 @@ class TextHelper {
       text,
       style: TextStyle(
         fontSize: fontSize,
-        fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+        fontWeight: isBold ? FontWeight.w900 : FontWeight.normal,
         color: color,
       ),
       maxLines: maxLines,
@@ -77,7 +77,7 @@ class TextHelper {
         text,
         style: TextStyle(
           fontSize: fontSize,
-          fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          fontWeight: isBold ? FontWeight.w900 : FontWeight.normal,
           color: color,
         ),
       ),

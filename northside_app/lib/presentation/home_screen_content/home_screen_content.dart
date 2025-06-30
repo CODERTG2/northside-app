@@ -65,11 +65,11 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
         mainAxisSpacing: 16,
         childAspectRatio: 2.7,
         children: [
-          _QuickActionButton(iconWidget: const Icon(Icons.sports_basketball, color: Colors.black54, size: 26), label: 'Athletics', onTap: () => appShellController.changePage(1)),
-          _QuickActionButton(iconWidget: const Icon(Icons.calendar_today_outlined, color: Colors.black54, size: 26), label: 'Events', onTap: () => appShellController.changePage(2)),
-          _QuickActionButton(iconWidget: const Icon(Icons.article, color: Colors.black54, size: 26), label: 'HoofBeat', onTap: () => Get.to(() => const HoofBeatPage())),
+          _QuickActionButton(iconWidget: const Icon(Icons.sports_basketball, color: Color(0xFFFF6B35), size: 26), label: 'Athletics', onTap: () => appShellController.changePage(1)),
+          _QuickActionButton(iconWidget: const Icon(Icons.calendar_today_outlined, color: Color(0xFF4285F4), size: 26), label: 'Events', onTap: () => appShellController.changePage(2)),
+          _QuickActionButton(iconWidget: const Icon(Icons.article, color: Color(0xFF34A853), size: 26), label: 'HoofBeat', onTap: () => Get.to(() => const HoofBeatPage())),
           // FIX: The label is now "Bulletin", the icon is updated, and it correctly navigates to index 3.
-          _QuickActionButton(iconWidget: const Icon(Icons.campaign, color: Colors.black54, size: 26), label: 'Bulletin', onTap: () => appShellController.changePage(3)),
+          _QuickActionButton(iconWidget: const Icon(Icons.campaign, color: Color(0xFFEA4335), size: 26), label: 'Bulletin', onTap: () => appShellController.changePage(3)),
         ],
       ),
     );
@@ -101,16 +101,16 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.announcement_outlined, size: 48, color: Colors.grey),
+                    Icon(Icons.announcement_outlined, size: 48, color: Colors.black),
                     SizedBox(height: 16),
                     Text(
                       'No Recent Announcements',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                     ),
                     SizedBox(height: 8),
                     Text(
                       'Check back later for updates!',
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ],
                 ),
@@ -180,7 +180,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                           child: Icon(
                             Icons.event,
                             size: 48,
-                            color: Colors.grey,
+                            color: Colors.black,
                           ),
                         ),
                       );
@@ -192,7 +192,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                       child: Icon(
                         Icons.event,
                         size: 48,
-                        color: Colors.grey,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -205,26 +205,26 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey),
+                        const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.black),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             article.subtitle,
-                            style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                            style: TextStyle(fontSize: 14, color: Colors.black),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
+                        const Icon(Icons.more_horiz, size: 20, color: Colors.black),
                         const SizedBox(width: 4),
                         Flexible(
                           child: Text(
                             'More Details',
-                            style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                            style: TextStyle(fontSize: 14, color: Colors.black),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.right,

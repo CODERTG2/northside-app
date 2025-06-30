@@ -2,12 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/webview_sheet.dart';
 import '../athletics/all_sports_page.dart';
 import '../athletics/sport_detail_page.dart';
 import '../../widgets/shared_header.dart';
+import '../app_shell/app_shell_controller.dart';
 import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
 
@@ -21,7 +23,36 @@ class AthleticsPage extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Athletics',
+          style: GoogleFonts.inter(
+            color: Colors.black, 
+            fontWeight: FontWeight.w900, 
+            fontSize: screenWidth * 0.07,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: GestureDetector(
+              onTap: () {
+                final AppShellController appShellController = Get.find();
+                appShellController.changePage(4);
+              },
+              child: CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.grey.shade300,
+                child: const Icon(Icons.person, color: Colors.black, size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
+        top: false,
         child: Obx(() {
           if (athleticsController.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
@@ -30,9 +61,6 @@ class AthleticsPage extends StatelessWidget {
           return ListView(
             padding: EdgeInsets.only(bottom: screenHeight * 0.12),
             children: [
-              const SharedHeader(
-                title: 'Athletics',
-              ),
               SizedBox(height: screenHeight * 0.02),
               _buildNewsCarousel(context, athleticsController),
               SizedBox(height: screenHeight * 0.04),
@@ -124,7 +152,7 @@ class AthleticsPage extends StatelessWidget {
                 SizedBox(height: 16),
                 Text(
                   'No Recent Athletics News',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -204,7 +232,7 @@ class AthleticsPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -291,14 +319,14 @@ class _NewsCard extends StatelessWidget {
                     children: [
                       Text(
                         article.title,
-                        style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
                         maxLines: isNarrowScreen ? 1 : 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: screenWidth * 0.01),
                       Text(
                         article.subtitle,
-                        style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
+                        style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

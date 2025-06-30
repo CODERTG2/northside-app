@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -15,6 +16,7 @@ import '../../models/bulletin_post.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
+import '../app_shell/app_shell_controller.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({super.key});
@@ -32,8 +34,33 @@ class _BulletinPageState extends State<BulletinPage> {
   Timer? _inactivityTimer;
   Timer? _midnightTimer;
   bool _isAutoScrolling = false;
-  double _lastSheetExtent = 0.55;
-  final double _initialSheetExtent = 0.55;
+  double? _lastSheetExtent;
+  double? _initialSheetExtent;
+
+  // Calculate responsive sheet extents based on screen dimensions
+  double get responsiveInitialExtent {
+    if (_initialSheetExtent != null) return _initialSheetExtent!;
+    
+    final context = this.context;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Adjust based on screen aspect ratio and size
+    double baseExtent = 0.45; // 45% for most devices
+    
+    // For very tall/narrow screens (like iPhone 14 Pro Max), reduce slightly
+    if (screenHeight / screenWidth > 2.2) {
+      baseExtent = 0.4;
+    }
+    // For shorter/wider screens (like iPad landscape), keep at base
+    else if (screenHeight / screenWidth < 1.5) {
+      baseExtent = 0.45;
+    }
+    
+    _initialSheetExtent = baseExtent;
+    _lastSheetExtent = baseExtent;
+    return baseExtent;
+  }
 
   // For drag handle
   final DraggableScrollableController _sheetController = DraggableScrollableController();
@@ -79,13 +106,27 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   double _getSnapBackExtent() {
+    final initialExtent = responsiveInitialExtent;
+    
     // Use calculated min extent if available, otherwise use initial extent
     if (_calculatedMinExtent != null) {
-      // If calculated min is higher than initial, use max(calculatedMin, initial)
-      // This ensures we never cover pinned content but prefer the middle position
-      return _calculatedMinExtent! > _initialSheetExtent ? _calculatedMinExtent! : _initialSheetExtent;
+      // Ensure we never cover pinned content by using the max of calculated and initial
+      // But cap it at a reasonable maximum to prevent the sheet from being too high
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+      
+      // Make max allowed responsive to screen size, but never exceed initial extent
+      double maxAllowed = initialExtent; // Never go above initial extent
+      if (screenHeight / screenWidth > 2.2) {
+        maxAllowed = (initialExtent * 0.9).clamp(0.3, initialExtent); // 90% of initial for tall screens
+      } else if (screenHeight / screenWidth < 1.5) {
+        maxAllowed = initialExtent; // Use initial extent for wider screens
+      }
+      
+      final safeExtent = (_calculatedMinExtent! > initialExtent ? initialExtent : _calculatedMinExtent!);
+      return safeExtent.clamp(0.1, maxAllowed);
     }
-    return _initialSheetExtent;
+    return initialExtent;
   }
 
   void _buildGroupedList() {
@@ -147,7 +188,20 @@ class _BulletinPageState extends State<BulletinPage> {
   void _onScroll() {
     if (_isAutoScrolling) return;
     _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(const Duration(seconds: 30), () {
+    
+    // Make inactivity timeout responsive to device type
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Longer timeout for tablets/larger screens, shorter for phones
+    Duration timeoutDuration;
+    if (screenWidth > 600 || screenHeight > 900) {
+      timeoutDuration = const Duration(seconds: 45); // Tablets get longer timeout
+    } else {
+      timeoutDuration = const Duration(seconds: 30); // Phones get standard timeout
+    }
+    
+    _inactivityTimer = Timer(timeoutDuration, () {
       _scrollToTodaySection(animate: true);
     });
   }
@@ -158,15 +212,26 @@ class _BulletinPageState extends State<BulletinPage> {
     double offset = 0;
     final keys = _groupedPosts.keys.toList();
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     
-    // Calculate offset for the target section, but add some padding so the full card is visible
+    // Calculate dynamic header height based on screen size
+    final double dateHeaderHeight = screenWidth * 0.13; // Responsive header height
+    final double cardHeight = screenWidth * 0.7; // Same as used in _BulletinEventCard
+    final double cardMargin = screenWidth * 0.04; // Same as used in _BulletinEventCard
+    
+    // Calculate offset for the target section
     for (int i = 0; i < _todaySectionIndex!; i++) {
-      offset += 56; // Date header height
-      offset += (_groupedPosts[keys[i]]!.length) * (screenWidth * 0.7 + screenWidth * 0.04); // Card height + card margin
+      offset += dateHeaderHeight; // Use responsive header height
+      offset += (_groupedPosts[keys[i]]!.length) * (cardHeight + cardMargin);
     }
     
-    // Add some padding so the first card is fully visible, not cut off at the top
-    offset = (offset - 20).clamp(0.0, double.infinity);
+    // Don't add the target section's header height here - we want it to be visible above the sheet
+    // offset += dateHeaderHeight; // Remove this line
+    
+    // Subtract a minimal buffer to align the date header tightly with the sheet's top edge
+    // We want the date header to be positioned precisely at the sheet's top edge
+    final double headerBuffer = dateHeaderHeight * 0.3; // 30% of header height for very tight alignment
+    offset = (offset - headerBuffer).clamp(0.0, double.infinity);
     
     if (animate) {
       _isAutoScrolling = true;
@@ -224,7 +289,7 @@ class _BulletinPageState extends State<BulletinPage> {
           sectionHeaderBox.size.height +
           carouselBox.size.height +
           16; // Add small buffer
-        final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.8);
+        final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.5);
         if (_calculatedMinExtent != calculatedMin) {
           setState(() {
             _calculatedMinExtent = calculatedMin;
@@ -234,17 +299,47 @@ class _BulletinPageState extends State<BulletinPage> {
     });
 
     final double effectiveMinExtent = _getSnapBackExtent();
-    final double effectiveInitialExtent = effectiveMinExtent;
+    final double effectiveInitialExtent = responsiveInitialExtent;
+    
+    // Ensure minChildSize <= initialChildSize to prevent Flutter assertion error
+    final double safeMinExtent = effectiveMinExtent > effectiveInitialExtent ? effectiveInitialExtent : effectiveMinExtent;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Bulletin',
+          style: GoogleFonts.inter(
+            color: Colors.black, 
+            fontWeight: FontWeight.w900, 
+            fontSize: screenWidth * 0.07,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: GestureDetector(
+              onTap: () {
+                final AppShellController appShellController = Get.find();
+                appShellController.changePage(4);
+              },
+              child: CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.grey.shade300,
+                child: const Icon(Icons.person, color: Colors.black, size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           // Main header and pinned carousel always visible
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SharedHeader(key: _headerKey, title: 'Bulletin'),
               SizedBox(height: topSpacer),
               _buildSectionHeader("Pinned", key: _sectionHeaderKey),
               if (pinnedPosts.isNotEmpty) 
@@ -261,7 +356,7 @@ class _BulletinPageState extends State<BulletinPage> {
             child: DraggableScrollableSheet(
               controller: _sheetController,
               initialChildSize: effectiveInitialExtent,
-              minChildSize: effectiveMinExtent,
+              minChildSize: safeMinExtent,
               maxChildSize: 0.9,
               expand: false, // Allow sheet to retract from any scroll position
               builder: (context, scrollController) {
@@ -309,7 +404,7 @@ class _BulletinPageState extends State<BulletinPage> {
                         onVerticalDragUpdate: (details) {
                           if (dragStartExtent != null) {
                             final dragDelta = details.primaryDelta ?? 0.0;
-                            final newExtent = (_sheetController.size - dragDelta / MediaQuery.of(context).size.height).clamp(effectiveMinExtent, 0.9);
+                            final newExtent = (_sheetController.size - dragDelta / MediaQuery.of(context).size.height).clamp(safeMinExtent, 0.9);
                             _sheetController.jumpTo(newExtent);
                           }
                         },
@@ -339,7 +434,10 @@ class _BulletinPageState extends State<BulletinPage> {
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
-                          padding: const EdgeInsets.only(top: 0, bottom: 150),
+                          padding: EdgeInsets.only(
+                            top: 0, 
+                            bottom: screenHeight * 0.18, // Responsive bottom padding
+                          ),
                           itemCount: dateKeys.length,
                           itemBuilder: (context, index) {
                             final date = dateKeys[index];
@@ -371,22 +469,39 @@ class _BulletinPageState extends State<BulletinPage> {
       padding: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, screenWidth * 0.04),
       child: Text(
         title,
-        style: TextStyle(fontSize: screenWidth * 0.055, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
+        style: TextStyle(fontSize: screenWidth * 0.055, fontWeight: FontWeight.w900, color: Colors.black),
       ),
     );
   }
 
   Widget _buildDateHeader(String date) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    
+    // Make header height responsive to screen size
+    final double headerHeight = screenWidth * 0.13; // 13% of screen width
+    final double verticalPadding = screenWidth * 0.03;
+    final double horizontalPadding = screenWidth * 0.06;
+    
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.03, screenWidth * 0.06, screenWidth * 0.02),
+      height: headerHeight,
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFF2F2F7),
       ),
-      child: Text(
-        date,
-        style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          date,
+          style: TextStyle(
+            fontSize: screenWidth * 0.05, 
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
@@ -494,24 +609,24 @@ class _BulletinEventCard extends StatelessWidget {
                       children: [
                         Text(
                           post.title,
-                          style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: screenWidth * 0.03),
                         Row(
                           children: [
-                            Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.grey),
+                            Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.black),
                             SizedBox(width: screenWidth * 0.02),
                             Expanded(
                               child: Text(
                                 post.subtitle,
-                                style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700),
+                                style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.grey),
+                            Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.black),
                           ],
                         ),
                       ],
@@ -582,14 +697,14 @@ class _PinnedPostCard extends StatelessWidget {
                 children: [
                   Text(
                     post.title,
-                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: screenWidth * 0.01),
                   Text(
                     post.subtitle,
-                    style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700),
+                    style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

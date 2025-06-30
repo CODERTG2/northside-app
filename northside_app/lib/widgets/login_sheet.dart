@@ -92,7 +92,7 @@ class _LoginSheetState extends State<LoginSheet> {
                   children: [
                     const Text(
                       'Link Flex Account',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 32),
                     // Email/Username TextField

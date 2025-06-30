@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../presentation/app_shell/app_shell_controller.dart';
 
 class SharedHeader extends StatelessWidget {
@@ -13,7 +14,7 @@ class SharedHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppShellController appShellController = Get.find();
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double titleFontSize = screenWidth * 0.07; // Responsive title size
+    final double titleFontSize = screenWidth * 0.07; // Match sport detail page styling
 
     return Padding(
       padding: EdgeInsets.only(
@@ -26,18 +27,10 @@ class SharedHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontSize: titleFontSize,
               fontWeight: FontWeight.w900,
               color: Colors.black,
-              letterSpacing: -1.2, // Even tighter tracking for extra bold impact
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.12),
-                  offset: const Offset(0, 2),
-                  blurRadius: 2,
-                ),
-              ],
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

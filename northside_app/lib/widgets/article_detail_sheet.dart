@@ -116,7 +116,7 @@ class ArticleDetailSheet extends StatelessWidget {
                 // Title
                 Text(
                   article.title,
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 16),
                 // Main content with link support

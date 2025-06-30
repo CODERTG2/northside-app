@@ -17,14 +17,40 @@ class FlexesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     final FlexesController controller = Get.put(FlexesController());
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 120),
-        children: [
-          const SharedHeader(title: 'Flexes'),
-          const SizedBox(height: 8),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Flexes',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: GestureDetector(
+              onTap: () {
+                final AppShellController appShellController = Get.find();
+                appShellController.changePage(4);
+              },
+              child: CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.grey.shade300,
+                child: const Icon(Icons.person, color: Colors.black, size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 120),
+          children: [
+            const SizedBox(height: 8),
           _buildDateSubtitle(),
           const SizedBox(height: 24),
           Padding(
@@ -51,7 +77,7 @@ class FlexesPage extends StatelessWidget {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.grey.shade600,
+          color: Colors.black,
         ),
       ),
     );
@@ -70,7 +96,7 @@ class _FlexRegistrationSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0, top: 16.0),
-          child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
         if (pickedChoice != null)
           _PickedFlexCard(choice: pickedChoice!)
