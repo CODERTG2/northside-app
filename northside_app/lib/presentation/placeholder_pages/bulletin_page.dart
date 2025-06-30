@@ -32,8 +32,33 @@ class _BulletinPageState extends State<BulletinPage> {
   Timer? _inactivityTimer;
   Timer? _midnightTimer;
   bool _isAutoScrolling = false;
-  double _lastSheetExtent = 0.35;
-  final double _initialSheetExtent = 0.35;
+  double? _lastSheetExtent;
+  double? _initialSheetExtent;
+
+  // Calculate responsive sheet extents based on screen dimensions
+  double get responsiveInitialExtent {
+    if (_initialSheetExtent != null) return _initialSheetExtent!;
+    
+    final context = this.context;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Adjust based on screen aspect ratio and size
+    double baseExtent = 0.4; // 40% for most devices
+    
+    // For very tall/narrow screens (like iPhone 14 Pro Max), reduce slightly
+    if (screenHeight / screenWidth > 2.2) {
+      baseExtent = 0.35;
+    }
+    // For shorter/wider screens (like iPad landscape), increase slightly  
+    else if (screenHeight / screenWidth < 1.5) {
+      baseExtent = 0.45;
+    }
+    
+    _initialSheetExtent = baseExtent;
+    _lastSheetExtent = baseExtent;
+    return baseExtent;
+  }
 
   // For drag handle
   final DraggableScrollableController _sheetController = DraggableScrollableController();
@@ -79,15 +104,27 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   double _getSnapBackExtent() {
+    final initialExtent = responsiveInitialExtent;
+    
     // Use calculated min extent if available, otherwise use initial extent
     if (_calculatedMinExtent != null) {
       // Ensure we never cover pinned content by using the max of calculated and initial
       // But cap it at a reasonable maximum to prevent the sheet from being too high
-      final maxAllowed = 0.45; // Never go above 45% of screen height
-      final safeExtent = (_calculatedMinExtent! > _initialSheetExtent ? _calculatedMinExtent! : _initialSheetExtent);
-      return safeExtent.clamp(_initialSheetExtent, maxAllowed);
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+      
+      // Make max allowed responsive to screen size
+      double maxAllowed = 0.5; // Default 50%
+      if (screenHeight / screenWidth > 2.2) {
+        maxAllowed = 0.45; // Slightly lower for very tall screens
+      } else if (screenHeight / screenWidth < 1.5) {
+        maxAllowed = 0.55; // Slightly higher for wider screens
+      }
+      
+      final safeExtent = (_calculatedMinExtent! > initialExtent ? _calculatedMinExtent! : initialExtent);
+      return safeExtent.clamp(initialExtent, maxAllowed);
     }
-    return _initialSheetExtent;
+    return initialExtent;
   }
 
   void _buildGroupedList() {
@@ -149,7 +186,20 @@ class _BulletinPageState extends State<BulletinPage> {
   void _onScroll() {
     if (_isAutoScrolling) return;
     _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(const Duration(seconds: 30), () {
+    
+    // Make inactivity timeout responsive to device type
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Longer timeout for tablets/larger screens, shorter for phones
+    Duration timeoutDuration;
+    if (screenWidth > 600 || screenHeight > 900) {
+      timeoutDuration = const Duration(seconds: 45); // Tablets get longer timeout
+    } else {
+      timeoutDuration = const Duration(seconds: 30); // Phones get standard timeout
+    }
+    
+    _inactivityTimer = Timer(timeoutDuration, () {
       _scrollToTodaySection(animate: true);
     });
   }
@@ -160,15 +210,25 @@ class _BulletinPageState extends State<BulletinPage> {
     double offset = 0;
     final keys = _groupedPosts.keys.toList();
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     
-    // Calculate offset for the target section, but add some padding so the full card is visible
+    // Calculate dynamic header height based on screen size
+    final double dateHeaderHeight = screenWidth * 0.13; // Responsive header height
+    final double cardHeight = screenWidth * 0.7; // Same as used in _BulletinEventCard
+    final double cardMargin = screenWidth * 0.04; // Same as used in _BulletinEventCard
+    
+    // Calculate offset for the target section
     for (int i = 0; i < _todaySectionIndex!; i++) {
-      offset += 56; // Date header height
-      offset += (_groupedPosts[keys[i]]!.length) * (screenWidth * 0.7 + screenWidth * 0.04); // Card height + card margin
+      offset += dateHeaderHeight; // Use responsive header height
+      offset += (_groupedPosts[keys[i]]!.length) * (cardHeight + cardMargin);
     }
     
-    // Add some padding so the first card is fully visible, not cut off at the top
-    offset = (offset - 20).clamp(0.0, double.infinity);
+    // Add the date header height for the target section itself
+    offset += dateHeaderHeight;
+    
+    // Subtract a responsive amount to ensure the date header is visible but the card starts right at the top
+    final double headerPadding = screenHeight * 0.035; // 3.5% of screen height
+    offset = (offset - headerPadding).clamp(0.0, double.infinity);
     
     if (animate) {
       _isAutoScrolling = true;
@@ -236,7 +296,7 @@ class _BulletinPageState extends State<BulletinPage> {
     });
 
     final double effectiveMinExtent = _getSnapBackExtent();
-    final double effectiveInitialExtent = effectiveMinExtent;
+    final double effectiveInitialExtent = responsiveInitialExtent;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
@@ -341,7 +401,10 @@ class _BulletinPageState extends State<BulletinPage> {
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
-                          padding: const EdgeInsets.only(top: 0, bottom: 150),
+                          padding: EdgeInsets.only(
+                            top: 0, 
+                            bottom: screenHeight * 0.18, // Responsive bottom padding
+                          ),
                           itemCount: dateKeys.length,
                           itemBuilder: (context, index) {
                             final date = dateKeys[index];
@@ -380,15 +443,32 @@ class _BulletinPageState extends State<BulletinPage> {
 
   Widget _buildDateHeader(String date) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    
+    // Make header height responsive to screen size
+    final double headerHeight = screenWidth * 0.13; // 13% of screen width
+    final double verticalPadding = screenWidth * 0.03;
+    final double horizontalPadding = screenWidth * 0.06;
+    
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.03, screenWidth * 0.06, screenWidth * 0.02),
+      height: headerHeight,
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFF2F2F7),
       ),
-      child: Text(
-        date,
-        style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          date,
+          style: TextStyle(
+            fontSize: screenWidth * 0.05, 
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
