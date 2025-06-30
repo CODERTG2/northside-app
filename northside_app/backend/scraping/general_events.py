@@ -18,9 +18,10 @@ def update_general_events():
         connect(host=os.environ['MONGODB_URL'])
     except Exception as e:
         print(f"Error connecting to the database: {e}")
+
     
-    added_count = 0
-    existing_count = 0
+    schedule = []
+    
     origin = "Northside Prep School Calendar"
     
     for month_num in range(1, 13):
@@ -46,6 +47,13 @@ def update_general_events():
                     event_date = f"{month_num}/{event_date}/{year_num}"
                     event_time = cell.find("span", class_="edEventDate").text.strip() if cell.find("span", class_="edEventDate") else "All Day"
 
+                    schedule.append({
+                        "date": event_date,
+                        "time": event_time,
+                        "name": event_name,
+                        "createdBy": origin
+                    })
+
                     existing_event = GeneralEvent.objects(
                         date=event_date,
                         time=event_time,
@@ -65,6 +73,14 @@ def update_general_events():
                         added_count += 1
                     else:
                         existing_count += 1
-    print(f"General schedule updated: {added_count} new events added, {existing_count} events already existed")
+    if GeneralEvent.objects.count() >= len(schedule):
+        print("No new events to add, skipping update.")
+        return
+    else:
+        GeneralEvent.drop_collection()
+        for event_data in schedule:
+            event = GeneralEvent(**event_data)
+            event.save()
+        print(f"General schedule updated: {len(schedule)} events processed")
 
 # update_general_events()

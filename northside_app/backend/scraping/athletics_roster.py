@@ -35,6 +35,8 @@ def update_athletics_roster():
     added_count = 0
     existing_count = 0
 
+    roster = []
+
     for sport in sports:
         for gender in genders:
             for season in seasons:
@@ -79,30 +81,24 @@ def update_athletics_roster():
                         # print(grades)
                         # print(positions)
                         for player in players:
-                            existing_athlete = Athlete.objects(
-                                name=player,
-                                number=numbers[players.index(player)],
-                                sport=sport,
-                                level=level,
-                                gender=gender,
-                                grade=grades[players.index(player)],
-                                position=positions[players.index(player)]
-                            ).first()
-                            if not existing_athlete:
-                                athlete = Athlete(
-                                    name=player,
-                                    number=numbers[players.index(player)],
-                                    sport=sport,
-                                    level=level,
-                                    gender=gender,
-                                    grade=grades[players.index(player)],
-                                    position=positions[players.index(player)]
-                                )
-                                athlete.save()
-                                added_count += 1
-                            else:
-                                existing_count += 1
+                            athlete = {
+                                "name": player,
+                                "number": numbers[players.index(player)],
+                                "sport": sport,
+                                "level": level,
+                                "gender": gender,
+                                "grade": grades[players.index(player)],
+                                "position": positions[players.index(player)]
+                            }
+                            roster.append(athlete)
 
-    print(f"Added {added_count} athletes, existing {existing_count} athletes.")
-
+    if Athlete.objects.count() >= len(roster):
+        print("Athletes already exist in the database, skipping addition.")
+        return
+    else:
+        Athlete.drop_collection()
+        for athlete_data in roster:
+            athlete = Athlete(**athlete_data)
+            athlete.save()
+        print(f"Added {len(roster)} athletes.")
 # update_athletics_roster()

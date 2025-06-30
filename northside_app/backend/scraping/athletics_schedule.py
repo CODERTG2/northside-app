@@ -112,24 +112,15 @@ def update_athletics_schedule():
     
     length = len(dates)  # Use shortest length to avoid index errors
     # print(f"Processing {length} events")
-    schedule = []
     added_count = 0
-    existing_count = 0
+
+    if AthleticsSchedule.objects.count() >= length:
+        return
+    else:
+        AthleticsSchedule.drop_collection()
 
     for i in range(length):
-        
-        event_data = {
-            "date": dates[i],
-            "time": times[i],
-            "sport": sports[i],
-            "team": teams[i],
-            "opponent": opponents[i],
-            "location": locations[i],
-            "home": home[i]
-        }
-        schedule.append(event_data)
-        
-        existing_event = AthleticsSchedule.objects(
+        event = AthleticsSchedule(
             date=dates[i],
             time=times[i],
             sport=sports[i],
@@ -137,24 +128,11 @@ def update_athletics_schedule():
             opponent=opponents[i],
             location=locations[i],
             home=home[i]
-        ).first()
-        
-        if not existing_event:
-            event = AthleticsSchedule(
-                date=dates[i],
-                time=times[i],
-                sport=sports[i],
-                team=teams[i],
-                opponent=opponents[i],
-                location=locations[i],
-                home=home[i]
-            )
-            event.save()
-            added_count += 1
-        else:
-            existing_count += 1
+        )
+        event.save()
+        added_count += 1
 
-    print(f"Athletics schedule updated: {added_count} new events added, {existing_count} events already existed")
+    print(f"Athletics schedule updated: {added_count} new events added")
     # print(schedule)
 
-update_athletics_schedule()
+# update_athletics_schedule()
