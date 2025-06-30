@@ -113,16 +113,16 @@ class _BulletinPageState extends State<BulletinPage> {
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
       
-      // Make max allowed responsive to screen size
-      double maxAllowed = 0.5; // Default 50%
+      // Make max allowed responsive to screen size, but never exceed initial extent
+      double maxAllowed = initialExtent; // Never go above initial extent
       if (screenHeight / screenWidth > 2.2) {
-        maxAllowed = 0.45; // Slightly lower for very tall screens
+        maxAllowed = (initialExtent * 0.9).clamp(0.3, initialExtent); // 90% of initial for tall screens
       } else if (screenHeight / screenWidth < 1.5) {
-        maxAllowed = 0.55; // Slightly higher for wider screens
+        maxAllowed = initialExtent; // Use initial extent for wider screens
       }
       
-      final safeExtent = (_calculatedMinExtent! > initialExtent ? _calculatedMinExtent! : initialExtent);
-      return safeExtent.clamp(initialExtent, maxAllowed);
+      final safeExtent = (_calculatedMinExtent! > initialExtent ? initialExtent : _calculatedMinExtent!);
+      return safeExtent.clamp(0.1, maxAllowed);
     }
     return initialExtent;
   }
@@ -297,6 +297,9 @@ class _BulletinPageState extends State<BulletinPage> {
 
     final double effectiveMinExtent = _getSnapBackExtent();
     final double effectiveInitialExtent = responsiveInitialExtent;
+    
+    // Ensure minChildSize <= initialChildSize to prevent Flutter assertion error
+    final double safeMinExtent = effectiveMinExtent > effectiveInitialExtent ? effectiveInitialExtent : effectiveMinExtent;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
@@ -323,7 +326,7 @@ class _BulletinPageState extends State<BulletinPage> {
             child: DraggableScrollableSheet(
               controller: _sheetController,
               initialChildSize: effectiveInitialExtent,
-              minChildSize: effectiveMinExtent,
+              minChildSize: safeMinExtent,
               maxChildSize: 0.9,
               expand: false, // Allow sheet to retract from any scroll position
               builder: (context, scrollController) {
@@ -371,7 +374,7 @@ class _BulletinPageState extends State<BulletinPage> {
                         onVerticalDragUpdate: (details) {
                           if (dragStartExtent != null) {
                             final dragDelta = details.primaryDelta ?? 0.0;
-                            final newExtent = (_sheetController.size - dragDelta / MediaQuery.of(context).size.height).clamp(effectiveMinExtent, 0.9);
+                            final newExtent = (_sheetController.size - dragDelta / MediaQuery.of(context).size.height).clamp(safeMinExtent, 0.9);
                             _sheetController.jumpTo(newExtent);
                           }
                         },
