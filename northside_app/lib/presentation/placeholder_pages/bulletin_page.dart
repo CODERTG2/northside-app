@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -15,6 +16,7 @@ import '../../models/bulletin_post.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
+import '../app_shell/app_shell_controller.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({super.key});
@@ -304,13 +306,40 @@ class _BulletinPageState extends State<BulletinPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Bulletin',
+          style: GoogleFonts.inter(
+            color: Colors.black, 
+            fontWeight: FontWeight.w900, 
+            fontSize: screenWidth * 0.07,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: GestureDetector(
+              onTap: () {
+                final AppShellController appShellController = Get.find();
+                appShellController.changePage(4);
+              },
+              child: CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.grey.shade300,
+                child: const Icon(Icons.person, color: Colors.black, size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           // Main header and pinned carousel always visible
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SharedHeader(key: _headerKey, title: 'Bulletin'),
               SizedBox(height: topSpacer),
               _buildSectionHeader("Pinned", key: _sectionHeaderKey),
               if (pinnedPosts.isNotEmpty) 

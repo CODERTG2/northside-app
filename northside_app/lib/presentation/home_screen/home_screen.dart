@@ -155,13 +155,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double fontSize = screenWidth * 0.09;
+    final double fontSize = screenWidth * 0.07;
     return Padding(
       padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.04),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: const Color(0xFF1E1E1E)), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
           CircleAvatar(
             radius: screenWidth * 0.06,
             backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9),

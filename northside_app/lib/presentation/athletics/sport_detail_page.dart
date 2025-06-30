@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../controllers/athletics_controller.dart';
 import '../../models/athlete.dart';
@@ -199,7 +200,11 @@ class _SportDetailPageState extends State<SportDetailPage> {
         ),
         title: Text(
           widget.sportName,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
+          style: GoogleFonts.inter(
+            color: Colors.black, 
+            fontWeight: FontWeight.w900, 
+            fontSize: screenWidth * 0.07,
+          ),
         ),
       ),
       body: Obx(() {

@@ -17,14 +17,40 @@ class FlexesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     final FlexesController controller = Get.put(FlexesController());
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 120),
-        children: [
-          const SharedHeader(title: 'Flexes'),
-          const SizedBox(height: 8),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Flexes',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: GestureDetector(
+              onTap: () {
+                final AppShellController appShellController = Get.find();
+                appShellController.changePage(4);
+              },
+              child: CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.grey.shade300,
+                child: const Icon(Icons.person, color: Colors.black, size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 120),
+          children: [
+            const SizedBox(height: 8),
           _buildDateSubtitle(),
           const SizedBox(height: 24),
           Padding(

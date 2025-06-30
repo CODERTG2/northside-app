@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HoofBeatPage extends StatefulWidget {
   const HoofBeatPage({super.key});
@@ -110,7 +111,7 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
                     final double screenWidth = MediaQuery.of(context).size.width;
                     return Text(
                       'Hoofbeat',
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: screenWidth * 0.07,
                         fontWeight: FontWeight.w900,
                         color: Colors.black,
