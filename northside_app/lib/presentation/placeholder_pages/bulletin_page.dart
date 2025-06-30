@@ -44,13 +44,13 @@ class _BulletinPageState extends State<BulletinPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     
     // Adjust based on screen aspect ratio and size
-    double baseExtent = 0.4; // 40% for most devices
+    double baseExtent = 0.45; // 45% for most devices
     
     // For very tall/narrow screens (like iPhone 14 Pro Max), reduce slightly
     if (screenHeight / screenWidth > 2.2) {
-      baseExtent = 0.35;
+      baseExtent = 0.4;
     }
-    // For shorter/wider screens (like iPad landscape), increase slightly  
+    // For shorter/wider screens (like iPad landscape), keep at base
     else if (screenHeight / screenWidth < 1.5) {
       baseExtent = 0.45;
     }
