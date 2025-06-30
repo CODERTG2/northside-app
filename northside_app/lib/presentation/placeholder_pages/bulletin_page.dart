@@ -226,9 +226,9 @@ class _BulletinPageState extends State<BulletinPage> {
     // Don't add the target section's header height here - we want it to be visible above the sheet
     // offset += dateHeaderHeight; // Remove this line
     
-    // Subtract enough to ensure the date header is fully visible above the draggable sheet
-    // We want the date header to appear just above the sheet's top edge
-    final double headerBuffer = dateHeaderHeight + (screenHeight * 0.02); // Full header height + small margin
+    // Subtract a minimal buffer to align the date header tightly with the sheet's top edge
+    // We want the date header to be positioned precisely at the sheet's top edge
+    final double headerBuffer = dateHeaderHeight * 0.3; // 30% of header height for very tight alignment
     offset = (offset - headerBuffer).clamp(0.0, double.infinity);
     
     if (animate) {
