@@ -199,7 +199,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
         ),
         title: Text(
           widget.sportName,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
         ),
       ),
       body: Obx(() {
@@ -271,7 +271,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                     _formatLevelName(level),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
+                      color: isSelected ? AppColors.primaryBlue : Colors.black,
                       fontSize: screenWidth * 0.045,
                     ),
                   ),
@@ -297,7 +297,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold)),
+          Text(title, style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w900)),
           SizedBox(height: screenWidth * 0.02),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -350,7 +350,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
   }
 
   Text _headerText(String text, double screenWidth) {
-    return Text(text, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.032));
+    return Text(text, style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.032));
   }
 
   Text _dataText(String text, double screenWidth) {

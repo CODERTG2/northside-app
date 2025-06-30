@@ -51,7 +51,7 @@ class FlexesPage extends StatelessWidget {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.grey.shade600,
+          color: Colors.black,
         ),
       ),
     );
@@ -70,7 +70,7 @@ class _FlexRegistrationSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0, top: 16.0),
-          child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
         if (pickedChoice != null)
           _PickedFlexCard(choice: pickedChoice!)

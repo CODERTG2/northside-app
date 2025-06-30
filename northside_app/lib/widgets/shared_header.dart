@@ -31,13 +31,6 @@ class SharedHeader extends StatelessWidget {
               fontWeight: FontWeight.w900,
               color: Colors.black,
               letterSpacing: -1.2, // Even tighter tracking for extra bold impact
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.12),
-                  offset: const Offset(0, 2),
-                  blurRadius: 2,
-                ),
-              ],
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

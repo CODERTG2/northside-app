@@ -114,7 +114,7 @@ class _WebViewSheetState extends State<WebViewSheet> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade700,
+                          color: Colors.black,
                         ),
                       ),
                     ),

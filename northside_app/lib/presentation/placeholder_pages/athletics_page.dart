@@ -124,7 +124,7 @@ class AthleticsPage extends StatelessWidget {
                 SizedBox(height: 16),
                 Text(
                   'No Recent Athletics News',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -204,7 +204,7 @@ class AthleticsPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -291,14 +291,14 @@ class _NewsCard extends StatelessWidget {
                     children: [
                       Text(
                         article.title,
-                        style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
                         maxLines: isNarrowScreen ? 1 : 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: screenWidth * 0.01),
                       Text(
                         article.subtitle,
-                        style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade600),
+                        style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

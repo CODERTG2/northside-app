@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
           border: isSelected ? Border.all(color: const Color(0xFF007AFF), width: 1.5) : null,
           borderRadius: BorderRadius.circular(screenWidth * 0.025),
         ),
-        child: Icon(icon, size: screenWidth * 0.07, color: isSelected ? const Color(0xFF007AFF) : Colors.grey[700]),
+        child: Icon(icon, size: screenWidth * 0.07, color: isSelected ? const Color(0xFF007AFF) : Colors.black),
       ),
     );
   }
@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xFF1E1E1E)), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: const Color(0xFF1E1E1E)), maxLines: 1, overflow: TextOverflow.ellipsis),
           CircleAvatar(
             radius: screenWidth * 0.06,
             backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9),
@@ -301,7 +301,6 @@ class _HomecomingCard extends StatelessWidget {
                         fontSize: screenWidth * 0.085,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 2.5,
-                        shadows: [Shadow(blurRadius: 5.0, color: Colors.black45, offset: Offset(2, 2))],
                       ),
                     ),
                   ),
@@ -319,7 +318,7 @@ class _HomecomingCard extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold, fontFamily: 'sans-serif'),
+                      style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900, fontFamily: 'sans-serif'),
                       children: [
                         TextSpan(text: 'Homecoming ', style: TextStyle(color: Color(0xFFB94056))),
                         TextSpan(text: '2024', style: TextStyle(color: Color(0xFF2E4096))),
@@ -329,13 +328,13 @@ class _HomecomingCard extends StatelessWidget {
                   SizedBox(height: screenWidth * 0.03),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.grey.shade600),
+                      Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.black),
                       SizedBox(width: screenWidth * 0.02),
-                      Text('This Friday', style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text('This Friday', style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
                       const Spacer(),
-                      Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.grey.shade600),
+                      Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.black),
                       SizedBox(width: screenWidth * 0.01),
-                      Text('More Details', style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text('More Details', style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ],
                   ),
                 ],

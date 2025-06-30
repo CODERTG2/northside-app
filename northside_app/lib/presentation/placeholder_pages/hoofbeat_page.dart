@@ -109,7 +109,7 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
                   'Hoofbeat',
                   style: TextStyle(
                     fontSize: 48,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w900,
                     color: Colors.black,
                   ),
                 ),

@@ -40,24 +40,24 @@ class AppTheme {
           displayLarge: TextStyle(
             // Original size was 28.sp
             fontSize: 26.sp, // Slightly smaller default to help on S9
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
             color: Colors.black,
           ),
           // For section headers (e.g., "Pinned")
           headlineMedium: TextStyle(
             fontSize: 15.sp, // Reduced from 16.sp
-            fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w900,
+            color: Colors.black,
           ),
           // For card titles (e.g., "Homecoming 2024")
           titleLarge: TextStyle(
             fontSize: 15.sp, // Reduced from 16.sp
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
           ),
           // For subtitles and body text
           bodyMedium: TextStyle(
             fontSize: 11.sp, // Reduced from 12.sp
-            color: Colors.grey.shade700,
+            color: Colors.black,
           ),
           // For button text
           labelLarge: TextStyle(

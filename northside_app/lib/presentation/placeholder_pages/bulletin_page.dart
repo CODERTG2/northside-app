@@ -440,7 +440,7 @@ class _BulletinPageState extends State<BulletinPage> {
       padding: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, screenWidth * 0.04),
       child: Text(
         title,
-        style: TextStyle(fontSize: screenWidth * 0.055, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
+        style: TextStyle(fontSize: screenWidth * 0.055, fontWeight: FontWeight.w900, color: Colors.black),
       ),
     );
   }
@@ -580,24 +580,24 @@ class _BulletinEventCard extends StatelessWidget {
                       children: [
                         Text(
                           post.title,
-                          style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: screenWidth * 0.03),
                         Row(
                           children: [
-                            Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.grey),
+                            Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.black),
                             SizedBox(width: screenWidth * 0.02),
                             Expanded(
                               child: Text(
                                 post.subtitle,
-                                style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700),
+                                style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.grey),
+                            Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.black),
                           ],
                         ),
                       ],
@@ -668,14 +668,14 @@ class _PinnedPostCard extends StatelessWidget {
                 children: [
                   Text(
                     post.title,
-                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: screenWidth * 0.01),
                   Text(
                     post.subtitle,
-                    style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.grey.shade700),
+                    style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

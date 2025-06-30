@@ -54,7 +54,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
         ),
         title: Text(
           'All Sports',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: screenWidth * 0.07),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
         ),
       ),
       body: ListView(
@@ -130,7 +130,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
           padding: EdgeInsets.only(bottom: screenWidth * 0.03),
           child: Text(
             title,
-            style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.045),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.045),
           ),
         ),
         ...sports.map((sport) {

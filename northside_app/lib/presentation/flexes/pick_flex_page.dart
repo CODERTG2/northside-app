@@ -38,7 +38,7 @@ class _PickFlexPageState extends State<PickFlexPage> {
         ),
         title: Text(
           'Pick ${widget.flexPeriod}',
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
         ),
         actions: [
           Padding(
@@ -78,7 +78,7 @@ class _PickFlexPageState extends State<PickFlexPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(choice.teacher, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                          Text(choice.room, style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
+                          Text(choice.room, style: TextStyle(fontSize: 16, color: Colors.black)),
                         ],
                       ),
                     ),
