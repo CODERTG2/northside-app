@@ -32,8 +32,8 @@ class _BulletinPageState extends State<BulletinPage> {
   Timer? _inactivityTimer;
   Timer? _midnightTimer;
   bool _isAutoScrolling = false;
-  double _lastSheetExtent = 0.55;
-  final double _initialSheetExtent = 0.55;
+  double _lastSheetExtent = 0.35;
+  final double _initialSheetExtent = 0.35;
 
   // For drag handle
   final DraggableScrollableController _sheetController = DraggableScrollableController();
@@ -81,9 +81,11 @@ class _BulletinPageState extends State<BulletinPage> {
   double _getSnapBackExtent() {
     // Use calculated min extent if available, otherwise use initial extent
     if (_calculatedMinExtent != null) {
-      // If calculated min is higher than initial, use max(calculatedMin, initial)
-      // This ensures we never cover pinned content but prefer the middle position
-      return _calculatedMinExtent! > _initialSheetExtent ? _calculatedMinExtent! : _initialSheetExtent;
+      // Ensure we never cover pinned content by using the max of calculated and initial
+      // But cap it at a reasonable maximum to prevent the sheet from being too high
+      final maxAllowed = 0.45; // Never go above 45% of screen height
+      final safeExtent = (_calculatedMinExtent! > _initialSheetExtent ? _calculatedMinExtent! : _initialSheetExtent);
+      return safeExtent.clamp(_initialSheetExtent, maxAllowed);
     }
     return _initialSheetExtent;
   }
@@ -224,7 +226,7 @@ class _BulletinPageState extends State<BulletinPage> {
           sectionHeaderBox.size.height +
           carouselBox.size.height +
           16; // Add small buffer
-        final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.8);
+        final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.5);
         if (_calculatedMinExtent != calculatedMin) {
           setState(() {
             _calculatedMinExtent = calculatedMin;
