@@ -223,12 +223,13 @@ class _BulletinPageState extends State<BulletinPage> {
       offset += (_groupedPosts[keys[i]]!.length) * (cardHeight + cardMargin);
     }
     
-    // Add the date header height for the target section itself
-    offset += dateHeaderHeight;
+    // Don't add the target section's header height here - we want it to be visible above the sheet
+    // offset += dateHeaderHeight; // Remove this line
     
-    // Subtract a responsive amount to ensure the date header is visible but the card starts right at the top
-    final double headerPadding = screenHeight * 0.035; // 3.5% of screen height
-    offset = (offset - headerPadding).clamp(0.0, double.infinity);
+    // Subtract enough to ensure the date header is fully visible above the draggable sheet
+    // We want the date header to appear just above the sheet's top edge
+    final double headerBuffer = dateHeaderHeight + (screenHeight * 0.02); // Full header height + small margin
+    offset = (offset - headerBuffer).clamp(0.0, double.infinity);
     
     if (animate) {
       _isAutoScrolling = true;
