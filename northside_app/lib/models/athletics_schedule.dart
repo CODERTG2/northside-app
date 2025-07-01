@@ -102,7 +102,7 @@ class AthleticsSchedule {
       title: '$sport $homeAway $opponent',
       subtitle: _buildArticleSubtitle(),
       content: '$teamName $homeAway $opponent at $location on $date at $time.',
-      imagePath: 'assets/images/flexes_icon.png', // Add image for athletics games
+      imagePath: 'assets/images/flexes_icon.png', // Use flexes icon for athletics games
     );
   }
 
@@ -232,7 +232,7 @@ class AthleticsSchedule {
       subtitle: _buildSubtitle(parseEventDate()),
       date: parseEventDate(),
       content: '${gender.toUpperCase()} ${level.toUpperCase()} ${home ? "vs" : "at"} $opponent at $location on $date at $time.',
-      imagePath: 'assets/images/flexes_icon.png', // Default image for athletics
+      imagePath: 'assets/images/flexes_icon.png', // Use flexes icon for athletics events
       isPinned: false,
     );
   }

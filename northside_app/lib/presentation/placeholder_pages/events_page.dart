@@ -138,10 +138,10 @@ class _EventsPageState extends State<EventsPage> {
             return const Center(child: CircularProgressIndicator());
           }
           
-          return ListView(
-            padding: EdgeInsets.only(bottom: screenHeight * 0.12),
-            children: [
-              SizedBox(height: screenHeight * 0.02),
+        return ListView(
+          padding: EdgeInsets.only(bottom: screenHeight * 0.12),
+          children: [
+            SizedBox(height: screenHeight * 0.02),
             _buildFilterButton(context),
             SizedBox(height: screenHeight * 0.02),
             _buildCalendar(context),
@@ -149,7 +149,8 @@ class _EventsPageState extends State<EventsPage> {
             _buildEventList(context),
           ],
         );
-      }),
+        }),
+      ),
     );
   }
 

@@ -89,21 +89,21 @@ class GeneralEvent {
       
       // If it's today, show time and location
       if (eventDay.isAtSameMomentAs(today)) {
-        return '$time${location != null ? ' - $location' : ''} • Created by $createdBy';
+        return '$time${location != null ? ' - $location' : ''}';
       }
       
       // If it's in the future, show days away and location
       final daysDifference = eventDay.difference(today).inDays;
       if (daysDifference > 0) {
         final daysText = daysDifference == 1 ? '1 day away' : '$daysDifference days away';
-        return '$daysText${location != null ? ' - $location' : ''} • Created by $createdBy';
+        return '$daysText${location != null ? ' - $location' : ''}';
       }
       
       // If it's in the past, show time (fallback)
-      return '$time${location != null ? ' - $location' : ''} • Created by $createdBy';
+      return '$time${location != null ? ' - $location' : ''}';
     } catch (e) {
       // If date parsing fails, fallback to time and location
-      return '$time${location != null ? ' - $location' : ''} • Created by $createdBy';
+      return '$time${location != null ? ' - $location' : ''}';
     }
   }
 

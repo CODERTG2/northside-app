@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../app_shell/app_shell_controller.dart';
 import '../flexes/flexes_controller.dart';
 import '../flexes/pick_flex_page.dart';
 import '../../models/flex_choice.dart';
@@ -51,20 +52,21 @@ class FlexesPage extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 120),
           children: [
             const SizedBox(height: 8),
-          _buildDateSubtitle(),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Obx(() => Column(
-              children: _flexPeriods
-                  .map((title) => _FlexRegistrationSection(
-                        title: title,
-                        pickedChoice: controller.getPickedFlexFor(title),
-                      ))
-                  .toList(),
-            )),
-          ),
-        ],
+            _buildDateSubtitle(),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Obx(() => Column(
+                children: _flexPeriods
+                    .map((title) => _FlexRegistrationSection(
+                          title: title,
+                          pickedChoice: controller.getPickedFlexFor(title),
+                        ))
+                    .toList(),
+              )),
+            ),
+          ],
+        ),
       ),
     );
   }

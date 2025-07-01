@@ -124,6 +124,7 @@ class BulletinController extends GetxController {
     
     // Create combined posts including athletics for home carousel
     final List<BulletinPost> homeCarouselPosts = [];
+    final Set<String> addedEventKeys = {}; // To prevent duplicates
     
     // Add general events (filter out announcements from allPosts)
     final generalEventPosts = allPosts.where((post) => 
@@ -131,7 +132,11 @@ class BulletinController extends GetxController {
     
     for (final post in generalEventPosts) {
       if (!post.date.isBefore(todayStart)) {
-        homeCarouselPosts.add(post);
+        final eventKey = '${post.title}_${post.date.toIso8601String()}';
+        if (!addedEventKeys.contains(eventKey)) {
+          homeCarouselPosts.add(post);
+          addedEventKeys.add(eventKey);
+        }
       }
     }
     
@@ -139,15 +144,26 @@ class BulletinController extends GetxController {
     for (final announcement in _announcements) {
       final bulletinPost = announcement.toBulletinPost(useEndDate: true);
       if (!bulletinPost.date.isBefore(todayStart)) {
-        homeCarouselPosts.add(bulletinPost);
+        final eventKey = '${bulletinPost.title}_${bulletinPost.date.toIso8601String()}';
+        if (!addedEventKeys.contains(eventKey)) {
+          homeCarouselPosts.add(bulletinPost);
+          addedEventKeys.add(eventKey);
+        }
       }
     }
     
-    // Add athletics events for home carousel
+    // Add athletics events for home carousel with improved duplicate detection
     for (final event in _athleticsEvents) {
       final bulletinPost = event.toBulletinPost();
       if (!bulletinPost.date.isBefore(todayStart)) {
-        homeCarouselPosts.add(bulletinPost);
+        // Create a more specific event key to detect true duplicates
+        final eventKey = '${bulletinPost.title}_${event.location}_${bulletinPost.date.toIso8601String()}_${event.time}';
+        
+        // Only skip if we have seen this exact same event (same title, location, date, and time)
+        if (!addedEventKeys.contains(eventKey)) {
+          homeCarouselPosts.add(bulletinPost);
+          addedEventKeys.add(eventKey);
+        }
       }
     }
     

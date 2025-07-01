@@ -220,16 +220,6 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                           ),
                         ),
                         const Icon(Icons.more_horiz, size: 20, color: Colors.black),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            'More Details',
-                            style: TextStyle(fontSize: 14, color: Colors.black),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
                       ],
                     ),
                   ],

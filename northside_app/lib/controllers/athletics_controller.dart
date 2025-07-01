@@ -228,8 +228,20 @@ class AthleticsController extends GetxController {
       }
     }).toList();
 
+    // Remove exact duplicates using a more specific key
+    final seen = <String>{};
+    final uniqueGames = <AthleticsSchedule>[];
+    
+    for (final game in upcomingGames) {
+      final gameKey = '${game.sport}_${game.opponent}_${game.location}_${game.date}_${game.time}';
+      if (!seen.contains(gameKey)) {
+        seen.add(gameKey);
+        uniqueGames.add(game);
+      }
+    }
+
     // Sort by date (earliest first)
-    upcomingGames.sort((a, b) {
+    uniqueGames.sort((a, b) {
       final dateA = _parseEventDate(a.date);
       final dateB = _parseEventDate(b.date);
       if (dateA == null && dateB == null) return 0;
@@ -239,7 +251,7 @@ class AthleticsController extends GetxController {
     });
 
     // Return articles from real data (take first 10 upcoming games)
-    return upcomingGames.take(10).map((game) => game.toArticle()).toList();
+    return uniqueGames.take(10).map((game) => game.toArticle()).toList();
   }
 
   // Helper method to parse various date formats
