@@ -216,8 +216,13 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Calculate dynamic header height based on screen size
     final double dateHeaderHeight = screenWidth * 0.13; // Responsive header height
-    final double cardHeight = screenWidth * 0.7; // Same as used in _BulletinEventCard
-    final double cardMargin = screenWidth * 0.04; // Same as used in _BulletinEventCard
+    final bool isNarrowScreen = screenWidth < 360;
+    // Update to match the new compact card height (padding + text content)
+    final double cardHeight = (isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04) * 2 + // top + bottom padding
+                             (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055) + // title font size (approximate line height)
+                             (isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02) + // spacing between title and subtitle
+                             (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.045); // subtitle line with icon
+    final double cardMargin = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04; // Same as used in _BulletinEventCard
     
     // Calculate offset for the target section
     for (int i = 0; i < _todaySectionIndex!; i++) {
@@ -274,7 +279,7 @@ class _BulletinPageState extends State<BulletinPage> {
     final dateKeys = _groupedPosts.keys.toList();
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double topSpacer = 24;
+    final double topSpacer = screenWidth * 0.057; // ~24px at 420px width
     final double betweenSpacer = 0; // Set to 0 to remove gap
 
     // Calculate dynamic minimum extent to avoid covering pinned section (always present now)
@@ -288,7 +293,7 @@ class _BulletinPageState extends State<BulletinPage> {
           topSpacer +
           sectionHeaderBox.size.height +
           carouselBox.size.height +
-          16; // Add small buffer
+          screenWidth * 0.038; // Add small buffer (~16px at 420px width)
         final double calculatedMin = (totalHeight / screenHeight).clamp(0.1, 0.5);
         if (_calculatedMinExtent != calculatedMin) {
           setState(() {
@@ -319,7 +324,7 @@ class _BulletinPageState extends State<BulletinPage> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 24.0),
+            padding: EdgeInsets.only(right: screenWidth * 0.057), // ~24px at 420px width
             child: GestureDetector(
               onTap: () {
                 final AppShellController appShellController = Get.find();
@@ -369,14 +374,14 @@ class _BulletinPageState extends State<BulletinPage> {
                 if (dateKeys.isEmpty) {
                   return Container(
                     // Remove the top margin to close the gap
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Color(0xFFF2F2F7),
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.057)), // ~24px at 420px width
                       boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: -5)],
                     ),
                     child: Center(
                       child: Padding(
-                        padding: EdgeInsets.all(32),
+                        padding: EdgeInsets.all(screenWidth * 0.076), // ~32px at 420px width
                         child: Text(
                           'No bulletin posts available.',
                           style: Theme.of(context).textTheme.bodyLarge,
@@ -387,9 +392,9 @@ class _BulletinPageState extends State<BulletinPage> {
                   );
                 }
                 return Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Color(0xFFF2F2F7),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.057)), // ~24px at 420px width
                     boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: -5)],
                   ),
                   child: Column(
@@ -418,11 +423,11 @@ class _BulletinPageState extends State<BulletinPage> {
                           // No need to trigger scrollToTodaySection here; handled by controller listener
                         },
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 8),
+                          padding: EdgeInsets.only(top: screenWidth * 0.029, bottom: screenWidth * 0.019), // ~12px, ~8px at 420px width
                           child: Center(
                             child: Container(
-                              width: 36,
-                              height: 5,
+                              width: screenWidth * 0.086, // ~36px at 420px width
+                              height: screenWidth * 0.012, // ~5px at 420px width
                               decoration: BoxDecoration(
                                 color: Colors.grey[400],
                                 borderRadius: BorderRadius.circular(2.5),
@@ -515,7 +520,7 @@ class _BulletinPageState extends State<BulletinPage> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.057), // ~24px at 420px width
         itemCount: posts.length,
         itemBuilder: (context, index) {
           return _PinnedPostCard(post: posts[index]);
@@ -532,7 +537,7 @@ class _BulletinPageState extends State<BulletinPage> {
       height: carouselHeight,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.057), // ~24px at 420px width
           child: Text(
             'No pinned posts at this time',
             style: TextStyle(
@@ -569,73 +574,54 @@ class _BulletinEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double cardRadius = screenWidth * 0.06;
-    final double cardHeight = screenWidth * 0.7;
-    final double fontSizeTitle = screenWidth * 0.055;
-    final double fontSizeSubtitle = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.045;
+    final bool isNarrowScreen = screenWidth < 360;
+    
     return GestureDetector(
       onTap: () => _showArticleSheet(post),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, screenWidth * 0.04),
-        child: Container(
-          height: cardHeight,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(cardRadius),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(cardRadius),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04),
+        padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              post.title,
+              style: TextStyle(
+                fontSize: isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055, 
+                fontWeight: FontWeight.w900
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02),
+            Row(
               children: [
-                Expanded(
-                  flex: 3,
-                  child: Image.asset(
-                    post.imagePath!,
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[200]),
-                  ),
+                Icon(
+                  Icons.calendar_today_outlined, 
+                  size: isNarrowScreen ? screenWidth * 0.04 : screenWidth * 0.045, 
+                  color: Colors.black
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.04, screenWidth * 0.03),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          post.title,
-                          style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: screenWidth * 0.03),
-                        Row(
-                          children: [
-                            Icon(Icons.calendar_today_outlined, size: iconSize, color: Colors.black),
-                            SizedBox(width: screenWidth * 0.02),
-                            Expanded(
-                              child: Text(
-                                post.subtitle,
-                                style: TextStyle(fontSize: fontSizeSubtitle, color: Colors.black),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Icon(Icons.more_horiz, size: iconSize * 1.2, color: Colors.black),
-                          ],
-                        ),
-                      ],
+                SizedBox(width: screenWidth * 0.02),
+                Flexible(
+                  child: Text(
+                    post.subtitle,
+                    style: TextStyle(
+                      fontSize: isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04,
+                      color: Colors.black,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
