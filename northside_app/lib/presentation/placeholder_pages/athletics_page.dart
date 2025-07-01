@@ -289,25 +289,30 @@ class _NewsCard extends StatelessWidget {
                 width: double.infinity,
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
-                  child: article.imagePath != null 
-                    ? Image.asset(
-                        article.imagePath!,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey.shade200,
-                            child: const Center(
-                              child: Icon(Icons.sports_basketball, size: 48, color: Colors.grey),
-                            ),
-                          );
-                        },
-                      )
-                    : Container(
-                        color: Colors.grey.shade200,
-                        child: const Center(
-                          child: Icon(Icons.sports_basketball, size: 48, color: Colors.grey),
+                  child: Container(
+                    padding: EdgeInsets.only(top: cardHeight * 0.06, bottom: 0.0), // Same ratio as home carousel
+                    child: article.imagePath != null 
+                      ? Image.asset(
+                          article.imagePath!,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'assets/images/flexes_icon.png',
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(Icons.sports_basketball, size: 48, color: Colors.grey);
+                              },
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          'assets/images/flexes_icon.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.sports_basketball, size: 48, color: Colors.grey);
+                          },
                         ),
-                      ),
+                  ),
                 ),
               ),
               Expanded(
