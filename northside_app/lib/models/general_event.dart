@@ -87,23 +87,22 @@ class GeneralEvent {
       final today = DateTime(now.year, now.month, now.day);
       final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
       
-      // If it's today, show time and location
+      // If it's today, show time only
       if (eventDay.isAtSameMomentAs(today)) {
-        return '$time${location != null ? ' - $location' : ''}';
+        return time;
       }
       
-      // If it's in the future, show days away and location
+      // If it's in the future, show days away only
       final daysDifference = eventDay.difference(today).inDays;
       if (daysDifference > 0) {
-        final daysText = daysDifference == 1 ? '1 day away' : '$daysDifference days away';
-        return '$daysText${location != null ? ' - $location' : ''}';
+        return daysDifference == 1 ? '1 day away' : '$daysDifference days away';
       }
       
       // If it's in the past, show time (fallback)
-      return '$time${location != null ? ' - $location' : ''}';
+      return time;
     } catch (e) {
-      // If date parsing fails, fallback to time and location
-      return '$time${location != null ? ' - $location' : ''}';
+      // If date parsing fails, fallback to time
+      return time;
     }
   }
 
@@ -186,19 +185,18 @@ class GeneralEvent {
     final today = DateTime(now.year, now.month, now.day);
     final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
     
-    // If it's today, show time
+    // If it's today, show time only
     if (eventDay.isAtSameMomentAs(today)) {
-      return '$time${location != null ? ' - $location' : ''}';
+      return time;
     }
     
-    // If it's in the future, show days away
+    // If it's in the future, show days away only
     final daysDifference = eventDay.difference(today).inDays;
     if (daysDifference > 0) {
-      final daysText = daysDifference == 1 ? '1 day away' : '$daysDifference days away';
-      return '$daysText${location != null ? ' - $location' : ''}';
+      return daysDifference == 1 ? '1 day away' : '$daysDifference days away';
     }
     
     // If it's in the past, show time (fallback)
-    return '$time${location != null ? ' - $location' : ''}';
+    return time;
   }
 }

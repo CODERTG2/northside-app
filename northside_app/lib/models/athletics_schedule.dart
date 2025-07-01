@@ -114,23 +114,22 @@ class AthleticsSchedule {
       final today = DateTime(now.year, now.month, now.day);
       final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
       
-      // If it's today, show time and location
+      // If it's today, show time only
       if (eventDay.isAtSameMomentAs(today)) {
-        return '$time - $location';
+        return time;
       }
       
-      // If it's in the future, show days away and location
+      // If it's in the future, show days away only
       final daysDifference = eventDay.difference(today).inDays;
       if (daysDifference > 0) {
-        final daysText = daysDifference == 1 ? '1 day away' : '$daysDifference days away';
-        return '$daysText - $location';
+        return daysDifference == 1 ? '1 day away' : '$daysDifference days away';
       }
       
       // If it's in the past, show time (fallback)
-      return '$time - $location';
+      return time;
     } catch (e) {
-      // If date parsing fails, fallback to time and location
-      return '$time - $location';
+      // If date parsing fails, fallback to time
+      return time;
     }
   }
 
@@ -243,19 +242,18 @@ class AthleticsSchedule {
     final today = DateTime(now.year, now.month, now.day);
     final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
     
-    // If it's today, show time and location
+    // If it's today, show time only
     if (eventDay.isAtSameMomentAs(today)) {
-      return '$time - $location';
+      return time;
     }
     
-    // If it's in the future, show days away and location
+    // If it's in the future, show days away only
     final daysDifference = eventDay.difference(today).inDays;
     if (daysDifference > 0) {
-      final daysText = daysDifference == 1 ? '1 day away' : '$daysDifference days away';
-      return '$daysText - $location';
+      return daysDifference == 1 ? '1 day away' : '$daysDifference days away';
     }
     
     // If it's in the past, show time (fallback)
-    return '$time - $location';
+    return time;
   }
 }

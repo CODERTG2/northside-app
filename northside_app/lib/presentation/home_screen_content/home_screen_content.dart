@@ -80,7 +80,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     
     if (events.isEmpty) {
       return SizedBox(
-        height: 350,
+        height: 300,
         child: Center(
           child: bulletinController.isLoading 
             ? const CircularProgressIndicator()
@@ -120,7 +120,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     }
     
     return SizedBox(
-      height: 350,
+      height: 300,
       child: PageView.builder(
         controller: controller.pageController,
         itemCount: events.length,
@@ -169,44 +169,49 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
           children: [
             Expanded(
               flex: 3,
-              child: article.imagePath != null 
-                ? Image.asset(
-                    article.imagePath!, 
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey.shade300,
-                        child: const Center(
-                          child: Icon(
-                            Icons.event,
-                            size: 48,
-                            color: Colors.black,
+              child: Container(
+                padding: const EdgeInsets.only(top: 17.0, bottom: 0.0),
+                child: article.imagePath != null 
+                  ? Image.asset(
+                      article.imagePath!, 
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade300,
+                          child: const Center(
+                            child: Icon(
+                              Icons.event,
+                              size: 48,
+                              color: Colors.black,
+                            ),
                           ),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: Colors.grey.shade300,
+                      child: const Center(
+                        child: Icon(
+                          Icons.event,
+                          size: 48,
+                          color: Colors.black,
                         ),
-                      );
-                    },
-                  )
-                : Container(
-                    color: Colors.grey.shade300,
-                    child: const Center(
-                      child: Icon(
-                        Icons.event,
-                        size: 48,
-                        color: Colors.black,
                       ),
                     ),
-                  ),
+              ),
             ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 12),
+            Transform.translate(
+              offset: const Offset(0, -1),
+              child: Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      const SizedBox(height: 12),
                     Row(
                       children: [
                         const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.black),
@@ -225,6 +230,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ),
