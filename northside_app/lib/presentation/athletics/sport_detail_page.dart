@@ -318,6 +318,41 @@ class _SportDetailPageState extends State<SportDetailPage> {
 
   DataTable _buildScheduleTable(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    
+    if (_schedules.isEmpty) {
+      return DataTable(
+        columnSpacing: screenWidth * 0.08,
+        columns: ['DATE', 'TIME', 'EVENT', 'OPPONENT', 'LOCATION', 'SCORE', 'W/L'].map((h) => DataColumn(label: _headerText(h, screenWidth))).toList(),
+        rows: [
+          DataRow(cells: [
+            DataCell(
+              Container(
+                width: screenWidth * 0.7, // Set explicit width
+                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
+                child: Center(
+                  child: Text(
+                    'No games currently scheduled',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey[600],
+                      fontSize: screenWidth * 0.035,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+          ]),
+        ],
+      );
+    }
+    
     return DataTable(
       columnSpacing: screenWidth * 0.08,
       columns: ['DATE', 'TIME', 'EVENT', 'OPPONENT', 'LOCATION', 'SCORE', 'W/L'].map((h) => DataColumn(label: _headerText(h, screenWidth))).toList(),
@@ -342,6 +377,37 @@ class _SportDetailPageState extends State<SportDetailPage> {
         child: const Center(
           child: CircularProgressIndicator(),
         ),
+      );
+    }
+    
+    if (_roster.isEmpty) {
+      return DataTable(
+        columnSpacing: screenWidth * 0.08,
+        columns: ['NAME', '#', 'POSITION', 'GRADE'].map((h) => DataColumn(label: _headerText(h, screenWidth))).toList(),
+        rows: [
+          DataRow(cells: [
+            DataCell(
+              Container(
+                width: screenWidth * 0.6, // Set explicit width
+                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
+                child: Center(
+                  child: Text(
+                    'No roster currently exists',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey[600],
+                      fontSize: screenWidth * 0.035,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+            const DataCell(Text('')),
+          ]),
+        ],
       );
     }
     

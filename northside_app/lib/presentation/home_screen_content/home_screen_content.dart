@@ -119,16 +119,60 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
       );
     }
     
+    // Set the event count for infinite scroll calculation
+    controller.setEventCount(events.length);
+    
+    // For single event, don't enable infinite scroll
+    if (events.length == 1) {
+      return SizedBox(
+        height: 300,
+        child: PageView.builder(
+          controller: controller.pageController,
+          itemCount: 1,
+          clipBehavior: Clip.none,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final post = events[0];
+            final article = Article(
+              title: post.title,
+              subtitle: post.subtitle,
+              imagePath: post.imagePath,
+              content: post.content,
+            );
+            return GestureDetector(
+              onTap: () {
+                Get.bottomSheet(
+                  ArticleDetailDraggableSheet(article: article),
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  useRootNavigator: false,
+                  enableDrag: true,
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: _buildEventCard(article),
+              ),
+            );
+          },
+        ),
+      );
+    }
+    
+    // For multiple events, enable infinite scroll
     return SizedBox(
       height: 300,
       child: PageView.builder(
-        controller: controller.pageController,
-        itemCount: events.length,
+        controller: PageController(
+          initialPage: controller.getVirtualIndex(0),
+        ),
+        itemCount: null, // Infinite
         clipBehavior: Clip.none,
         physics: const BouncingScrollPhysics(),
         onPageChanged: controller.onPageChanged,
         itemBuilder: (context, index) {
-          final post = events[index];
+          final actualIndex = index % events.length;
+          final post = events[actualIndex];
           final article = Article(
             title: post.title,
             subtitle: post.subtitle,
@@ -240,25 +284,27 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
 
   Widget _buildPageIndicator(BulletinController bulletinController) {
     final events = bulletinController.upcomingEvents;
-    if (events.isEmpty) {
-      return const SizedBox.shrink(); // Don't show indicator if no events
+    if (events.isEmpty || events.length == 1) {
+      return const SizedBox.shrink(); // Don't show indicator if no events or single event
     }
     
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(events.length, (index) {
-        final currentIndex = controller.currentPageIndex.value;
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-          width: 8.0,
-          height: 8.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: currentIndex == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
-          ),
-        );
-      }),
-    );
+    return Obx(() {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(events.length, (index) {
+          final currentIndex = controller.currentPageIndex.value;
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+            width: 8.0,
+            height: 8.0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: currentIndex == index ? const Color(0xFF333333) : Colors.grey.withOpacity(0.4),
+            ),
+          );
+        }),
+      );
+    });
   }
 }
 

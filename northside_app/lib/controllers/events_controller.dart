@@ -188,7 +188,7 @@ class EventsController extends GetxController {
       }
     }
 
-    // Add athletics events
+    // Add athletics events with deduplication
     for (final event in athleticsEvents) {
       try {
         final date = _parseEventDate(event.date);
@@ -197,7 +197,20 @@ class EventsController extends GetxController {
           if (eventsMap[dayKey] == null) {
             eventsMap[dayKey] = [];
           }
-          eventsMap[dayKey]!.add(event.toArticle());
+          
+          final article = event.toArticle();
+          
+          // Check for duplicates in the same day
+          final isDuplicate = eventsMap[dayKey]!.any((existingArticle) =>
+            existingArticle.title == article.title &&
+            existingArticle.subtitle == article.subtitle
+          );
+          
+          if (!isDuplicate) {
+            eventsMap[dayKey]!.add(article);
+          } else {
+            AppLogger.info('Duplicate athletics event filtered out: ${article.title} on ${event.date}');
+          }
         }
       } catch (e) {
         AppLogger.info('Error parsing date for athletics event: ${event.date} - $e');
