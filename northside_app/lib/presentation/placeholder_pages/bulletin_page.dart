@@ -217,11 +217,13 @@ class _BulletinPageState extends State<BulletinPage> {
     // Calculate dynamic header height based on screen size
     final double dateHeaderHeight = screenWidth * 0.13; // Responsive header height
     final bool isNarrowScreen = screenWidth < 360;
-    // Update to match the new compact card height (padding + text content)
-    final double cardHeight = (isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04) * 2 + // top + bottom padding
-                             (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055) + // title font size (approximate line height)
-                             (isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02) + // spacing between title and subtitle
-                             (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.045); // subtitle line with icon
+    
+    // Calculate actual card height based on the new compact design
+    final double cardPadding = (isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04) * 2; // top + bottom padding
+    final double titleHeight = (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055) * 2.2; // title (2 lines max) with line height
+    final double spacingBetween = isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02; // spacing between title and subtitle
+    final double subtitleHeight = isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.045; // subtitle row with icon
+    final double cardHeight = cardPadding + titleHeight + spacingBetween + subtitleHeight;
     final double cardMargin = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04; // Same as used in _BulletinEventCard
     
     // Calculate offset for the target section
@@ -230,13 +232,19 @@ class _BulletinPageState extends State<BulletinPage> {
       offset += (_groupedPosts[keys[i]]!.length) * (cardHeight + cardMargin);
     }
     
-    // Don't add the target section's header height here - we want it to be visible above the sheet
-    // offset += dateHeaderHeight; // Remove this line
+    // Debug information
+    print('📍 Scroll to Today Debug:');
+    print('   Target section: ${keys.isNotEmpty && _todaySectionIndex! < keys.length ? keys[_todaySectionIndex!] : "N/A"}');
+    print('   Card height: ${cardHeight.toStringAsFixed(1)}px');
+    print('   Card margin: ${cardMargin.toStringAsFixed(1)}px');
+    print('   Date header height: ${dateHeaderHeight.toStringAsFixed(1)}px');
+    print('   Calculated offset: ${offset.toStringAsFixed(1)}px');
     
-    // Subtract a minimal buffer to align the date header tightly with the sheet's top edge
-    // We want the date header to be positioned precisely at the sheet's top edge
-    final double headerBuffer = dateHeaderHeight * 0.3; // 30% of header height for very tight alignment
+    // Reduce the header buffer for better positioning
+    final double headerBuffer = dateHeaderHeight * 0.2; // Reduced from 0.3 to 0.2 for tighter alignment
     offset = (offset - headerBuffer).clamp(0.0, double.infinity);
+    
+    print('   Final offset after buffer: ${offset.toStringAsFixed(1)}px');
     
     if (animate) {
       _isAutoScrolling = true;
@@ -366,8 +374,11 @@ class _BulletinPageState extends State<BulletinPage> {
               expand: false, // Allow sheet to retract from any scroll position
               builder: (context, scrollController) {
                 _draggableSheetController = scrollController;
+                // Delay the scroll slightly to ensure the sheet is fully rendered with new compact cards
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _scrollToTodaySection();
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    _scrollToTodaySection(animate: false);
+                  });
                 });
                 scrollController.removeListener(_onScroll);
                 scrollController.addListener(_onScroll);
