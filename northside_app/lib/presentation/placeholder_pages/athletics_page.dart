@@ -36,9 +36,9 @@ class AthleticsPage extends StatelessWidget {
             _buildNewsCarousel(context, athleticsController),
             SizedBox(height: screenHeight * 0.04),
             _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-            SizedBox(height: screenHeight * 0.005),
+            SizedBox(height: screenHeight * 0.002),
             _buildSportsGrid(context),
-            SizedBox(height: screenHeight * 0.01),
+            SizedBox(height: screenHeight * 0.002),
             _buildRegisterButton(context),
           ],
         );
