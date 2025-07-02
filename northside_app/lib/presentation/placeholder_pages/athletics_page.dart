@@ -164,33 +164,29 @@ class AthleticsPage extends StatelessWidget {
 
   Widget _buildSportsGrid(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double crossAxisSpacing = screenWidth * 0.04;
     final double mainAxisSpacing = screenWidth * 0.04;
     final double childAspectRatio = 2.5;
     final sports = ['Baseball', 'Cross Country', 'Lacrosse', 'Soccer'];
-    return Transform.translate(
-      offset: Offset(0, -screenHeight * 0.01), // Pull cards closer to header
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: crossAxisSpacing,
-            mainAxisSpacing: mainAxisSpacing,
-            childAspectRatio: childAspectRatio,
-          ),
-          itemCount: sports.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            final sportName = sports[index];
-            return _SportButton(
-              name: sportName,
-              onTap: () => Get.to(() => SportDetailPage(sportName: "Men's $sportName")),
-            );
-          },
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: crossAxisSpacing,
+          mainAxisSpacing: mainAxisSpacing,
+          childAspectRatio: childAspectRatio,
         ),
+        itemCount: sports.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final sportName = sports[index];
+          return _SportButton(
+            name: sportName,
+            onTap: () => Get.to(() => SportDetailPage(sportName: "Men's $sportName")),
+          );
+        },
       ),
     );
   }
@@ -199,13 +195,22 @@ class AthleticsPage extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.045;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.06,
+        right: screenWidth * 0.06,
+        bottom: screenWidth * 0.01, // Reduce bottom padding to bring cards closer
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black),
+            style: TextStyle(
+              fontSize: fontSize, 
+              fontWeight: FontWeight.w600, 
+              color: Colors.black,
+              height: 1.0, // Reduce line height to minimize space
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
