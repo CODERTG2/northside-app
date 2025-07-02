@@ -29,7 +29,10 @@ class AthleticsPage extends StatelessWidget {
         }
         
         return ListView(
-          padding: EdgeInsets.only(bottom: screenHeight * 0.12),
+          padding: EdgeInsets.only(
+            top: screenHeight * 0.02,
+            bottom: screenHeight * 0.12,
+          ),
           children: [
             const SharedHeader(title: 'Athletics'),
             SizedBox(height: screenHeight * 0.02),
