@@ -139,4 +139,4 @@ def update_athletics_schedule():
     print(f"Athletics schedule updated: {added_count} new events added")
     # print(schedule)
 
-update_athletics_schedule()
+# update_athletics_schedule()
