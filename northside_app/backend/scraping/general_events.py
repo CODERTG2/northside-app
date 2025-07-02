@@ -54,25 +54,6 @@ def update_general_events():
                         "createdBy": origin
                     })
 
-                    existing_event = GeneralEvent.objects(
-                        date=event_date,
-                        time=event_time,
-                        name=event_name,
-                        createdBy=origin
-                    ).first()
-
-                    if not existing_event:
-                        event = GeneralEvent(
-                            date=event_date,
-                            time=event_time,
-                            name=event_name,
-                            createdBy=origin,
-                            createdAt=datetime.now()
-                        )
-                        event.save()
-                        added_count += 1
-                    else:
-                        existing_count += 1
     if GeneralEvent.objects.count() >= len(schedule):
         print("No new events to add, skipping update.")
         return
