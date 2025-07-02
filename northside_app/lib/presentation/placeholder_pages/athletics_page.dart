@@ -1,4 +1,10 @@
-// lib/presentation/placeholder_pages/athletics_page.dart
+// lib/presentation/placeholder_pag            _buildNewsCarousel(context, athleticsController),
+            SizedBox(height: screenHeight * 0.04),
+            _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
+            SizedBox(height: screenHeight * 0.015),
+            _buildSportsGrid(context),
+            SizedBox(height: screenHeight * 0.015),
+            _buildRegisterButton(context),etics_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,9 +42,9 @@ class AthleticsPage extends StatelessWidget {
             _buildNewsCarousel(context, athleticsController),
             SizedBox(height: screenHeight * 0.04),
             _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-            SizedBox(height: screenHeight * 0.03),
+            SizedBox(height: screenHeight * 0.015),
             _buildSportsGrid(context),
-            SizedBox(height: screenHeight * 0.04),
+            SizedBox(height: screenHeight * 0.025),
             _buildRegisterButton(context),
           ],
         );
