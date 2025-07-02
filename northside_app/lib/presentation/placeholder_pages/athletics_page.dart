@@ -36,6 +36,7 @@ class AthleticsPage extends StatelessWidget {
             _buildNewsCarousel(context, athleticsController),
             SizedBox(height: screenHeight * 0.04),
             _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
+            SizedBox(height: screenHeight * 0.005),
             _buildSportsGrid(context),
             SizedBox(height: screenHeight * 0.015),
             _buildRegisterButton(context),
@@ -195,22 +196,13 @@ class AthleticsPage extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.045;
     return Padding(
-      padding: EdgeInsets.only(
-        left: screenWidth * 0.06,
-        right: screenWidth * 0.06,
-        bottom: screenWidth * 0.01, // Reduce bottom padding to bring cards closer
-      ),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: fontSize, 
-              fontWeight: FontWeight.w600, 
-              color: Colors.black,
-              height: 1.0, // Reduce line height to minimize space
-            ),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
