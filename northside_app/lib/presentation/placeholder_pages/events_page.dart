@@ -103,36 +103,7 @@ class _EventsPageState extends State<EventsPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Events',
-          style: GoogleFonts.inter(
-            color: Colors.black, 
-            fontWeight: FontWeight.w900, 
-            fontSize: screenWidth * 0.07,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 24.0),
-            child: GestureDetector(
-              onTap: () {
-                final AppShellController appShellController = Get.find();
-                appShellController.changePage(4);
-              },
-              child: CircleAvatar(
-                radius: 22,
-                backgroundColor: Colors.grey.shade300,
-                child: const Icon(Icons.person, color: Colors.black, size: 28),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
+      body: Container(
         child: Obx(() {
           if (eventsController.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
@@ -141,6 +112,7 @@ class _EventsPageState extends State<EventsPage> {
         return ListView(
           padding: EdgeInsets.only(bottom: screenHeight * 0.12),
           children: [
+            const SharedHeader(title: 'Events'),
             SizedBox(height: screenHeight * 0.02),
             _buildFilterButton(context),
             SizedBox(height: screenHeight * 0.02),

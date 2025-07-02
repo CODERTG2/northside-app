@@ -319,40 +319,13 @@ class _BulletinPageState extends State<BulletinPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Bulletin',
-          style: GoogleFonts.inter(
-            color: Colors.black, 
-            fontWeight: FontWeight.w900, 
-            fontSize: screenWidth * 0.07,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: screenWidth * 0.057), // ~24px at 420px width
-            child: GestureDetector(
-              onTap: () {
-                final AppShellController appShellController = Get.find();
-                appShellController.changePage(4);
-              },
-              child: CircleAvatar(
-                radius: 22,
-                backgroundColor: Colors.grey.shade300,
-                child: const Icon(Icons.person, color: Colors.black, size: 28),
-              ),
-            ),
-          ),
-        ],
-      ),
       body: Stack(
         children: [
           // Main header and pinned carousel always visible
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SharedHeader(title: 'Bulletin'),
               SizedBox(height: topSpacer),
               _buildSectionHeader("Pinned", key: _sectionHeaderKey),
               if (pinnedPosts.isNotEmpty) 
