@@ -169,8 +169,8 @@ class AthleticsPage extends StatelessWidget {
     final double mainAxisSpacing = screenWidth * 0.04;
     final double childAspectRatio = 2.5;
     final sports = ['Baseball', 'Cross Country', 'Lacrosse', 'Soccer'];
-    return Container(
-      margin: EdgeInsets.only(top: -screenHeight * 0.01), // Pull cards closer to header
+    return Transform.translate(
+      offset: Offset(0, -screenHeight * 0.01), // Pull cards closer to header
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
         child: GridView.builder(
