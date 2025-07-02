@@ -164,29 +164,33 @@ class AthleticsPage extends StatelessWidget {
 
   Widget _buildSportsGrid(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     final double crossAxisSpacing = screenWidth * 0.04;
     final double mainAxisSpacing = screenWidth * 0.04;
     final double childAspectRatio = 2.5;
     final sports = ['Baseball', 'Cross Country', 'Lacrosse', 'Soccer'];
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: crossAxisSpacing,
-          mainAxisSpacing: mainAxisSpacing,
-          childAspectRatio: childAspectRatio,
+    return Container(
+      margin: EdgeInsets.only(top: -screenHeight * 0.01), // Pull cards closer to header
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: crossAxisSpacing,
+            mainAxisSpacing: mainAxisSpacing,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: sports.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final sportName = sports[index];
+            return _SportButton(
+              name: sportName,
+              onTap: () => Get.to(() => SportDetailPage(sportName: "Men's $sportName")),
+            );
+          },
         ),
-        itemCount: sports.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          final sportName = sports[index];
-          return _SportButton(
-            name: sportName,
-            onTap: () => Get.to(() => SportDetailPage(sportName: "Men's $sportName")),
-          );
-        },
       ),
     );
   }
