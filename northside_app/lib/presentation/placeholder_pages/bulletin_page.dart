@@ -108,24 +108,25 @@ class _BulletinPageState extends State<BulletinPage> {
   double _getSnapBackExtent() {
     final initialExtent = responsiveInitialExtent;
     
-    // Use calculated min extent if available, otherwise use initial extent
+    // Use calculated min extent if available, otherwise use a lower snap-back extent
     if (_calculatedMinExtent != null) {
       // Ensure we never cover pinned content by using the max of calculated and initial
       // But cap it at a reasonable maximum to prevent the sheet from being too high
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
       
-      // Make max allowed responsive to screen size, but never exceed initial extent
-      double maxAllowed = initialExtent; // Never go above initial extent
+      // Make max allowed responsive to screen size, match initial extent for consistent snap-back
+      double maxAllowed = initialExtent; // Match initial extent for consistent snap-back
       if (screenHeight / screenWidth > 2.2) {
-        maxAllowed = (initialExtent * 0.9).clamp(0.3, initialExtent); // 90% of initial for tall screens
+        maxAllowed = initialExtent; // Match initial extent for tall screens
       } else if (screenHeight / screenWidth < 1.5) {
-        maxAllowed = initialExtent; // Use initial extent for wider screens
+        maxAllowed = initialExtent; // Match initial extent for wider screens
       }
       
-      final safeExtent = (_calculatedMinExtent! > initialExtent ? initialExtent : _calculatedMinExtent!);
+      final safeExtent = (_calculatedMinExtent! > maxAllowed ? maxAllowed : _calculatedMinExtent!);
       return safeExtent.clamp(0.1, maxAllowed);
     }
+    // Return initial extent to match the initial height for consistent snap-back
     return initialExtent;
   }
 
