@@ -463,41 +463,87 @@ class AthleticsController extends GetxController {
     return result;
   }
 
-  // Fallback season mapping for sports without backend season data
+  // Smart fallback season mapping using actual schedule dates
   String _getFallbackSeasonForSport(String sport) {
     final sportLower = sport.toLowerCase();
+    print('=== DEBUG: Getting fallback season for sport: "$sport"');
     
-    // Fall sports
+    // Find games for this sport in the schedule
+    final sportGames = schedule.where((game) => 
+      game.sport.toLowerCase().contains(sportLower) ||
+      sportLower.contains(game.sport.toLowerCase())
+    ).toList();
+    
+    print('=== DEBUG: Found ${sportGames.length} games for sport "$sport"');
+    
+    if (sportGames.isNotEmpty) {
+      // Parse game dates and extract months
+      final gameDates = <DateTime>[];
+      for (final game in sportGames) {
+        final date = _parseEventDate(game.date);
+        if (date != null) {
+          gameDates.add(date);
+          print('=== DEBUG: Game date for $sport: ${game.date} -> ${date.month}/${date.year}');
+        }
+      }
+      
+      if (gameDates.isNotEmpty) {
+        // Determine season based on when most games are played
+        final months = gameDates.map((date) => date.month).toList();
+        final avgMonth = months.reduce((a, b) => a + b) / months.length;
+        
+        print('=== DEBUG: Average month for $sport: $avgMonth (months: $months)');
+        
+        // Determine season based on average month
+        String season;
+        if (avgMonth >= 8 && avgMonth <= 11) {
+          season = 'fall';    // August-November
+        } else if (avgMonth >= 12 || avgMonth <= 2) {
+          season = 'winter';  // December-February
+        } else if (avgMonth >= 3 && avgMonth <= 6) {
+          season = 'spring';  // March-June
+        } else {
+          season = 'fall';    // July -> default to fall (summer sports rare in high school)
+        }
+        
+        print('=== DEBUG: Sport "$sport" assigned to "$season" season based on schedule dates');
+        return season;
+      }
+    }
+    
+    // If no schedule data found, fall back to traditional sport type mapping
+    print('=== DEBUG: No schedule data for "$sport", using traditional mapping');
+    
+    // Traditional fallback mapping (kept as final backup)
     if (sportLower.contains('football') || 
         sportLower.contains('soccer') || 
         sportLower.contains('volleyball') || 
         sportLower.contains('cross country') || 
         sportLower.contains('field hockey') ||
-        sportLower.contains('golf')) {  // Golf is typically fall
+        sportLower.contains('golf')) {
       return 'fall';
     }
     
-    // Winter sports
     if (sportLower.contains('basketball') || 
         sportLower.contains('wrestling') || 
         sportLower.contains('swimming') || 
         sportLower.contains('hockey') || 
         sportLower.contains('indoor track') ||
-        sportLower.contains('water-polo') ||  // Water polo is typically winter
+        sportLower.contains('water-polo') ||
         sportLower.contains('water polo')) {
       return 'winter';
     }
     
-    // Spring sports
     if (sportLower.contains('baseball') || 
         sportLower.contains('softball') || 
         sportLower.contains('tennis') || 
         sportLower.contains('track') || 
-        sportLower.contains('lacrosse')) {  // Lacrosse is typically spring
+        sportLower.contains('lacrosse')) {
       return 'spring';
     }
     
-    // Default to fall if unsure
+    // Default to fall if completely unsure
+    print('=== DEBUG: Sport "$sport" defaulted to fall season');
     return 'fall';
   }
 
