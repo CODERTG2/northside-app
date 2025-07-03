@@ -27,6 +27,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
   // Get sports from backend data organized by season and gender
   SeasonSports _getSportsForSeason(String season) {
     final allSports = athleticsController.getAllAvailableSports();
+    print('=== DEBUG: All available sports from backend (${allSports.length}): $allSports');
     
     // Define which sports belong to which season based on typical school schedules
     // More precise categorization to avoid duplicates
@@ -45,30 +46,25 @@ class _AllSportsPageState extends State<AllSportsPage> {
     };
     
     final seasonSports = seasonSportsMap[season] ?? [];
+    print('=== DEBUG: Season sports for $season: $seasonSports');
     
-    // Filter backend sports by season with more precise matching
+    // Filter backend sports by season with more inclusive matching (temporary debug)
     final filteredSports = allSports.where((sport) {
       final sportLower = sport.toLowerCase().trim();
       
-      // Direct exact matching first
-      if (seasonSports.contains(sportLower)) {
-        return true;
-      }
-      
-      // More specific partial matching to avoid cross-season duplicates
+      // More inclusive matching to see all potential matches
       for (final seasonSport in seasonSports) {
-        // Only match if sport name contains the season sport as a complete word/phrase
-        if (sportLower == seasonSport.toLowerCase() ||
-            (sportLower.contains(seasonSport.toLowerCase()) && 
-             (sportLower.startsWith(seasonSport.toLowerCase()) || 
-              sportLower.endsWith(seasonSport.toLowerCase()) ||
-              sportLower.contains(' ${seasonSport.toLowerCase()} ')))) {
+        if (sportLower.contains(seasonSport.toLowerCase()) || 
+            seasonSport.toLowerCase().contains(sportLower)) {
+          print('=== DEBUG: Inclusive match for $sport with $seasonSport');
           return true;
         }
       }
       
       return false;
     }).toList();
+    
+    print('=== DEBUG: Filtered sports for $season (${filteredSports.length}): $filteredSports');
     
     // Separate by gender based on backend data
     final mens = <String>[];
@@ -82,6 +78,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
       );
       if (maleAthletes.isNotEmpty) {
         mens.add(sport);
+        print('=== DEBUG: Added $sport to mens (${maleAthletes.length} athletes)');
       }
       
       // Check if this sport has female/girls athletes  
@@ -91,8 +88,11 @@ class _AllSportsPageState extends State<AllSportsPage> {
       );
       if (femaleAthletes.isNotEmpty) {
         womens.add(sport);
+        print('=== DEBUG: Added $sport to womens (${femaleAthletes.length} athletes)');
       }
     }
+    
+    print('=== DEBUG: Final result for $season - Mens: $mens, Womens: $womens');
     
     // Remove duplicates and sort
     return SeasonSports(
