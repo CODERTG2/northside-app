@@ -55,7 +55,7 @@ class Athlete {
       name: json['name'] ?? '',
       number: json['number'] ?? 0,
       sport: json['sport'] ?? '',
-      season: json['season'] ?? '',
+      season: json['season'] ?? '', // Will be empty until backend adds season field
       level: json['level'] ?? '',
       gender: json['gender'] ?? '',
       grade: json['grade'] ?? '',
