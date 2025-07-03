@@ -244,7 +244,7 @@ class _BulletinPageState extends State<BulletinPage> {
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.02; // Same as ListView padding
     // Add positive buffer to push the first card down into proper view
-    final double positiveBuffer = dateHeaderHeight * 0.8; // Increased to 80% to scroll content down more
+    final double positiveBuffer = dateHeaderHeight * 0.5; // Reduced to 50% to scroll higher and show content lower
     offset = (offset - listViewTopPadding + positiveBuffer).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
