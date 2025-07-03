@@ -242,13 +242,12 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.02; // Same as ListView padding
-    final double extraBuffer = dateHeaderHeight * 0.3; // Reduced buffer to prevent cutoff
-    final double cardBuffer = cardHeight * 0.1; // Reduced card-based buffer
-    offset = (offset - listViewTopPadding - extraBuffer - cardBuffer).clamp(0.0, double.infinity);
+    // Add positive buffer to push the first card down into proper view
+    final double positiveBuffer = dateHeaderHeight * 0.5; // 50% of header height to push content down
+    offset = (offset - listViewTopPadding + positiveBuffer).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
-    print('   Extra buffer: ${extraBuffer.toStringAsFixed(1)}px');
-    print('   Card buffer: ${cardBuffer.toStringAsFixed(1)}px');
+    print('   Positive buffer (push content down): ${positiveBuffer.toStringAsFixed(1)}px');
     print('   Final offset after adjustments: ${offset.toStringAsFixed(1)}px');
     
     if (animate) {
