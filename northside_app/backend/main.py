@@ -41,6 +41,7 @@ def roster():
 def schedule():
     try:
         sport = request.args.get('sport')
+        season = request.args.get('season')
         gender = request.args.get('gender')
         level = request.args.get('level')
         date = request.args.get('date')
@@ -50,6 +51,8 @@ def schedule():
         query = {}
         if sport:
             query['sport'] = sport
+        if season:
+            query['season'] = season
         if gender:
             query['gender'] = gender
         if level:

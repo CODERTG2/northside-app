@@ -5,6 +5,7 @@ class Athlete(Document):
     name = StringField(required=True)
     number = IntField(required=True)
     sport = StringField(required=True)
+    season = StringField(required=True, enum=["fall", "winter", "spring"])
     level = StringField(required=True, enum=['varsity', 'jv', 'freshman'])
     gender = StringField(required=True, enum=["girls", "boys"])
     grade = StringField(required=True, enum=["Fr.", "So.", "Jr.", "Sr."])
