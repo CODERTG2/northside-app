@@ -9,6 +9,7 @@ class Athlete {
   final String name;
   final int number;
   final String sport;
+  final String season; // fall, winter, spring
   final String level; // varsity, jv, freshman
   final String gender; // girls, boys
   final String grade; // Fr., So., Jr., Sr.
@@ -20,6 +21,7 @@ class Athlete {
     required this.name,
     required this.number,
     required this.sport,
+    required this.season,
     required this.level,
     required this.gender,
     required this.grade,
@@ -53,6 +55,7 @@ class Athlete {
       name: json['name'] ?? '',
       number: json['number'] ?? 0,
       sport: json['sport'] ?? '',
+      season: json['season'] ?? '',
       level: json['level'] ?? '',
       gender: json['gender'] ?? '',
       grade: json['grade'] ?? '',
@@ -66,6 +69,7 @@ class Athlete {
       'name': name,
       'number': number,
       'sport': sport,
+      'season': season,
       'level': level,
       'gender': gender,
       'grade': grade,
