@@ -242,8 +242,8 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.01; // Same as ListView padding
-    final double headerBuffer = dateHeaderHeight * 0.1; // Reduced buffer for tighter alignment
-    offset = (offset - headerBuffer - listViewTopPadding).clamp(0.0, double.infinity);
+    final double headerBuffer = 0; // Remove buffer completely for perfect alignment
+    offset = (offset - listViewTopPadding).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
     print('   Header buffer: ${headerBuffer.toStringAsFixed(1)}px');
@@ -423,7 +423,6 @@ class _BulletinPageState extends State<BulletinPage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenWidth * 0.02),
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
