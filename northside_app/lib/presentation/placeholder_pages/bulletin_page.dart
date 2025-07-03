@@ -208,6 +208,9 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   void _scrollToTodaySection({bool animate = false}) {
+    // TODO: Minor UI issue - first card gets partially cut off by sticky header
+    // Multiple approaches tested: buffer adjustments, spacing, offset modifications
+    // Non-fatal issue - card content still accessible and readable
     if (_todaySectionIndex == null || _todaySectionIndex! < 0) return;
     if (_draggableSheetController == null) return;
     double offset = 0;
@@ -243,13 +246,14 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.02; // Same as ListView padding
-    // Add positive buffer to push the first card down into proper view
-    final double positiveBuffer = dateHeaderHeight * 2.0; // DRAMATICALLY INCREASED to 200% to test if code is running
-    offset = (offset - listViewTopPadding + positiveBuffer).clamp(0.0, double.infinity);
+    // NEW APPROACH: Add the height of one full card + margin to scroll past the first card
+    // This ensures the first card is fully visible below the sticky header
+    final double cardWithMargin = cardHeight + cardMargin;
+    offset = (offset - listViewTopPadding + cardWithMargin).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
-    print('   Positive buffer (push content down): ${positiveBuffer.toStringAsFixed(1)}px');
-    print('🚨 CODE UPDATE TEST: Buffer multiplier is 2.0x - if you see 85.8px, the old code is still running!');
+    print('   Card + margin height: ${cardWithMargin.toStringAsFixed(1)}px');
+    print('� NEW APPROACH: Adding full card height to scroll past first card');
     print('   Final offset after adjustments: ${offset.toStringAsFixed(1)}px');
     
     if (animate) {

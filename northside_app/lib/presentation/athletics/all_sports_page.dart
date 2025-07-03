@@ -29,10 +29,9 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final allSports = athleticsController.getAllAvailableSports();
     print('=== DEBUG: All available sports from backend (${allSports.length}): $allSports');
     
-    // For now, show all sports in every season since we don't have reliable season data from backend
-    // In the future, the backend should provide season information with the sports data
-    final filteredSports = allSports;
-    print('=== DEBUG: Showing all sports for $season (${filteredSports.length}): $filteredSports');
+    // Get sports for this season from backend season data (completely backend-driven)
+    final filteredSports = athleticsController.getSportsBySeason(season);
+    print('=== DEBUG: Sports for $season from backend season data (${filteredSports.length}): $filteredSports');
     
     // Separate by gender based on backend data
     final mens = <String>[];

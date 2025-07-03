@@ -35,6 +35,7 @@ class ApiService {
   // Fetch athletes/roster
   static Future<List<Athlete>> getRoster({
     String? sport,
+    String? season,
     String? gender,
     String? level,
   }) async {
@@ -43,6 +44,7 @@ class ApiService {
       List<String> params = [];
       
       if (sport != null) params.add('sport=$sport');
+      if (season != null) params.add('season=$season');
       if (gender != null) params.add('gender=$gender');
       if (level != null) params.add('level=$level');
       

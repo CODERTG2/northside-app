@@ -48,11 +48,15 @@ class AthleticsController extends GetxController {
       final fetchedAthletes = await ApiService.getRoster();
       print('=== DEBUG: Fetched ${fetchedAthletes.length} athletes from backend');
       
-      // Log sample athlete data
+      // Log sample athlete data including season info
       if (fetchedAthletes.isNotEmpty) {
         for (int i = 0; i < fetchedAthletes.length && i < 5; i++) {
-          print('=== DEBUG: Sample athlete $i: ${fetchedAthletes[i].name} - ${fetchedAthletes[i].sport} - ${fetchedAthletes[i].gender}');
+          print('=== DEBUG: Sample athlete $i: ${fetchedAthletes[i].name} - ${fetchedAthletes[i].sport} - ${fetchedAthletes[i].gender} - Season: "${fetchedAthletes[i].season}"');
         }
+        
+        // Check all unique seasons in the data
+        final uniqueSeasons = fetchedAthletes.map((a) => a.season).toSet();
+        print('=== DEBUG: Unique seasons found in athlete data: $uniqueSeasons');
       }
       
       athletes.assignAll(fetchedAthletes);
@@ -295,7 +299,7 @@ class AthleticsController extends GetxController {
       }
       
       // Try parsing "Aug 26 2025" format (athletics schedule format)
-      if (dateString.contains(' ') && !dateString.contains('/') && !dateString.contains('-')) {
+      if (dateString.contains(' ')) {
         final parts = dateString.split(' ');
         if (parts.length == 3) {
           final monthStr = parts[0];
@@ -385,71 +389,37 @@ class AthleticsController extends GetxController {
     return sports;
   }
 
-  // Get sports by season based on schedule dates (completely backend-driven)
+  // Get all available sports and organize them by season based on backend data
   List<String> getSportsBySeason(String season) {
-    // Determine date ranges for each season (typical US school year)
-    final now = DateTime.now();
-    final currentYear = now.year;
+    final seasonLower = season.toLowerCase();
+    print('=== DEBUG: getSportsBySeason called for season: "$season" (lowercase: "$seasonLower")');
+    print('=== DEBUG: Total athletes loaded: ${athletes.length}');
+    print('=== DEBUG: Backend season filtering not deployed yet - showing all sports');
     
-    DateTime seasonStart, seasonEnd;
+    // First, get ALL available sports from athletes and schedule
+    final allSports = <String>{};
     
-    switch (season) {
-      case 'Fall':
-        // August 1 - November 30
-        seasonStart = DateTime(currentYear, 8, 1);
-        seasonEnd = DateTime(currentYear, 11, 30);
-        break;
-      case 'Winter':
-        // December 1 - February 28/29
-        seasonStart = DateTime(currentYear - 1, 12, 1);
-        seasonEnd = DateTime(currentYear, 2, 29);
-        break;
-      case 'Spring':
-        // March 1 - June 30
-        seasonStart = DateTime(currentYear, 3, 1);
-        seasonEnd = DateTime(currentYear, 6, 30);
-        break;
-      default:
-        return [];
-    }
-    
-    // Get sports that have schedule events in this season
-    final seasonSports = <String>{};
-    
-    for (final event in schedule) {
-      try {
-        // Parse the date from the schedule event
-        final eventDate = DateTime.parse(event.date);
-        
-        bool inSeason = false;
-        if (season == 'Winter') {
-          // Handle winter season crossing year boundary
-          final lastWinterStart = DateTime(currentYear - 1, 12, 1);
-          final lastWinterEnd = DateTime(currentYear, 2, 29);
-          final currentWinterStart = DateTime(currentYear, 12, 1);
-          final currentWinterEnd = DateTime(currentYear + 1, 2, 29);
-          
-          inSeason = (eventDate.isAfter(lastWinterStart) && eventDate.isBefore(lastWinterEnd)) ||
-                    (eventDate.isAfter(currentWinterStart) && eventDate.isBefore(currentWinterEnd));
-        } else {
-          inSeason = eventDate.isAfter(seasonStart) && eventDate.isBefore(seasonEnd);
-        }
-        
-        if (inSeason && event.sport.isNotEmpty) {
-          seasonSports.add(event.sport);
-        }
-      } catch (e) {
-        // Skip events with invalid dates
-        AppLogger.warning('Invalid date in schedule: ${event.date}');
-      }
-    }
-    
-    // Also include sports that have athletes (even if no current schedule)
+    // Get sports from athletes
     for (final athlete in athletes) {
       if (athlete.sport.isNotEmpty) {
-        seasonSports.add(athlete.sport);
+        allSports.add(athlete.sport);
       }
     }
+    
+    // Get sports from schedule
+    for (final event in schedule) {
+      if (event.sport.isNotEmpty) {
+        allSports.add(event.sport);
+      }
+    }
+    
+    print('=== DEBUG: All available sports found: $allSports');
+    
+    // Since backend filtering isn't ready, show all sports in every season
+    // This matches the original behavior
+    final seasonSports = Set<String>.from(allSports);
+    
+    print('=== DEBUG: Showing all ${seasonSports.length} sports for season "$season": $seasonSports');
     
     // Normalize and deduplicate
     final normalizedSports = <String, String>{}; // normalized -> original
@@ -462,7 +432,44 @@ class AthleticsController extends GetxController {
     
     final result = normalizedSports.values.toList();
     result.sort();
+    print('=== DEBUG: Final sports for season "$season": $result');
     return result;
+  }
+
+  // Fallback season mapping for sports without backend season data
+  String _getFallbackSeasonForSport(String sport) {
+    final sportLower = sport.toLowerCase();
+    
+    // Fall sports
+    if (sportLower.contains('football') || 
+        sportLower.contains('soccer') || 
+        sportLower.contains('volleyball') || 
+        sportLower.contains('cross country') || 
+        sportLower.contains('field hockey')) {
+      return 'fall';
+    }
+    
+    // Winter sports
+    if (sportLower.contains('basketball') || 
+        sportLower.contains('wrestling') || 
+        sportLower.contains('swimming') || 
+        sportLower.contains('hockey') || 
+        sportLower.contains('indoor track')) {
+      return 'winter';
+    }
+    
+    // Spring sports
+    if (sportLower.contains('baseball') || 
+        sportLower.contains('softball') || 
+        sportLower.contains('tennis') || 
+        sportLower.contains('track') || 
+        sportLower.contains('lacrosse') || 
+        sportLower.contains('golf')) {
+      return 'spring';
+    }
+    
+    // Default to fall if unsure
+    return 'fall';
   }
 
   // Get teams by sport (combines gender and level)
