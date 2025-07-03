@@ -104,4 +104,5 @@ def update_athletics_roster():
             athlete = Athlete(**athlete_data)
             athlete.save()
         print(f"Added {len(roster)} athletes.")
+
 # update_athletics_roster()
