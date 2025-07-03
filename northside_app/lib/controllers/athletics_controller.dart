@@ -394,9 +394,8 @@ class AthleticsController extends GetxController {
     final seasonLower = season.toLowerCase();
     print('=== DEBUG: getSportsBySeason called for season: "$season" (lowercase: "$seasonLower")');
     print('=== DEBUG: Total athletes loaded: ${athletes.length}');
-    print('=== DEBUG: Backend season filtering not deployed yet - showing all sports');
     
-    // First, get ALL available sports from athletes and schedule
+    // Get ALL available sports from both athletes and schedule (never filter out backend data)
     final allSports = <String>{};
     
     // Get sports from athletes
@@ -415,13 +414,41 @@ class AthleticsController extends GetxController {
     
     print('=== DEBUG: All available sports found: $allSports');
     
-    // Since backend filtering isn't ready, show all sports in every season
-    // This matches the original behavior
-    final seasonSports = Set<String>.from(allSports);
+    // Check what seasons we have in the backend data
+    final availableSeasons = athletes.map((a) => a.season).where((s) => s.isNotEmpty).toSet();
+    print('=== DEBUG: Available seasons in backend: $availableSeasons');
     
-    print('=== DEBUG: Showing all ${seasonSports.length} sports for season "$season": $seasonSports');
+    final seasonSports = <String>{};
     
-    // Normalize and deduplicate
+    // Strategy: Use backend season data where available, fallback for others
+    for (final sport in allSports) {
+      bool addedFromBackend = false;
+      
+      // First, check if any athletes for this sport have backend season data
+      for (final athlete in athletes) {
+        if (athlete.sport.toLowerCase() == sport.toLowerCase() && 
+            athlete.season.isNotEmpty && 
+            athlete.season.toLowerCase() == seasonLower) {
+          seasonSports.add(sport);
+          addedFromBackend = true;
+          print('=== DEBUG: Sport "$sport" added to "$season" from backend season data');
+          break;
+        }
+      }
+      
+      // If no backend season data for this sport, use fallback mapping
+      if (!addedFromBackend) {
+        final fallbackSeason = _getFallbackSeasonForSport(sport);
+        if (fallbackSeason == seasonLower) {
+          seasonSports.add(sport);
+          print('=== DEBUG: Sport "$sport" added to "$season" via fallback mapping');
+        }
+      }
+    }
+    
+    print('=== DEBUG: Sports for season "$season": $seasonSports');
+    
+    // Normalize and deduplicate (preserve all backend sports)
     final normalizedSports = <String, String>{}; // normalized -> original
     for (final sport in seasonSports) {
       final normalized = _normalizeSportName(sport);
@@ -445,7 +472,8 @@ class AthleticsController extends GetxController {
         sportLower.contains('soccer') || 
         sportLower.contains('volleyball') || 
         sportLower.contains('cross country') || 
-        sportLower.contains('field hockey')) {
+        sportLower.contains('field hockey') ||
+        sportLower.contains('golf')) {  // Golf is typically fall
       return 'fall';
     }
     
@@ -454,7 +482,9 @@ class AthleticsController extends GetxController {
         sportLower.contains('wrestling') || 
         sportLower.contains('swimming') || 
         sportLower.contains('hockey') || 
-        sportLower.contains('indoor track')) {
+        sportLower.contains('indoor track') ||
+        sportLower.contains('water-polo') ||  // Water polo is typically winter
+        sportLower.contains('water polo')) {
       return 'winter';
     }
     
@@ -463,8 +493,7 @@ class AthleticsController extends GetxController {
         sportLower.contains('softball') || 
         sportLower.contains('tennis') || 
         sportLower.contains('track') || 
-        sportLower.contains('lacrosse') || 
-        sportLower.contains('golf')) {
+        sportLower.contains('lacrosse')) {  // Lacrosse is typically spring
       return 'spring';
     }
     
