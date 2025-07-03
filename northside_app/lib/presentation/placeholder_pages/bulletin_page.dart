@@ -420,11 +420,12 @@ class _BulletinPageState extends State<BulletinPage> {
                           ),
                         ),
                       ),
+                      SizedBox(height: screenWidth * 0.05),
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
                           padding: EdgeInsets.only(
-                            top: screenWidth * 0.05, // Increased top padding to prevent cutoff
+                            top: 0, // Increased top padding to prevent cutoff
                             bottom: screenHeight * 0.18, // Responsive bottom padding
                           ),
                           itemCount: dateKeys.length,
