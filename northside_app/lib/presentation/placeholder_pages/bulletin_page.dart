@@ -243,13 +243,14 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.02; // Same as ListView padding
-    // Instead of adding buffer, subtract the sticky header height to position the first card below it
-    final double stickyHeaderOffset = dateHeaderHeight; // Full header height to clear the sticky header
-    offset = (offset - listViewTopPadding - stickyHeaderOffset).clamp(0.0, double.infinity);
+    // NEW APPROACH: Add the height of one full card + margin to scroll past the first card
+    // This ensures the first card is fully visible below the sticky header
+    final double cardWithMargin = cardHeight + cardMargin;
+    offset = (offset - listViewTopPadding + cardWithMargin).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
-    print('   Sticky header offset (subtract): ${stickyHeaderOffset.toStringAsFixed(1)}px');
-    print('🔧 TESTING: Subtracting header height instead of adding buffer');
+    print('   Card + margin height: ${cardWithMargin.toStringAsFixed(1)}px');
+    print('� NEW APPROACH: Adding full card height to scroll past first card');
     print('   Final offset after adjustments: ${offset.toStringAsFixed(1)}px');
     
     if (animate) {
