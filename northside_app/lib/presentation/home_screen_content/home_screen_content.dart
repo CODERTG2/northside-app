@@ -40,7 +40,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height for consistent spacing
               _buildQuickActions(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.04), // 4% of screen height
-              Obx(() => _buildEventsCarousel(bulletinController)),
+              Obx(() => _buildEventsCarousel(context, bulletinController)),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02), // 2% of screen height
               Obx(() => _buildPageIndicator(bulletinController)),
             ],
@@ -75,12 +75,14 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     );
   }
 
-  Widget _buildEventsCarousel(BulletinController bulletinController) {
+  Widget _buildEventsCarousel(BuildContext context, BulletinController bulletinController) {
     final events = bulletinController.upcomingEvents;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double carouselHeight = screenHeight * 0.4; // 40% of screen height
     
     if (events.isEmpty) {
       return SizedBox(
-        height: 300,
+        height: carouselHeight,
         child: Center(
           child: bulletinController.isLoading 
             ? const CircularProgressIndicator()
@@ -125,7 +127,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     // For single event, don't enable infinite scroll
     if (events.length == 1) {
       return SizedBox(
-        height: 300,
+        height: carouselHeight,
         child: PageView.builder(
           controller: controller.pageController,
           itemCount: 1,
@@ -161,7 +163,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     
     // For multiple events, enable infinite scroll
     return SizedBox(
-      height: 300,
+      height: carouselHeight,
       child: PageView.builder(
         controller: PageController(
           initialPage: controller.getVirtualIndex(0),
