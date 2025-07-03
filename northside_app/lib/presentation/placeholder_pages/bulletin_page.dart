@@ -240,11 +240,14 @@ class _BulletinPageState extends State<BulletinPage> {
     print('   Date header height: ${dateHeaderHeight.toStringAsFixed(1)}px');
     print('   Calculated offset: ${offset.toStringAsFixed(1)}px');
     
-    // Reduce the header buffer for better positioning
-    final double headerBuffer = dateHeaderHeight * 0.2; // Reduced from 0.3 to 0.2 for tighter alignment
-    offset = (offset - headerBuffer).clamp(0.0, double.infinity);
+    // Account for ListView padding and ensure perfect visibility
+    final double listViewTopPadding = screenWidth * 0.01; // Same as ListView padding
+    final double headerBuffer = dateHeaderHeight * 0.1; // Reduced buffer for tighter alignment
+    offset = (offset - headerBuffer - listViewTopPadding).clamp(0.0, double.infinity);
     
-    print('   Final offset after buffer: ${offset.toStringAsFixed(1)}px');
+    print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
+    print('   Header buffer: ${headerBuffer.toStringAsFixed(1)}px');
+    print('   Final offset after adjustments: ${offset.toStringAsFixed(1)}px');
     
     if (animate) {
       _isAutoScrolling = true;
