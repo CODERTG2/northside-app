@@ -101,7 +101,7 @@ class _BulletinPageState extends State<BulletinPage> {
     // If sheet is at the snap-back extent, immediately scroll to Today (no animation)
     final snapBackExtent = _getSnapBackExtent();
     if ((_sheetController.size - snapBackExtent).abs() < 0.01) {
-      _scrollToTodaySection(animate: false);
+      _scrollToTodaySection(animate: true);
     }
   }
 
