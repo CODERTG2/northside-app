@@ -46,15 +46,15 @@ class _BulletinPageState extends State<BulletinPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     
     // Adjust based on screen aspect ratio and size - balanced to show first card without next date
-    double baseExtent = 0.46; // 46% for most devices (increased from 42%)
+    double baseExtent = 0.49; // 49% for most devices (increased from 46%)
     
     // For very tall/narrow screens (like iPhone 14 Pro Max), reduce slightly
     if (screenHeight / screenWidth > 2.2) {
-      baseExtent = 0.42; // Increased from 0.38
+      baseExtent = 0.45; // Increased from 0.42
     }
     // For shorter/wider screens (like iPad landscape), keep at base
     else if (screenHeight / screenWidth < 1.5) {
-      baseExtent = 0.46; // Increased from 0.42
+      baseExtent = 0.49; // Increased from 0.46
     }
     
     _initialSheetExtent = baseExtent;
