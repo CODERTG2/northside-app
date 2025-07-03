@@ -30,6 +30,9 @@ class AthleticsController extends GetxController {
         loadAthletes(),
         loadSchedule(),
       ]);
+      
+      // Debug logging
+      logAvailableSports();
     } catch (e) {
       error.value = 'Failed to load athletics data: $e';
       AppLogger.error('Error loading athletics data', e);
@@ -341,15 +344,31 @@ class AthleticsController extends GetxController {
     
     // Add sports from athletes
     for (final athlete in athletes) {
-      sportsSet.add(athlete.sport);
+      final normalizedSport = _normalizeSportName(athlete.sport);
+      if (normalizedSport.isNotEmpty) {
+        sportsSet.add(athlete.sport); // Keep original case for display
+      }
     }
     
     // Add sports from schedule
     for (final event in schedule) {
-      sportsSet.add(event.sport);
+      final normalizedSport = _normalizeSportName(event.sport);
+      if (normalizedSport.isNotEmpty) {
+        sportsSet.add(event.sport); // Keep original case for display
+      }
     }
     
-    final sports = sportsSet.toList();
+    // Convert to list and remove duplicates based on normalized names
+    final sportsMap = <String, String>{}; // normalized -> original
+    for (final sport in sportsSet) {
+      final normalized = _normalizeSportName(sport);
+      // Only keep the first occurrence of each normalized sport name
+      if (!sportsMap.containsKey(normalized)) {
+        sportsMap[normalized] = sport;
+      }
+    }
+    
+    final sports = sportsMap.values.toList();
     sports.sort();
     return sports;
   }
@@ -376,6 +395,8 @@ class AthleticsController extends GetxController {
         .replaceAll('16in', '')
         .replaceAll('16 in', '')
         .replaceAll('  ', ' ')
+        .replaceAll('track and field', 'track & field') // Standardize track & field
+        .replaceAll('cheer leading', 'cheerleading') // Standardize cheerleading
         .trim();
   }
 
@@ -388,5 +409,21 @@ class AthleticsController extends GetxController {
       return 'girls';
     }
     return normalizedGender;
+  }
+
+  // Debug method to log all available sports
+  void logAvailableSports() {
+    AppLogger.info('=== ALL AVAILABLE SPORTS DEBUG ===');
+    AppLogger.info('Total athletes: ${athletes.length}');
+    AppLogger.info('Total schedule events: ${schedule.length}');
+    
+    final athleteSports = athletes.map((a) => a.sport).toSet();
+    final scheduleSports = schedule.map((s) => s.sport).toSet();
+    
+    AppLogger.info('Sports from athletes (${athleteSports.length}): ${athleteSports.toList()..sort()}');
+    AppLogger.info('Sports from schedule (${scheduleSports.length}): ${scheduleSports.toList()..sort()}');
+    
+    final allSports = getAllAvailableSports();
+    AppLogger.info('Combined normalized sports (${allSports.length}): $allSports');
   }
 }

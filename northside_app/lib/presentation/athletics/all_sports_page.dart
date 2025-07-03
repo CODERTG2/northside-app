@@ -29,28 +29,45 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final allSports = athleticsController.getAllAvailableSports();
     
     // Define which sports belong to which season based on typical school schedules
+    // More precise categorization to avoid duplicates
     final seasonSportsMap = {
       'Fall': [
-        'cross country', 'golf', 'softball', 'soccer', 'cheerleading', 'cheer leading', 
-        'dance', 'tennis', 'flag football', 'swimming', 'volleyball'
+        'cross country', 'golf', 'cheer leading', 'cheerleading', 'dance', 
+        'flag football', 'volleyball', 'tennis', 'swimming'
       ],
       'Winter': [
-        'basketball', 'bowling', 'swimming', 'wrestling', 'indoor track', 'track'
+        'basketball', 'bowling', 'wrestling', 'indoor track', 'track'
       ],
       'Spring': [
-        'baseball', 'lacrosse', 'tennis', 'track & field', 'track and field', 
-        'volleyball', 'soccer', 'softball', 'water polo'
+        'baseball', 'lacrosse', 'track & field', 'track and field', 
+        'soccer', 'softball', 'water polo'
       ],
     };
     
     final seasonSports = seasonSportsMap[season] ?? [];
     
-    // Filter backend sports by season
+    // Filter backend sports by season with more precise matching
     final filteredSports = allSports.where((sport) {
-      return seasonSports.any((seasonSport) => 
-        sport.toLowerCase().contains(seasonSport.toLowerCase()) ||
-        seasonSport.toLowerCase().contains(sport.toLowerCase())
-      );
+      final sportLower = sport.toLowerCase().trim();
+      
+      // Direct exact matching first
+      if (seasonSports.contains(sportLower)) {
+        return true;
+      }
+      
+      // More specific partial matching to avoid cross-season duplicates
+      for (final seasonSport in seasonSports) {
+        // Only match if sport name contains the season sport as a complete word/phrase
+        if (sportLower == seasonSport.toLowerCase() ||
+            (sportLower.contains(seasonSport.toLowerCase()) && 
+             (sportLower.startsWith(seasonSport.toLowerCase()) || 
+              sportLower.endsWith(seasonSport.toLowerCase()) ||
+              sportLower.contains(' ${seasonSport.toLowerCase()} ')))) {
+          return true;
+        }
+      }
+      
+      return false;
     }).toList();
     
     // Separate by gender based on backend data
