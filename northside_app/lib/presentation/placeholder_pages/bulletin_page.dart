@@ -208,6 +208,9 @@ class _BulletinPageState extends State<BulletinPage> {
   }
 
   void _scrollToTodaySection({bool animate = false}) {
+    // TODO: Minor UI issue - first card gets partially cut off by sticky header
+    // Multiple approaches tested: buffer adjustments, spacing, offset modifications
+    // Non-fatal issue - card content still accessible and readable
     if (_todaySectionIndex == null || _todaySectionIndex! < 0) return;
     if (_draggableSheetController == null) return;
     double offset = 0;
