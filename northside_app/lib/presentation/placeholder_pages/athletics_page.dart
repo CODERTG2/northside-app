@@ -36,7 +36,7 @@ class AthleticsPage extends StatelessWidget {
             _buildNewsCarousel(context, athleticsController),
             SizedBox(height: screenHeight * 0.04),
             _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-            _buildSportsGrid(context),
+            _buildSportsGrid(context, athleticsController),
             SizedBox(height: screenHeight * 0.015),
             _buildRegisterButton(context),
           ],
@@ -162,7 +162,7 @@ class AthleticsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSportsGrid(BuildContext context) {
+  Widget _buildSportsGrid(BuildContext context, AthleticsController athleticsController) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double crossAxisSpacing = screenWidth * 0.04;
