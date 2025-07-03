@@ -514,6 +514,37 @@ class AthleticsController extends GetxController {
     // If no schedule data found, fall back to traditional sport type mapping
     print('=== DEBUG: No schedule data for "$sport", using traditional mapping');
     
+    // Special handling for gender-specific sports
+    if (sportLower.contains('swimming')) {
+      // Check if we can determine gender from athletes for this sport
+      final swimmingAthletes = athletes.where((athlete) => 
+        athlete.sport.toLowerCase().contains('swimming')).toList();
+      
+      if (swimmingAthletes.isNotEmpty) {
+        final femaleSwimmers = swimmingAthletes.where((athlete) => 
+          _normalizeGender(athlete.gender) == 'girls').length;
+        final maleSwimmers = swimmingAthletes.where((athlete) => 
+          _normalizeGender(athlete.gender) == 'boys').length;
+        
+        print('=== DEBUG: Swimming - Female swimmers: $femaleSwimmers, Male swimmers: $maleSwimmers');
+        
+        if (femaleSwimmers > maleSwimmers) {
+          print('=== DEBUG: Swimming assigned to fall (majority female)');
+          return 'fall';  // Women's swim is fall
+        } else {
+          print('=== DEBUG: Swimming assigned to winter (majority male)');
+          return 'winter'; // Men's swim is winter
+        }
+      }
+      // Default swimming to winter if no gender data
+      return 'winter';
+    }
+    
+    if (sportLower.contains('water-polo') || sportLower.contains('water polo')) {
+      print('=== DEBUG: Water polo assigned to spring');
+      return 'spring'; // Both men and women polo is spring
+    }
+    
     // Traditional fallback mapping (kept as final backup)
     if (sportLower.contains('football') || 
         sportLower.contains('soccer') || 
@@ -526,11 +557,8 @@ class AthleticsController extends GetxController {
     
     if (sportLower.contains('basketball') || 
         sportLower.contains('wrestling') || 
-        sportLower.contains('swimming') || 
         sportLower.contains('hockey') || 
-        sportLower.contains('indoor track') ||
-        sportLower.contains('water-polo') ||
-        sportLower.contains('water polo')) {
+        sportLower.contains('indoor track')) {
       return 'winter';
     }
     
