@@ -29,42 +29,10 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final allSports = athleticsController.getAllAvailableSports();
     print('=== DEBUG: All available sports from backend (${allSports.length}): $allSports');
     
-    // Define which sports belong to which season based on typical school schedules
-    // More precise categorization to avoid duplicates
-    final seasonSportsMap = {
-      'Fall': [
-        'cross country', 'golf', 'cheer leading', 'cheerleading', 'dance', 
-        'flag football', 'volleyball', 'tennis', 'swimming'
-      ],
-      'Winter': [
-        'basketball', 'bowling', 'wrestling', 'indoor track', 'track'
-      ],
-      'Spring': [
-        'baseball', 'lacrosse', 'track & field', 'track and field', 
-        'soccer', 'softball', 'water polo'
-      ],
-    };
-    
-    final seasonSports = seasonSportsMap[season] ?? [];
-    print('=== DEBUG: Season sports for $season: $seasonSports');
-    
-    // Filter backend sports by season with more inclusive matching (temporary debug)
-    final filteredSports = allSports.where((sport) {
-      final sportLower = sport.toLowerCase().trim();
-      
-      // More inclusive matching to see all potential matches
-      for (final seasonSport in seasonSports) {
-        if (sportLower.contains(seasonSport.toLowerCase()) || 
-            seasonSport.toLowerCase().contains(sportLower)) {
-          print('=== DEBUG: Inclusive match for $sport with $seasonSport');
-          return true;
-        }
-      }
-      
-      return false;
-    }).toList();
-    
-    print('=== DEBUG: Filtered sports for $season (${filteredSports.length}): $filteredSports');
+    // For now, show all sports in every season since we don't have reliable season data from backend
+    // In the future, the backend should provide season information with the sports data
+    final filteredSports = allSports;
+    print('=== DEBUG: Showing all sports for $season (${filteredSports.length}): $filteredSports');
     
     // Separate by gender based on backend data
     final mens = <String>[];

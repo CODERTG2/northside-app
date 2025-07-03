@@ -44,9 +44,21 @@ class AthleticsController extends GetxController {
   // Load athletes/roster from API
   Future<void> loadAthletes() async {
     try {
+      print('=== DEBUG: Starting to fetch athletes from backend...');
       final fetchedAthletes = await ApiService.getRoster();
+      print('=== DEBUG: Fetched ${fetchedAthletes.length} athletes from backend');
+      
+      // Log sample athlete data
+      if (fetchedAthletes.isNotEmpty) {
+        for (int i = 0; i < fetchedAthletes.length && i < 5; i++) {
+          print('=== DEBUG: Sample athlete $i: ${fetchedAthletes[i].name} - ${fetchedAthletes[i].sport} - ${fetchedAthletes[i].gender}');
+        }
+      }
+      
       athletes.assignAll(fetchedAthletes);
+      print('=== DEBUG: Successfully loaded ${athletes.length} athletes');
     } catch (e) {
+      print('=== DEBUG: ERROR loading athletes: $e');
       AppLogger.error('Error loading athletes', e);
     }
   }
@@ -373,6 +385,86 @@ class AthleticsController extends GetxController {
     return sports;
   }
 
+  // Get sports by season based on schedule dates (completely backend-driven)
+  List<String> getSportsBySeason(String season) {
+    // Determine date ranges for each season (typical US school year)
+    final now = DateTime.now();
+    final currentYear = now.year;
+    
+    DateTime seasonStart, seasonEnd;
+    
+    switch (season) {
+      case 'Fall':
+        // August 1 - November 30
+        seasonStart = DateTime(currentYear, 8, 1);
+        seasonEnd = DateTime(currentYear, 11, 30);
+        break;
+      case 'Winter':
+        // December 1 - February 28/29
+        seasonStart = DateTime(currentYear - 1, 12, 1);
+        seasonEnd = DateTime(currentYear, 2, 29);
+        break;
+      case 'Spring':
+        // March 1 - June 30
+        seasonStart = DateTime(currentYear, 3, 1);
+        seasonEnd = DateTime(currentYear, 6, 30);
+        break;
+      default:
+        return [];
+    }
+    
+    // Get sports that have schedule events in this season
+    final seasonSports = <String>{};
+    
+    for (final event in schedule) {
+      try {
+        // Parse the date from the schedule event
+        final eventDate = DateTime.parse(event.date);
+        
+        bool inSeason = false;
+        if (season == 'Winter') {
+          // Handle winter season crossing year boundary
+          final lastWinterStart = DateTime(currentYear - 1, 12, 1);
+          final lastWinterEnd = DateTime(currentYear, 2, 29);
+          final currentWinterStart = DateTime(currentYear, 12, 1);
+          final currentWinterEnd = DateTime(currentYear + 1, 2, 29);
+          
+          inSeason = (eventDate.isAfter(lastWinterStart) && eventDate.isBefore(lastWinterEnd)) ||
+                    (eventDate.isAfter(currentWinterStart) && eventDate.isBefore(currentWinterEnd));
+        } else {
+          inSeason = eventDate.isAfter(seasonStart) && eventDate.isBefore(seasonEnd);
+        }
+        
+        if (inSeason && event.sport.isNotEmpty) {
+          seasonSports.add(event.sport);
+        }
+      } catch (e) {
+        // Skip events with invalid dates
+        AppLogger.warning('Invalid date in schedule: ${event.date}');
+      }
+    }
+    
+    // Also include sports that have athletes (even if no current schedule)
+    for (final athlete in athletes) {
+      if (athlete.sport.isNotEmpty) {
+        seasonSports.add(athlete.sport);
+      }
+    }
+    
+    // Normalize and deduplicate
+    final normalizedSports = <String, String>{}; // normalized -> original
+    for (final sport in seasonSports) {
+      final normalized = _normalizeSportName(sport);
+      if (!normalizedSports.containsKey(normalized)) {
+        normalizedSports[normalized] = sport;
+      }
+    }
+    
+    final result = normalizedSports.values.toList();
+    result.sort();
+    return result;
+  }
+
   // Get teams by sport (combines gender and level)
   List<String> getTeamsBySport(String sport) {
     final sportAthletes = getAthletesBySport(sport: sport);
@@ -425,5 +517,88 @@ class AthleticsController extends GetxController {
     
     final allSports = getAllAvailableSports();
     AppLogger.info('Combined normalized sports (${allSports.length}): $allSports');
+  }
+
+  // Get sports by season based on schedule dates (completely backend-driven)
+  List<String> getSportsBySeason(String season) {
+    // Determine date ranges for each season (typical US school year)
+    final now = DateTime.now();
+    final currentYear = now.year;
+    
+    DateTime seasonStart, seasonEnd;
+    
+    switch (season) {
+      case 'Fall':
+        // August 1 - November 30
+        seasonStart = DateTime(currentYear, 8, 1);
+        seasonEnd = DateTime(currentYear, 11, 30);
+        break;
+      case 'Winter':
+        // December 1 - February 28/29
+        seasonStart = DateTime(currentYear - 1, 12, 1);
+        seasonEnd = DateTime(currentYear, 2, 29);
+        // Also check current year winter season
+        final currentWinterStart = DateTime(currentYear, 12, 1);
+        final currentWinterEnd = DateTime(currentYear + 1, 2, 29);
+        break;
+      case 'Spring':
+        // March 1 - June 30
+        seasonStart = DateTime(currentYear, 3, 1);
+        seasonEnd = DateTime(currentYear, 6, 30);
+        break;
+      default:
+        return [];
+    }
+    
+    // Get sports that have schedule events in this season
+    final seasonSports = <String>{};
+    
+    for (final event in schedule) {
+      try {
+        // Parse the date from the schedule event
+        final eventDate = DateTime.parse(event.date);
+        
+        bool inSeason = false;
+        if (season == 'Winter') {
+          // Handle winter season crossing year boundary
+          final lastWinterStart = DateTime(currentYear - 1, 12, 1);
+          final lastWinterEnd = DateTime(currentYear, 2, 29);
+          final currentWinterStart = DateTime(currentYear, 12, 1);
+          final currentWinterEnd = DateTime(currentYear + 1, 2, 29);
+          
+          inSeason = (eventDate.isAfter(lastWinterStart) && eventDate.isBefore(lastWinterEnd)) ||
+                    (eventDate.isAfter(currentWinterStart) && eventDate.isBefore(currentWinterEnd));
+        } else {
+          inSeason = eventDate.isAfter(seasonStart) && eventDate.isBefore(seasonEnd);
+        }
+        
+        if (inSeason && event.sport.isNotEmpty) {
+          seasonSports.add(event.sport);
+        }
+      } catch (e) {
+        // Skip events with invalid dates
+        AppLogger.warning('Invalid date in schedule: ${event.date}');
+      }
+    }
+    
+    // Also include sports that have athletes (even if no current schedule)
+    for (final athlete in athletes) {
+      if (athlete.sport.isNotEmpty) {
+        seasonSports.add(athlete.sport);
+      }
+    }
+    
+    // Normalize and deduplicate
+    final normalizedSports = <String, String>{}; // normalized -> original
+    for (final sport in seasonSports) {
+      final normalized = _normalizeSportName(sport);
+      if (!normalizedSports.containsKey(normalized)) {
+        normalizedSports[normalized] = sport;
+      }
+    }
+    
+    final result = normalizedSports.values.toList();
+    result.sort();
+    return result;
   }
 }
