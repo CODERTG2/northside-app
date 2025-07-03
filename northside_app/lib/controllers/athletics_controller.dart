@@ -48,11 +48,15 @@ class AthleticsController extends GetxController {
       final fetchedAthletes = await ApiService.getRoster();
       print('=== DEBUG: Fetched ${fetchedAthletes.length} athletes from backend');
       
-      // Log sample athlete data
+      // Log sample athlete data including season info
       if (fetchedAthletes.isNotEmpty) {
         for (int i = 0; i < fetchedAthletes.length && i < 5; i++) {
-          print('=== DEBUG: Sample athlete $i: ${fetchedAthletes[i].name} - ${fetchedAthletes[i].sport} - ${fetchedAthletes[i].gender}');
+          print('=== DEBUG: Sample athlete $i: ${fetchedAthletes[i].name} - ${fetchedAthletes[i].sport} - ${fetchedAthletes[i].gender} - Season: "${fetchedAthletes[i].season}"');
         }
+        
+        // Check all unique seasons in the data
+        final uniqueSeasons = fetchedAthletes.map((a) => a.season).toSet();
+        print('=== DEBUG: Unique seasons found in athlete data: $uniqueSeasons');
       }
       
       athletes.assignAll(fetchedAthletes);
@@ -295,10 +299,6 @@ class AthleticsController extends GetxController {
       }
       
       // Try parsing "Aug 26 2025" format (athletics schedule format)
-      if (dateString.contains(' ') && !dateString.contains('/') && !dateString.contains('-')) {
-        final parts = dateString.split(' ');
-        if (parts.length == 3) {
-          final monthStr = parts[0];
           final day = int.tryParse(parts[1]) ?? 1;
           final year = int.tryParse(parts[2]) ?? DateTime.now().year;
           
@@ -388,15 +388,21 @@ class AthleticsController extends GetxController {
   // Get sports by season based on backend season data (completely backend-driven)
   List<String> getSportsBySeason(String season) {
     final seasonLower = season.toLowerCase();
+    print('=== DEBUG: getSportsBySeason called for season: "$season" (lowercase: "$seasonLower")');
+    print('=== DEBUG: Total athletes loaded: ${athletes.length}');
     
     // Get sports that have athletes for this season
     final seasonSports = <String>{};
     
     for (final athlete in athletes) {
+      print('=== DEBUG: Athlete: ${athlete.name}, Sport: "${athlete.sport}", Season: "${athlete.season}"');
       if (athlete.season.toLowerCase() == seasonLower && athlete.sport.isNotEmpty) {
         seasonSports.add(athlete.sport);
+        print('=== DEBUG: Added sport "${athlete.sport}" for season "$season"');
       }
     }
+    
+    print('=== DEBUG: Found ${seasonSports.length} unique sports for season "$season": $seasonSports');
     
     // Normalize and deduplicate
     final normalizedSports = <String, String>{}; // normalized -> original
@@ -409,6 +415,7 @@ class AthleticsController extends GetxController {
     
     final result = normalizedSports.values.toList();
     result.sort();
+    print('=== DEBUG: Final normalized sports for season "$season": $result');
     return result;
   }
 
