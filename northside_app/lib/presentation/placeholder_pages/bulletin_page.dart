@@ -45,16 +45,16 @@ class _BulletinPageState extends State<BulletinPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     
-    // Adjust based on screen aspect ratio and size
-    double baseExtent = 0.47; // 47% for most devices (reduced from 55%)
+    // Adjust based on screen aspect ratio and size - reduced to prevent next date visibility
+    double baseExtent = 0.42; // 42% for most devices (reduced from 48%)
     
-    // For very tall/narrow screens (like iPhone 14 Pro Max), reduce slightly
+    // For very tall/narrow screens (like iPhone 14 Pro Max), reduce further
     if (screenHeight / screenWidth > 2.2) {
-      baseExtent = 0.42; // Reduced from 0.5
+      baseExtent = 0.38; // Reduced from 0.43
     }
     // For shorter/wider screens (like iPad landscape), keep at base
     else if (screenHeight / screenWidth < 1.5) {
-      baseExtent = 0.47; // Reduced from 0.55
+      baseExtent = 0.42; // Reduced from 0.48
     }
     
     _initialSheetExtent = baseExtent;
@@ -429,7 +429,7 @@ class _BulletinPageState extends State<BulletinPage> {
                         child: ListView.builder(
                           controller: scrollController,
                           padding: EdgeInsets.only(
-                            top: screenWidth * 0.01, // Reduced top padding to prevent cutoff
+                            top: screenWidth * 0.02, // Small buffer above first card
                             bottom: screenHeight * 0.18, // Responsive bottom padding
                           ),
                           itemCount: dateKeys.length,
