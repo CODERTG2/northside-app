@@ -87,6 +87,7 @@ def update_athletics_roster():
                                 "name": player,
                                 "number": numbers[players.index(player)],
                                 "sport": sport,
+                                "season": season,
                                 "level": level,
                                 "gender": gender,
                                 "grade": grades[players.index(player)],
