@@ -46,15 +46,15 @@ class _BulletinPageState extends State<BulletinPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     
     // Adjust based on screen aspect ratio and size
-    double baseExtent = 0.45; // 45% for most devices
+    double baseExtent = 0.55; // 55% for most devices (increased from 45%)
     
     // For very tall/narrow screens (like iPhone 14 Pro Max), reduce slightly
     if (screenHeight / screenWidth > 2.2) {
-      baseExtent = 0.4;
+      baseExtent = 0.5; // Increased from 0.4
     }
     // For shorter/wider screens (like iPad landscape), keep at base
     else if (screenHeight / screenWidth < 1.5) {
-      baseExtent = 0.45;
+      baseExtent = 0.55; // Increased from 0.45
     }
     
     _initialSheetExtent = baseExtent;
@@ -242,11 +242,13 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.01; // Same as ListView padding
-    final double extraBuffer = dateHeaderHeight * 0.3; // Add extra buffer to ensure full card visibility
-    offset = (offset - listViewTopPadding - extraBuffer).clamp(0.0, double.infinity);
+    final double extraBuffer = dateHeaderHeight * 0.8; // Much more aggressive buffer
+    final double cardBuffer = cardHeight * 0.2; // Add extra card-based buffer
+    offset = (offset - listViewTopPadding - extraBuffer - cardBuffer).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
     print('   Extra buffer: ${extraBuffer.toStringAsFixed(1)}px');
+    print('   Card buffer: ${cardBuffer.toStringAsFixed(1)}px');
     print('   Final offset after adjustments: ${offset.toStringAsFixed(1)}px');
     
     if (animate) {
