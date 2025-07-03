@@ -73,15 +73,24 @@ class AthleticsController extends GetxController {
   }) {
     return athletes.where((athlete) {
       bool matches = true;
-      if (sport != null && athlete.sport.toLowerCase() != sport.toLowerCase()) {
-        matches = false;
+      
+      if (sport != null) {
+        final normalizedSport = _normalizeSportName(sport);
+        final normalizedAthleteSport = _normalizeSportName(athlete.sport);
+        matches = normalizedAthleteSport.contains(normalizedSport) || 
+                  normalizedSport.contains(normalizedAthleteSport);
       }
-      if (gender != null && athlete.gender.toLowerCase() != gender.toLowerCase()) {
-        matches = false;
+      
+      if (gender != null && matches) {
+        final normalizedGender = _normalizeGender(gender);
+        final normalizedAthleteGender = _normalizeGender(athlete.gender);
+        matches = normalizedAthleteGender == normalizedGender;
       }
-      if (level != null && athlete.level.toLowerCase() != level.toLowerCase()) {
-        matches = false;
+      
+      if (level != null && matches) {
+        matches = athlete.level.toLowerCase() == level.toLowerCase();
       }
+      
       return matches;
     }).toList();
   }
@@ -326,6 +335,25 @@ class AthleticsController extends GetxController {
     return sports;
   }
 
+  // Get unique sports from both athletes and schedule data
+  List<String> getAllAvailableSports() {
+    final sportsSet = <String>{};
+    
+    // Add sports from athletes
+    for (final athlete in athletes) {
+      sportsSet.add(athlete.sport);
+    }
+    
+    // Add sports from schedule
+    for (final event in schedule) {
+      sportsSet.add(event.sport);
+    }
+    
+    final sports = sportsSet.toList();
+    sports.sort();
+    return sports;
+  }
+
   // Get teams by sport (combines gender and level)
   List<String> getTeamsBySport(String sport) {
     final sportAthletes = getAthletesBySport(sport: sport);
@@ -339,5 +367,26 @@ class AthleticsController extends GetxController {
   // Refresh data
   Future<void> refreshData() async {
     await loadData();
+  }
+
+  // Helper method to normalize sport names for consistency
+  String _normalizeSportName(String sport) {
+    return sport.toLowerCase()
+        .replaceAll('&', 'and')
+        .replaceAll('16in', '')
+        .replaceAll('16 in', '')
+        .replaceAll('  ', ' ')
+        .trim();
+  }
+
+  // Helper method to normalize gender values
+  String _normalizeGender(String gender) {
+    final normalizedGender = gender.toLowerCase().trim();
+    if (normalizedGender == 'boys' || normalizedGender == 'men' || normalizedGender == 'male' || normalizedGender == 'm') {
+      return 'boys';
+    } else if (normalizedGender == 'girls' || normalizedGender == 'women' || normalizedGender == 'female' || normalizedGender == 'w') {
+      return 'girls';
+    }
+    return normalizedGender;
   }
 }

@@ -168,7 +168,58 @@ class AthleticsPage extends StatelessWidget {
     final double crossAxisSpacing = screenWidth * 0.04;
     final double mainAxisSpacing = screenWidth * 0.04;
     final double childAspectRatio = 2.5;
-    final sports = ['Baseball', 'Cross Country', 'Lacrosse', 'Soccer'];
+    
+    // Get available sports from backend
+    final availableSports = athleticsController.getAllAvailableSports();
+    
+    // Take first 4 sports for the preview grid, or show message if none
+    final displaySports = availableSports.take(4).toList();
+    
+    if (displaySports.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+        child: Container(
+          padding: EdgeInsets.all(screenWidth * 0.06),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(Icons.sports_outlined, size: 48, color: Colors.grey.shade400),
+                SizedBox(height: screenWidth * 0.04),
+                Text(
+                  'No Sports Available',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.045,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                SizedBox(height: screenWidth * 0.02),
+                Text(
+                  'Sports data will appear here when available',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.035,
+                    color: Colors.grey.shade500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    
     return Transform.translate(
       offset: Offset(0, -screenHeight * 0.01), // Pull cards closer to header
       child: Padding(
@@ -180,13 +231,18 @@ class AthleticsPage extends StatelessWidget {
             mainAxisSpacing: mainAxisSpacing,
             childAspectRatio: childAspectRatio,
           ),
-          itemCount: sports.length,
+          itemCount: displaySports.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            final sportName = sports[index];
+            final sportName = displaySports[index];
+            // Capitalize sport name for display
+            final displayName = sportName.split(' ').map((word) => 
+              word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : word
+            ).join(' ');
+            
             return _SportButton(
-              name: sportName,
+              name: displayName,
               onTap: () => Get.to(() => SportDetailPage(sportName: "Men's $sportName")),
             );
           },

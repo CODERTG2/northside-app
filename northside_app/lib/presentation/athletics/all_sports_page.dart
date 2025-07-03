@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
+import '../../controllers/athletics_controller.dart';
 import 'sport_detail_page.dart';
 
 class SeasonSports {
@@ -10,21 +11,6 @@ class SeasonSports {
   final List<String> mens;
   final List<String> womens;
 }
-
-final Map<String, SeasonSports> _sportsData = {
-  'Fall': const SeasonSports(
-    mens: ['Cross Country', 'Golf', 'Softball 16in', 'Soccer'],
-    womens: ['Cross Country', 'Golf', 'Cheer Leading', 'Dance', 'Tennis', 'Flag Football', 'Swimming', 'Volleyball'],
-  ),
-  'Winter': const SeasonSports(
-    mens: ['Basketball', 'Bowling', 'Swimming', 'Wrestling'],
-    womens: ['Basketball', 'Bowling', 'Indoor Track'],
-  ),
-  'Spring': const SeasonSports(
-    mens: ['Baseball', 'Lacrosse', 'Tennis', 'Track & Field', 'Volleyball'],
-    womens: ['Lacrosse', 'Soccer', 'Softball', 'Track & Field', 'Water Polo'],
-  ),
-};
 
 class AllSportsPage extends StatefulWidget {
   const AllSportsPage({super.key});
@@ -34,14 +20,74 @@ class AllSportsPage extends StatefulWidget {
 }
 
 class _AllSportsPageState extends State<AllSportsPage> {
+  final AthleticsController athleticsController = Get.put(AthleticsController());
   String _selectedSeason = 'Fall';
   final List<String> _seasons = ['Fall', 'Winter', 'Spring'];
+
+  // Get sports from backend data organized by season and gender
+  SeasonSports _getSportsForSeason(String season) {
+    final allSports = athleticsController.getAllAvailableSports();
+    
+    // Define which sports belong to which season based on typical school schedules
+    final seasonSportsMap = {
+      'Fall': [
+        'cross country', 'golf', 'softball', 'soccer', 'cheerleading', 'cheer leading', 
+        'dance', 'tennis', 'flag football', 'swimming', 'volleyball'
+      ],
+      'Winter': [
+        'basketball', 'bowling', 'swimming', 'wrestling', 'indoor track', 'track'
+      ],
+      'Spring': [
+        'baseball', 'lacrosse', 'tennis', 'track & field', 'track and field', 
+        'volleyball', 'soccer', 'softball', 'water polo'
+      ],
+    };
+    
+    final seasonSports = seasonSportsMap[season] ?? [];
+    
+    // Filter backend sports by season
+    final filteredSports = allSports.where((sport) {
+      return seasonSports.any((seasonSport) => 
+        sport.toLowerCase().contains(seasonSport.toLowerCase()) ||
+        seasonSport.toLowerCase().contains(sport.toLowerCase())
+      );
+    }).toList();
+    
+    // Separate by gender based on backend data
+    final mens = <String>[];
+    final womens = <String>[];
+    
+    for (final sport in filteredSports) {
+      // Check if this sport has male/boys athletes
+      final maleAthletes = athleticsController.getAthletesBySport(
+        sport: sport, 
+        gender: 'boys'
+      );
+      if (maleAthletes.isNotEmpty) {
+        mens.add(sport);
+      }
+      
+      // Check if this sport has female/girls athletes  
+      final femaleAthletes = athleticsController.getAthletesBySport(
+        sport: sport,
+        gender: 'girls'
+      );
+      if (femaleAthletes.isNotEmpty) {
+        womens.add(sport);
+      }
+    }
+    
+    // Remove duplicates and sort
+    return SeasonSports(
+      mens: mens.toSet().toList()..sort(),
+      womens: womens.toSet().toList()..sort(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
-    final currentSports = _sportsData[_selectedSeason]!;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
@@ -57,15 +103,50 @@ class _AllSportsPageState extends State<AllSportsPage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
         ),
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-        children: [
-          SizedBox(height: screenHeight * 0.02),
-          _buildSeasonTabs(context),
-          SizedBox(height: screenHeight * 0.03),
-          _buildSportsColumns(context, currentSports),
-        ],
-      ),
+      body: Obx(() {
+        if (athleticsController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (athleticsController.error.value.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
+                SizedBox(height: 16),
+                Text(
+                  'Error loading sports data',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  athleticsController.error.value,
+                  style: TextStyle(color: Colors.grey.shade600),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => athleticsController.refreshData(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+        
+        final currentSports = _getSportsForSeason(_selectedSeason);
+        
+        return ListView(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+          children: [
+            SizedBox(height: screenHeight * 0.02),
+            _buildSeasonTabs(context),
+            SizedBox(height: screenHeight * 0.03),
+            _buildSportsColumns(context, currentSports),
+          ],
+        );
+      }),
     );
   }
 
@@ -123,6 +204,40 @@ class _AllSportsPageState extends State<AllSportsPage> {
   Widget _buildSportColumn(BuildContext context, String title, List<String> sports) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final sportPrefix = title == 'Men\'s' ? 'Men\'s' : 'Women\'s';
+    
+    if (sports.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: screenWidth * 0.03),
+            child: Text(
+              title,
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.045),
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(screenWidth * 0.04),
+            ),
+            child: Center(
+              child: Text(
+                'No sports available',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: screenWidth * 0.035,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,9 +249,14 @@ class _AllSportsPageState extends State<AllSportsPage> {
           ),
         ),
         ...sports.map((sport) {
+          // Capitalize sport name for display
+          final displayName = sport.split(' ').map((word) => 
+            word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : word
+          ).join(' ');
+          
           final fullSportName = sport.contains('Men\'s') || sport.contains('Women\'s') ? sport : '$sportPrefix $sport';
           return _SportChip(
-            name: sport,
+            name: displayName,
             onTap: () => Get.to(() => SportDetailPage(sportName: fullSportName)),
           );
         }).toList(),
