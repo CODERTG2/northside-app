@@ -425,7 +425,7 @@ class _BulletinPageState extends State<BulletinPage> {
                         child: ListView.builder(
                           controller: scrollController,
                           padding: EdgeInsets.only(
-                            top: 0, // Reset top padding
+                            top: screenWidth * 0.05, // Increased top padding to prevent cutoff
                             bottom: screenHeight * 0.18, // Responsive bottom padding
                           ),
                           itemCount: dateKeys.length,
