@@ -242,8 +242,8 @@ class _BulletinPageState extends State<BulletinPage> {
     
     // Account for ListView padding and ensure perfect visibility
     final double listViewTopPadding = screenWidth * 0.02; // Same as ListView padding
-    final double extraBuffer = dateHeaderHeight * 0.8; // Much more aggressive buffer
-    final double cardBuffer = cardHeight * 0.2; // Add extra card-based buffer
+    final double extraBuffer = dateHeaderHeight * 0.3; // Reduced buffer to prevent cutoff
+    final double cardBuffer = cardHeight * 0.1; // Reduced card-based buffer
     offset = (offset - listViewTopPadding - extraBuffer - cardBuffer).clamp(0.0, double.infinity);
     
     print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
