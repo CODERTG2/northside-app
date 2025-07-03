@@ -315,7 +315,7 @@ class _BulletinPageState extends State<BulletinPage> {
     final double effectiveInitialExtent = responsiveInitialExtent;
     
     // Ensure minChildSize <= initialChildSize to prevent Flutter assertion error
-    final double safeMinExtent = effectiveMinExtent > effectiveInitialExtent ? effectiveInitialExtent : effectiveMinExtent;
+    final double safeMinExtent = (effectiveMinExtent > effectiveInitialExtent ? effectiveInitialExtent : effectiveMinExtent) * 0.9;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F7),
