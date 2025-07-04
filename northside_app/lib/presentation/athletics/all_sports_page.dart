@@ -122,7 +122,7 @@ class _AllSportsPageState extends State<AllSportsPage> {
                   style: TextStyle(
                     fontSize: screenWidth * 0.04,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? Colors.black : Colors.grey.shade600,
+                    color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
                   ),
                 ),
               ),
