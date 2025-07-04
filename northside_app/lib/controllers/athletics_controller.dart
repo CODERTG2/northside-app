@@ -468,9 +468,20 @@ class AthleticsController extends GetxController {
     final availableSeasons = athletes.map((a) => a.season).where((s) => s.isNotEmpty).toSet();
     print('=== DEBUG: Available seasons in backend: $availableSeasons');
     
+    // Debug: Check if backend has proper season data
+    if (availableSeasons.isEmpty) {
+      print('=== WARNING: No season data found in backend! Backend scraping may not be working correctly.');
+    } else {
+      print('=== DEBUG: Backend has season data, checking sport-season mappings...');
+      for (final season in availableSeasons) {
+        final sportsInSeason = athletes.where((a) => a.season.toLowerCase() == season.toLowerCase()).map((a) => a.sport).toSet();
+        print('=== DEBUG: $season season has ${sportsInSeason.length} sports: $sportsInSeason');
+      }
+    }
+    
     final seasonSports = <String>{};
     
-    // Strategy: Use backend season data where available, fallback for others
+    // Strategy: PRIORITIZE backend season data, minimal fallback only when absolutely necessary
     for (final sport in allSports) {
       bool addedFromBackend = false;
       
@@ -486,12 +497,45 @@ class AthleticsController extends GetxController {
         }
       }
       
-      // If no backend season data for this sport, use fallback mapping
+      // IMPORTANT: Also check schedule data for season information
       if (!addedFromBackend) {
+        for (final event in schedule) {
+          if (event.sport.toLowerCase() == sport.toLowerCase()) {
+            // Try to determine season from schedule date
+            final eventDate = _parseEventDate(event.date);
+            if (eventDate != null) {
+              final eventMonth = eventDate.month;
+              String eventSeason;
+              
+              if (eventMonth >= 8 && eventMonth <= 11) {
+                eventSeason = 'fall';
+              } else if (eventMonth >= 12 || eventMonth <= 2) {
+                eventSeason = 'winter';
+              } else if (eventMonth >= 3 && eventMonth <= 6) {
+                eventSeason = 'spring';
+              } else {
+                eventSeason = 'fall'; // July default
+              }
+              
+              if (eventSeason == seasonLower) {
+                seasonSports.add(sport);
+                addedFromBackend = true;
+                print('=== DEBUG: Sport "$sport" added to "$season" from schedule date analysis');
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      // ONLY use fallback if absolutely no backend data exists
+      if (!addedFromBackend) {
+        print('=== WARNING: No backend data for "$sport", this should not happen if backend is working correctly');
+        // Minimal fallback - only for critical cases
         final fallbackSeason = _getFallbackSeasonForSport(sport);
         if (fallbackSeason == seasonLower) {
           seasonSports.add(sport);
-          print('=== DEBUG: Sport "$sport" added to "$season" via fallback mapping');
+          print('=== DEBUG: Sport "$sport" added to "$season" via emergency fallback (backend data missing)');
         }
       }
     }
@@ -513,12 +557,12 @@ class AthleticsController extends GetxController {
     return result;
   }
 
-  // Smart fallback season mapping using actual schedule dates
+  // Emergency fallback season mapping - should rarely be used if backend data is correct
   String _getFallbackSeasonForSport(String sport) {
     final sportLower = sport.toLowerCase();
-    print('=== DEBUG: Getting fallback season for sport: "$sport"');
+    print('=== WARNING: Using emergency fallback for sport: "$sport" - backend data should provide this!');
     
-    // Find games for this sport in the schedule
+    // Find games for this sport in the schedule first
     final sportGames = schedule.where((game) => 
       game.sport.toLowerCase().contains(sportLower) ||
       sportLower.contains(game.sport.toLowerCase())
@@ -553,7 +597,7 @@ class AthleticsController extends GetxController {
         } else if (avgMonth >= 3 && avgMonth <= 6) {
           season = 'spring';  // March-June
         } else {
-          season = 'fall';    // July -> default to fall (summer sports rare in high school)
+          season = 'fall';    // July -> default to fall
         }
         
         print('=== DEBUG: Sport "$sport" assigned to "$season" season based on schedule dates');
@@ -561,67 +605,8 @@ class AthleticsController extends GetxController {
       }
     }
     
-    // If no schedule data found, fall back to traditional sport type mapping
-    print('=== DEBUG: No schedule data for "$sport", using traditional mapping');
-    
-    // Special handling for gender-specific sports
-    if (sportLower.contains('swimming')) {
-      // Check if we can determine gender from athletes for this sport
-      final swimmingAthletes = athletes.where((athlete) => 
-        athlete.sport.toLowerCase().contains('swimming')).toList();
-      
-      if (swimmingAthletes.isNotEmpty) {
-        final femaleSwimmers = swimmingAthletes.where((athlete) => 
-          _normalizeGender(athlete.gender) == 'girls').length;
-        final maleSwimmers = swimmingAthletes.where((athlete) => 
-          _normalizeGender(athlete.gender) == 'boys').length;
-        
-        print('=== DEBUG: Swimming - Female swimmers: $femaleSwimmers, Male swimmers: $maleSwimmers');
-        
-        if (femaleSwimmers > maleSwimmers) {
-          print('=== DEBUG: Swimming assigned to fall (majority female)');
-          return 'fall';  // Women's swim is fall
-        } else {
-          print('=== DEBUG: Swimming assigned to winter (majority male)');
-          return 'winter'; // Men's swim is winter
-        }
-      }
-      // Default swimming to winter if no gender data
-      return 'winter';
-    }
-    
-    if (sportLower.contains('water-polo') || sportLower.contains('water polo')) {
-      print('=== DEBUG: Water polo assigned to spring');
-      return 'spring'; // Both men and women polo is spring
-    }
-    
-    // Traditional fallback mapping (kept as final backup)
-    if (sportLower.contains('football') || 
-        sportLower.contains('soccer') || 
-        sportLower.contains('volleyball') || 
-        sportLower.contains('cross country') || 
-        sportLower.contains('field hockey') ||
-        sportLower.contains('golf')) {
-      return 'fall';
-    }
-    
-    if (sportLower.contains('basketball') || 
-        sportLower.contains('wrestling') || 
-        sportLower.contains('hockey') || 
-        sportLower.contains('indoor track')) {
-      return 'winter';
-    }
-    
-    if (sportLower.contains('baseball') || 
-        sportLower.contains('softball') || 
-        sportLower.contains('tennis') || 
-        sportLower.contains('track') || 
-        sportLower.contains('lacrosse')) {
-      return 'spring';
-    }
-    
-    // Default to fall if completely unsure
-    print('=== DEBUG: Sport "$sport" defaulted to fall season');
+    // If absolutely no data, return fall as default
+    print('=== WARNING: No data available for "$sport", defaulting to fall - this indicates a backend issue');
     return 'fall';
   }
 
