@@ -91,6 +91,7 @@ class _BulletinPageState extends State<BulletinPage> {
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
     final duration = tomorrow.difference(now);
     _midnightTimer = Timer(duration, () {
+      if (!mounted) return;
       _buildGroupedList();
       setState(() {});
       _scheduleMidnightUpdate(); // Reschedule for next midnight
@@ -203,68 +204,59 @@ class _BulletinPageState extends State<BulletinPage> {
     }
     
     _inactivityTimer = Timer(timeoutDuration, () {
+      if (!mounted) return;
       _scrollToTodaySection(animate: true);
     });
   }
 
   void _scrollToTodaySection({bool animate = false}) {
-    // TODO: Minor UI issue - first card gets partially cut off by sticky header
-    // Multiple approaches tested: buffer adjustments, spacing, offset modifications
-    // Non-fatal issue - card content still accessible and readable
-    if (_todaySectionIndex == null || _todaySectionIndex! < 0) return;
-    if (_draggableSheetController == null) return;
+    if (_todaySectionIndex == null || _todaySectionIndex! < 0 || _groupedPosts.keys.isEmpty) return;
+    if (_draggableSheetController == null || !_draggableSheetController!.hasClients) return;
+
     double offset = 0;
     final keys = _groupedPosts.keys.toList();
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    
-    // Calculate dynamic header height based on screen size
-    final double dateHeaderHeight = screenWidth * 0.13; // Responsive header height
+
+    // Calculate dynamic element heights based on screen size
+    final double dateHeaderHeight = screenWidth * 0.13;
     final bool isNarrowScreen = screenWidth < 360;
-    
-    // Calculate actual card height based on the new compact design
-    final double cardPadding = (isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04) * 2; // top + bottom padding
-    final double titleHeight = (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055) * 2.2; // title (2 lines max) with line height
-    final double spacingBetween = isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02; // spacing between title and subtitle
-    final double subtitleHeight = isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.045; // subtitle row with icon
+
+    // Calculate actual card height based on the compact design
+    final double cardPadding = (isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04) * 2;
+    final double titleHeight = (isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055) * 2.2;
+    final double spacingBetween = isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02;
+    final double subtitleHeight = isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.045;
     final double cardHeight = cardPadding + titleHeight + spacingBetween + subtitleHeight;
-    final double cardMargin = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04; // Same as used in _BulletinEventCard
-    
-    // Calculate offset for the target section
+    final double cardMargin = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04;
+
+    // Calculate offset for the target section by summing the heights of preceding sections
     for (int i = 0; i < _todaySectionIndex!; i++) {
-      offset += dateHeaderHeight; // Use responsive header height
-      offset += (_groupedPosts[keys[i]]!.length) * (cardHeight + cardMargin);
+      offset += dateHeaderHeight; // Height of the date header
+      offset += (_groupedPosts[keys[i]]!.length) * (cardHeight + cardMargin); // Total height of cards in the section
     }
+
+    // --- FIX APPLIED HERE ---
+    // The calculated 'offset' brings the top of the target sticky header to the top of the scroll view.
+    // However, the sticky header itself then obscures the top of the first card.
+    //
+    // The correct approach is to add a small buffer to push the first card down so it's
+    // fully visible below the sticky header. A small, responsive value works best.
+    final double scrollBuffer = screenWidth * 0.02; // A small buffer, same as ListView's top padding for consistency
     
-    // Debug information
-    print('📍 Scroll to Today Debug:');
-    print('   Target section: ${keys.isNotEmpty && _todaySectionIndex! < keys.length ? keys[_todaySectionIndex!] : "N/A"}');
-    print('   Card height: ${cardHeight.toStringAsFixed(1)}px');
-    print('   Card margin: ${cardMargin.toStringAsFixed(1)}px');
-    print('   Date header height: ${dateHeaderHeight.toStringAsFixed(1)}px');
-    print('   Calculated offset: ${offset.toStringAsFixed(1)}px');
-    
-    // Account for ListView padding and ensure perfect visibility
-    final double listViewTopPadding = screenWidth * 0.02; // Same as ListView padding
-    // NEW APPROACH: Add the height of one full card + margin to scroll past the first card
-    // This ensures the first card is fully visible below the sticky header
-    final double cardWithMargin = cardHeight + cardMargin;
-    offset = (offset - listViewTopPadding + cardWithMargin).clamp(0.0, double.infinity);
-    
-    print('   ListView top padding: ${listViewTopPadding.toStringAsFixed(1)}px');
-    print('   Card + margin height: ${cardWithMargin.toStringAsFixed(1)}px');
-    print('� NEW APPROACH: Adding full card height to scroll past first card');
-    print('   Final offset after adjustments: ${offset.toStringAsFixed(1)}px');
+    offset = (offset + scrollBuffer).clamp(0.0, _draggableSheetController!.position.maxScrollExtent);
     
     if (animate) {
       _isAutoScrolling = true;
       _draggableSheetController!.animateTo(
         offset,
         duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      ).then((_) => _isAutoScrolling = false);
+        curve: Curves.easeOut,
+      ).whenComplete(() => _isAutoScrolling = false);
     } else {
+      _isAutoScrolling = true;
       _draggableSheetController!.jumpTo(offset);
+      // Use a short timer to reset the flag after a jump to prevent user scrolls from being blocked
+      Future.delayed(const Duration(milliseconds: 50), () => _isAutoScrolling = false);
     }
   }
 
@@ -288,6 +280,7 @@ class _BulletinPageState extends State<BulletinPage> {
     _inactivityTimer?.cancel();
     _midnightTimer?.cancel();
     _sheetController.removeListener(_onSheetExtentChanged);
+    _sheetController.dispose();
     super.dispose();
   }
 
@@ -302,6 +295,7 @@ class _BulletinPageState extends State<BulletinPage> {
 
     // Calculate dynamic minimum extent to avoid covering pinned section (always present now)
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final headerBox = _headerKey.currentContext?.findRenderObject() as RenderBox?;
       final sectionHeaderBox = _sectionHeaderKey.currentContext?.findRenderObject() as RenderBox?;
       final carouselBox = _carouselKey.currentContext?.findRenderObject() as RenderBox?;
@@ -333,6 +327,7 @@ class _BulletinPageState extends State<BulletinPage> {
         children: [
           // Main header and pinned carousel always visible
           Column(
+            key: _headerKey,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SharedHeader(title: 'Bulletin'),
@@ -359,7 +354,9 @@ class _BulletinPageState extends State<BulletinPage> {
                 _draggableSheetController = scrollController;
                 // Delay the scroll slightly to ensure the sheet is fully rendered with new compact cards
                 WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
                   Future.delayed(const Duration(milliseconds: 100), () {
+                     if (!mounted) return;
                     _scrollToTodaySection(animate: false);
                   });
                 });
@@ -475,7 +472,6 @@ class _BulletinPageState extends State<BulletinPage> {
 
   Widget _buildDateHeader(String date) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     
     // Make header height responsive to screen size
     final double headerHeight = screenWidth * 0.13; // 13% of screen width
@@ -550,7 +546,7 @@ class _BulletinEventCard extends StatelessWidget {
   const _BulletinEventCard({required this.post});
   final BulletinPost post;
 
-  void _showArticleSheet(BulletinPost post) {
+  void _showArticleSheet(BuildContext context, BulletinPost post) {
     Get.bottomSheet(
       ArticleDetailDraggableSheet(article: Article(
         title: post.title,
@@ -571,7 +567,7 @@ class _BulletinEventCard extends StatelessWidget {
     final bool isNarrowScreen = screenWidth < 360;
     
     return GestureDetector(
-      onTap: () => _showArticleSheet(post),
+      onTap: () => _showArticleSheet(context, post),
       child: Container(
         width: double.infinity,
         margin: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04),
@@ -626,7 +622,7 @@ class _PinnedPostCard extends StatelessWidget {
   const _PinnedPostCard({required this.post});
   final BulletinPost post;
 
-  void _showArticleSheet(BulletinPost post) {
+  void _showArticleSheet(BuildContext context, BulletinPost post) {
     Get.bottomSheet(
       ArticleDetailDraggableSheet(article: Article(
         title: post.title,
@@ -648,7 +644,7 @@ class _PinnedPostCard extends StatelessWidget {
     final double fontSizeTitle = screenWidth * 0.045;
     final double fontSizeSubtitle = screenWidth * 0.035;
     return GestureDetector(
-      onTap: () => _showArticleSheet(post),
+      onTap: () => _showArticleSheet(context, post),
       child: Container(
         width: cardWidth,
         margin: EdgeInsets.only(right: screenWidth * 0.04, bottom: screenWidth * 0.01),
@@ -667,7 +663,12 @@ class _PinnedPostCard extends StatelessWidget {
                 height: imageHeight,
                 width: double.infinity,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[200]),
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: imageHeight,
+                  width: double.infinity,
+                  color: Colors.grey[200], 
+                  child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                ),
               ),
             ),
             Padding(
