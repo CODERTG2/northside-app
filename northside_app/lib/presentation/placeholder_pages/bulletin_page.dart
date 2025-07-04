@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -576,10 +577,15 @@ class _BulletinEventCard extends StatelessWidget {
         width: double.infinity,
         margin: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04),
         padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 24,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+          shadows: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 4), spreadRadius: 0)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -642,7 +648,7 @@ class _PinnedPostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double cardRadius = screenWidth * 0.05;
+    final double cardRadius = 32;
     final double cardWidth = screenWidth * 0.65;
     final double imageHeight = screenWidth * 0.32;
     final double fontSizeTitle = screenWidth * 0.045;
@@ -652,16 +658,24 @@ class _PinnedPostCard extends StatelessWidget {
       child: Container(
         width: cardWidth,
         margin: EdgeInsets.only(right: screenWidth * 0.04, bottom: screenWidth * 0.01),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(cardRadius),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: cardRadius,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+          shadows: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 4), spreadRadius: 0)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
+            ClipSmoothRect(
+              radius: SmoothBorderRadius.only(
+                topLeft: SmoothRadius(cornerRadius: cardRadius, cornerSmoothing: 1.0),
+                topRight: SmoothRadius(cornerRadius: cardRadius, cornerSmoothing: 1.0),
+              ),
               child: Image.asset(
                 post.imagePath!,
                 height: imageHeight,

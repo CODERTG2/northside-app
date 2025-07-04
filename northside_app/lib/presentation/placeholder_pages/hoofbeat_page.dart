@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HoofBeatPage extends StatefulWidget {
@@ -27,14 +28,22 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
       barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 20,
+              cornerSmoothing: 1.0,
+            ),
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 20,
+                  cornerSmoothing: 1.0,
+                ),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -74,8 +83,11 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      shape: SmoothRectangleBorder(
+                        borderRadius: SmoothBorderRadius(
+                          cornerRadius: 8,
+                          cornerSmoothing: 1.0,
+                        ),
                       ),
                     ),
                     child: const Text(
@@ -214,14 +226,20 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
   Widget _buildPlaceholderCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 16,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 60,
+            offset: const Offset(0, 10),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -291,14 +309,20 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
     return Container(
       width: 280,
       margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 16,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: 60,
+            offset: const Offset(0, 10),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -361,14 +385,20 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 16,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 60,
+            offset: const Offset(0, 10),
+            spreadRadius: 0,
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../models/article.dart';
 import 'article_detail_sheet.dart';
 
@@ -28,9 +29,15 @@ class ArticleDetailDraggableSheet extends StatelessWidget {
         expand: false,
         builder: (context, scrollController) {
           return Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFFF2F2F7),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            decoration: ShapeDecoration(
+              color: const Color(0xFFF2F2F7),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius.only(
+                  topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                  topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                ),
+              ),
+              shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
             ),
             child: ArticleDetailSheet(
               article: article,

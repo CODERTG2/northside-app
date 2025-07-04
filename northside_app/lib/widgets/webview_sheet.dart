@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../core/utils/logger.dart';
 
 class WebViewSheet extends StatefulWidget {
@@ -97,9 +98,14 @@ class _WebViewSheetState extends State<WebViewSheet> {
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 width: 40,
                 height: 5,
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 10,
+                      cornerSmoothing: 1.0,
+                    ),
+                  ),
                 ),
               ),
               // Header with external browser button

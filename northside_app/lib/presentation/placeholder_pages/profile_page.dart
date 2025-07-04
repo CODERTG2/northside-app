@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
@@ -157,10 +158,15 @@ class ProfilePage extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.only(bottom: screenWidth * 0.03),
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenWidth * 0.04),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 24,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+          shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

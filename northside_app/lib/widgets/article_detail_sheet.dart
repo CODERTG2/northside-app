@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../models/article.dart';
 import 'webview_sheet.dart';
@@ -83,9 +84,14 @@ class ArticleDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     // This container gives the sheet its shape and background color.
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFF2F2F7),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: ShapeDecoration(
+        color: const Color(0xFFF2F2F7),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius.only(
+            topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+            topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+          ),
+        ),
       ),
       child: Column(
         children: [
@@ -94,9 +100,14 @@ class ArticleDetailSheet extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 12),
             width: 40,
             height: 5,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(10),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 10,
+                  cornerSmoothing: 1.0,
+                ),
+              ),
             ),
           ),
           // Scrollable content area
@@ -108,8 +119,11 @@ class ArticleDetailSheet extends StatelessWidget {
                 if (article.imagePath != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 24.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                    child: ClipSmoothRect(
+                      radius: SmoothBorderRadius(
+                        cornerRadius: 24,
+                        cornerSmoothing: 1.0,
+                      ),
                       child: Image.asset(article.imagePath!, fit: BoxFit.contain),
                     ),
                   ),

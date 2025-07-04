@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../core/utils/logger.dart';
 
 class LoginSheet extends StatefulWidget {
@@ -79,9 +80,14 @@ class _LoginSheetState extends State<LoginSheet> {
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 width: 40,
                 height: 5,
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 10,
+                      cornerSmoothing: 1.0,
+                    ),
+                  ),
                 ),
               ),
               // Scrollable content area
@@ -114,7 +120,12 @@ class _LoginSheetState extends State<LoginSheet> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 16,
+                            cornerSmoothing: 1.0,
+                          ),
+                        ),
                         elevation: 5,
                         shadowColor: Colors.blue.withOpacity(0.4),
                       ),

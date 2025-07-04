@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
 import 'sport_detail_page.dart';
@@ -99,9 +100,14 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.01),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(screenWidth * 0.03),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 32,
+            cornerSmoothing: 1.0,
+          ),
+        ),
       ),
       child: Row(
         children: _genders.map((gender) {
@@ -111,10 +117,15 @@ class _AllSportsPageState extends State<AllSportsPage> {
               onTap: () => setState(() => _selectedGender = gender),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: screenWidth * 0.035),
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
-                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))] : null,
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 28,
+                      cornerSmoothing: 1.0,
+                    ),
+                  ),
+                  shadows: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))] : null,
                 ),
                 child: Text(
                   gender,
@@ -167,17 +178,22 @@ class _SportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.045;
-    final double borderRadius = screenWidth * 0.04;
+    final double borderRadius = 24;
     final double verticalPadding = screenWidth * 0.04;
     
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: verticalPadding),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(borderRadius),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: borderRadius,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+          shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
         ),
         child: Center(
           child: Text(

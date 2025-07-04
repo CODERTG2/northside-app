@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'home_screen_content_controller.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
@@ -66,7 +67,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
         childAspectRatio: 2.7,
         children: [
           _QuickActionButton(iconWidget: const Icon(Icons.sports_basketball, color: Color(0xFFFF6B35), size: 26), label: 'Athletics', onTap: () => appShellController.changePage(1)),
-          _QuickActionButton(iconWidget: const Icon(Icons.calendar_today_outlined, color: Color(0xFF4285F4), size: 26), label: 'Events', onTap: () => appShellController.changePage(2)),
+          _QuickActionButton(iconWidget: const Icon(Icons.calendar_today, color: Color(0xFF4285F4), size: 26), label: 'Events', onTap: () => appShellController.changePage(2)),
           _QuickActionButton(iconWidget: const Icon(Icons.article, color: Color(0xFF34A853), size: 26), label: 'HoofBeat', onTap: () => Get.to(() => const HoofBeatPage())),
           // FIX: The label is now "Bulletin", the icon is updated, and it correctly navigates to index 3.
           _QuickActionButton(iconWidget: const Icon(Icons.campaign, color: Color(0xFFEA4335), size: 26), label: 'Bulletin', onTap: () => appShellController.changePage(3)),
@@ -89,30 +90,36 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
             : Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24.0),
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 32,
+                      cornerSmoothing: 1.0,
+                    ),
+                  ),
+                  shadows: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      color: Colors.black.withOpacity(0.1), // Reduced from 0.25 to 0.1 for subtlety
+                      blurRadius: 60,
+                      offset: const Offset(0, 10),
+                      spreadRadius: 0, // Reduced from 2 to 0 for cleaner shadow
                     ),
                   ],
                 ),
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.announcement_outlined, size: 48, color: Colors.black),
+                    Icon(Icons.announcement_outlined, size: 48, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
                       'No Recent Announcements',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.black),
                     ),
                     SizedBox(height: 8),
                     Text(
                       'Check back later for updates!',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -202,75 +209,91 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
   }
 
   Widget _buildEventCard(Article article) {
+    final double screenHeight = MediaQuery.of(Get.context!).size.height;
+    final double carouselHeight = screenHeight * 0.4; // 40% of screen height
+    final double imageHeight = carouselHeight * 0.70; // 70% of carousel height for image
+    
     return Container(
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 32,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1), // Reduced from 0.25 to 0.1 for subtlety
+            blurRadius: 60,
+            offset: const Offset(0, 10),
+            spreadRadius: 0, // Reduced from 2 to 0 for cleaner shadow
+          ),
+        ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(
+          cornerRadius: 32,
+          cornerSmoothing: 1.0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              flex: 3,
-              child: Container(
-                padding: const EdgeInsets.only(top: 17.0, bottom: 0.0),
-                child: article.imagePath != null 
-                  ? Image.asset(
-                      article.imagePath!, 
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Center(
-                            child: Icon(
-                              Icons.event,
-                              size: 48,
-                              color: Colors.black,
-                            ),
+            Container(
+              height: imageHeight, // Dynamic height based on screen size
+              padding: const EdgeInsets.only(top: 17.0, bottom: 0.0),
+              child: article.imagePath != null 
+                ? Image.asset(
+                    article.imagePath!, 
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: Icon(
+                            Icons.event,
+                            size: 48,
+                            color: Colors.grey,
                           ),
-                        );
-                      },
-                    )
-                  : Container(
-                      color: Colors.grey.shade300,
-                      child: const Center(
-                        child: Icon(
-                          Icons.event,
-                          size: 48,
-                          color: Colors.black,
                         ),
+                      );
+                    },
+                  )
+                : Container(
+                    color: Colors.grey.shade200,
+                    child: const Center(
+                      child: Icon(
+                        Icons.event,
+                        size: 48,
+                        color: Colors.grey,
                       ),
                     ),
-              ),
+                  ),
             ),
             Transform.translate(
               offset: const Offset(0, -1),
               child: Expanded(
-                flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.black),
+                        const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             article.subtitle,
-                            style: TextStyle(fontSize: 14, color: Colors.black),
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Icon(Icons.more_horiz, size: 20, color: Colors.black),
+                        const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
                       ],
                     ),
                   ],
@@ -322,10 +345,22 @@ class _QuickActionButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 24,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+          shadows: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1), // Reduced from 0.25 to 0.1 for subtlety
+              blurRadius: 60,
+              offset: const Offset(0, 10),
+              spreadRadius: 0, // Reduced from 2 to 0 for cleaner shadow
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -335,7 +370,7 @@ class _QuickActionButton extends StatelessWidget {
             Flexible(
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

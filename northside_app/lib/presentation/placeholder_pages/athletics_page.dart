@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/webview_sheet.dart';
@@ -63,10 +64,15 @@ class AthleticsPage extends StatelessWidget {
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: screenWidth * 0.045),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 24,
+                cornerSmoothing: 1.0,
+              ),
+            ),
+            shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -103,14 +109,20 @@ class AthleticsPage extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 24.0),
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: Colors.white.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 32,
+                  cornerSmoothing: 1.0,
+                ),
+              ),
+              shadows: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  blurRadius: 60,
+                  offset: const Offset(0, 10),
+                  spreadRadius: 0,
                 ),
               ],
             ),
@@ -322,7 +334,7 @@ class _NewsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar devices
-    final double cardRadius = screenWidth * 0.05;
+    final double cardRadius = 32;
     final double fontSizeTitle = isNarrowScreen ? screenWidth * 0.042 : screenWidth * 0.045;
     final double fontSizeSubtitle = isNarrowScreen ? screenWidth * 0.032 : screenWidth * 0.035;
     final double cardPadding = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04;
@@ -335,10 +347,15 @@ class _NewsCard extends StatelessWidget {
         
         return Container(
           margin: EdgeInsets.only(right: screenWidth * 0.04),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(cardRadius),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: cardRadius,
+                cornerSmoothing: 1.0,
+              ),
+            ),
+            shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,8 +363,11 @@ class _NewsCard extends StatelessWidget {
               SizedBox(
                 height: imageHeight,
                 width: double.infinity,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius)),
+                child: ClipSmoothRect(
+                  radius: SmoothBorderRadius.only(
+                    topLeft: SmoothRadius(cornerRadius: cardRadius, cornerSmoothing: 1.0),
+                    topRight: SmoothRadius(cornerRadius: cardRadius, cornerSmoothing: 1.0),
+                  ),
                   child: Container(
                     padding: EdgeInsets.only(top: cardHeight * 0.06, bottom: 0.0), // Same ratio as home carousel
                     child: article.imagePath != null 
@@ -415,16 +435,21 @@ class _SportButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.045;
-    final double borderRadius = screenWidth * 0.04;
+    final double borderRadius = 24;
     final double verticalPadding = screenWidth * 0.04;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: verticalPadding),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(borderRadius),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: borderRadius,
+              cornerSmoothing: 1.0,
+            ),
+          ),
+          shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
         ),
         child: Center(
           child: Text(

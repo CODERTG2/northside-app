@@ -2,13 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sizer/sizer.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../controllers/athletics_controller.dart';
-import '../../models/athlete.dart';
-import '../../models/athletics_schedule.dart';
-import '../../widgets/shared_header.dart';
 import '../../core/utils/logger.dart';
 import '../../core/utils/app_colors.dart';
 import '../../api.dart';
@@ -252,9 +249,14 @@ class _SportDetailPageState extends State<SportDetailPage> {
     final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.01),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(screenWidth * 0.03),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 32,
+            cornerSmoothing: 1.0,
+          ),
+        ),
       ),
       child: Row(
         children: _levels.map((level) {
@@ -269,10 +271,15 @@ class _SportDetailPageState extends State<SportDetailPage> {
               },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.025),
-                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2))] : [],
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 28,
+                      cornerSmoothing: 1.0,
+                    ),
+                  ),
+                  shadows: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2))] : [],
                 ),
                 child: Center(
                   child: Text(
@@ -297,10 +304,14 @@ class _SportDetailPageState extends State<SportDetailPage> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       padding: EdgeInsets.all(screenWidth * 0.04),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(screenWidth * 0.04),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 24,
+            cornerSmoothing: 1.0,
+          ),
+        ),          shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

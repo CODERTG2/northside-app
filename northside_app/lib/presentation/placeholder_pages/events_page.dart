@@ -4,17 +4,13 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:stampede/models/article.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../controllers/events_controller.dart';
-import '../../models/general_event.dart';
-import '../../models/athletics_schedule.dart';
 import '../../core/utils/logger.dart';
 import '../../core/utils/app_colors.dart';
-import '../app_shell/app_shell_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/text_helper.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
@@ -135,9 +131,14 @@ class _EventsPageState extends State<EventsPage> {
         alignment: Alignment.centerLeft,
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.02),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(10),
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 10,
+                cornerSmoothing: 1.0,
+              ),
+            ),
           ),
           child: Text(
             'For Current Year',
@@ -160,10 +161,15 @@ class _EventsPageState extends State<EventsPage> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: verticalPadding),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 24,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
       ),
       // Wrap in LayoutBuilder to adjust calendar based on available space
       child: LayoutBuilder(
@@ -301,10 +307,15 @@ class _NoEventsCard extends StatelessWidget {
     final bool isNarrowScreen = screenWidth < 360;
     return Container(
       padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.04 : screenWidth * 0.05),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 24,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
       ),
       child: Center(
         child: TextHelper.responsiveText(
@@ -332,10 +343,15 @@ class _EventDetailCard extends StatelessWidget {
       width: double.infinity,
       margin: EdgeInsets.only(bottom: isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04),
       padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: AppTheme.cardRadius,
+            cornerSmoothing: 1.0,
+          ),
+        ),
+        shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
