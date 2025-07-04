@@ -467,6 +467,14 @@ class AthleticsController extends GetxController {
       if (!normalizedSports.containsKey(normalized)) {
         normalizedSports[normalized] = sport;
       }
+    }
+    
+    final result = normalizedSports.values.toList();
+    result.sort();
+    print('=== DEBUG: Final sports for season "$season": $result');
+    return result;
+  }
+
   // Emergency fallback season mapping - should rarely be used if backend data is correct
   String _getFallbackSeasonForSport(String sport) {
     final sportLower = sport.toLowerCase();
