@@ -2,15 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
+import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
 import 'sport_detail_page.dart';
-
-class SeasonSports {
-  const SeasonSports({required this.mens, required this.womens});
-  final List<String> mens;
-  final List<String> womens;
-}
 
 class AllSportsPage extends StatefulWidget {
   const AllSportsPage({super.key});
@@ -21,107 +15,55 @@ class AllSportsPage extends StatefulWidget {
 
 class _AllSportsPageState extends State<AllSportsPage> {
   final AthleticsController athleticsController = Get.put(AthleticsController());
-  String _selectedSeason = 'Fall';
-  final List<String> _seasons = ['Fall', 'Winter', 'Spring'];
+  String _selectedGender = 'Girls';
+  final List<String> _genders = ['Girls', 'Boys', 'Coed'];
 
-  // Get sports from backend data organized by season and gender
-  SeasonSports _getSportsForSeason(String season) {
-    final allSports = athleticsController.getAllAvailableSports();
-    print('=== DEBUG: All available sports from backend (${allSports.length}): $allSports');
-    
-    // CRITICAL: Show ALL sports from backend regardless of season
-    // This ensures users can access all sports that exist on the website
-    final filteredSports = allSports; // Use ALL sports, not season-filtered
-    print('=== CRITICAL: Showing ALL ${filteredSports.length} sports regardless of season: $filteredSports');
-    print('=== CRITICAL: This ensures complete visibility of all website sports');
-    
-    // Separate by gender based on backend data
-    final mens = <String>[];
-    final womens = <String>[];
-    
-    for (final sport in filteredSports) {
-      // Get all athletes for this sport to determine gender distribution
-      final allAthletes = athleticsController.getAthletesBySport(sport: sport);
-      print('=== DEBUG: Sport "$sport" has ${allAthletes.length} total athletes');
-      
-      // Special debug logging for flag football
-      if (sport.toLowerCase().contains('flag')) {
-        print('=== DEBUG: *** FLAG FOOTBALL FOUND: "$sport" ***');
-        print('=== DEBUG: Flag football athletes: ${allAthletes.length}');
-        for (final athlete in allAthletes) {
-          print('=== DEBUG: Flag football athlete: ${athlete.name} - ${athlete.gender} - ${athlete.level}');
-        }
-      }
-      
-      if (allAthletes.isNotEmpty) {
-        // Log sample gender data for debugging
-        final genders = allAthletes.map((a) => a.gender).toSet();
-        print('=== DEBUG: Sport "$sport" gender distribution: $genders');
-      }
-      
-      // Check if this sport has male/boys athletes
-      final maleAthletes = athleticsController.getAthletesBySport(
-        sport: sport, 
-        gender: 'boys'
-      );
-      
-      // Check if this sport has female/girls athletes  
-      final femaleAthletes = athleticsController.getAthletesBySport(
-        sport: sport,
-        gender: 'girls'
-      );
-      
-      // CRITICAL: Always show ALL backend sports, even without athletes
-      // This ensures no sports are filtered out from the website data
-      
-      if (maleAthletes.isNotEmpty) {
-        mens.add(sport);
-        print('=== DEBUG: Added $sport to mens (${maleAthletes.length} athletes)');
-      }
-      
-      if (femaleAthletes.isNotEmpty) {
-        womens.add(sport);
-        print('=== DEBUG: Added $sport to womens (${femaleAthletes.length} athletes)');
-      }
-      
-      // If no athletes found, check if backend has gender info to decide column
-      // Otherwise add to both categories to ensure visibility
-      if (maleAthletes.isEmpty && femaleAthletes.isEmpty) {
-        // Try to get gender info from any athlete for this sport
-        final anyAthleteForSport = allAthletes.isNotEmpty ? allAthletes.first : null;
-        
-        if (anyAthleteForSport != null) {
-          final gender = anyAthleteForSport.gender.toLowerCase();
-          if (gender.contains('boy') || gender.contains('men') || gender.contains('male')) {
-            mens.add(sport);
-            print('=== DEBUG: Added $sport to mens (no roster but gender info: ${anyAthleteForSport.gender})');
-          } else if (gender.contains('girl') || gender.contains('women') || gender.contains('female')) {
-            womens.add(sport);
-            print('=== DEBUG: Added $sport to womens (no roster but gender info: ${anyAthleteForSport.gender})');
-          } else {
-            // Unknown gender, add to both
-            mens.add(sport);
-            womens.add(sport);
-            print('=== DEBUG: Added $sport to BOTH genders (unknown gender: ${anyAthleteForSport.gender})');
-          }
-        } else {
-          // No athletes at all, add to both to ensure visibility
-          mens.add(sport);
-          womens.add(sport);
-          print('=== DEBUG: Added $sport to BOTH genders (no athletes found - ensuring visibility)');
-        }
-      }
-    }
-    
-    print('=== DEBUG: Final result for $season - Mens: $mens, Womens: $womens');
-    
-    // Remove duplicates and sort
-    return SeasonSports(
-      mens: mens.toSet().toList()..sort(),
-      womens: womens.toSet().toList()..sort(),
-    );
+  // Hardcoded sports list from the Northside Prep Athletics website
+  // This ensures all sports are always available regardless of backend status
+  static const Map<String, List<String>> _sportsByGender = {
+    'Girls': [
+      'Badminton',
+      'Basketball', 
+      'Bowling',
+      'Cross Country',
+      'Flag Football',
+      'Golf',
+      'Indoor Track',
+      'Lacrosse',
+      'Soccer',
+      'Softball',
+      'Swimming',
+      'Tennis',
+      'Track',
+      'Volleyball',
+      'Water Polo',
+    ],
+    'Boys': [
+      'Baseball',
+      'Basketball',
+      'Bowling', 
+      'Cross Country',
+      'Golf',
+      'Indoor Track',
+      'Lacrosse',
+      'Soccer',
+      'Swimming',
+      'Tennis',
+      'Track',
+      'Volleyball',
+      'Water Polo',
+      'Wrestling',
+    ],
+    'Coed': [
+      'Competitive Cheer',
+      'Dance',
+      'Pom Pon',
+    ],
+  };
+
+  List<String> _getSportsForGender(String gender) {
+    return _sportsByGender[gender] ?? [];
   }
-
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -141,54 +83,19 @@ class _AllSportsPageState extends State<AllSportsPage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
         ),
       ),
-      body: Obx(() {
-        if (athleticsController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        
-        if (athleticsController.error.value.isNotEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
-                SizedBox(height: 16),
-                Text(
-                  'Error loading sports data',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  athleticsController.error.value,
-                  style: TextStyle(color: Colors.grey.shade600),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => athleticsController.refreshData(),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
-        }
-        
-        final currentSports = _getSportsForSeason(_selectedSeason);
-        
-        return ListView(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-          children: [
-            SizedBox(height: screenHeight * 0.02),
-            _buildSeasonTabs(context),
-            SizedBox(height: screenHeight * 0.03),
-            _buildSportsColumns(context, currentSports),
-          ],
-        );
-      }),
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+        children: [
+          SizedBox(height: screenHeight * 0.02),
+          _buildGenderTabs(context),
+          SizedBox(height: screenHeight * 0.03),
+          _buildSportsList(context),
+        ],
+      ),
     );
   }
 
-  Widget _buildSeasonTabs(BuildContext context) {
+  Widget _buildGenderTabs(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.01),
@@ -197,26 +104,25 @@ class _AllSportsPageState extends State<AllSportsPage> {
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
       ),
       child: Row(
-        children: _seasons.map((season) {
-          final isSelected = _selectedSeason == season;
+        children: _genders.map((gender) {
+          final isSelected = _selectedGender == gender;
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _selectedSeason = season),
+              onTap: () => setState(() => _selectedGender = gender),
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
+                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.035),
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white : Colors.transparent,
                   borderRadius: BorderRadius.circular(screenWidth * 0.025),
-                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)] : [],
+                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))] : null,
                 ),
-                child: Center(
-                  child: Text(
-                    season,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? AppColors.primaryBlue : Colors.grey.shade600,
-                      fontSize: screenWidth * 0.045,
-                    ),
+                child: Text(
+                  gender,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? Colors.black : Colors.grey.shade600,
                   ),
                 ),
               ),
@@ -227,84 +133,46 @@ class _AllSportsPageState extends State<AllSportsPage> {
     );
   }
 
-  Widget _buildSportsColumns(BuildContext context, SeasonSports sports) {
+  Widget _buildSportsList(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: _buildSportColumn(context, 'Men\'s', sports.mens)),
-        SizedBox(width: screenWidth * 0.04),
-        Expanded(child: _buildSportColumn(context, 'Women\'s', sports.womens)),
-      ],
-    );
-  }
-
-  Widget _buildSportColumn(BuildContext context, String title, List<String> sports) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final sportPrefix = title == 'Men\'s' ? 'Men\'s' : 'Women\'s';
+    final sports = _getSportsForGender(_selectedGender);
     
-    // REMOVED: "No sports available" logic - always show all sports that exist in backend
-    // This ensures every sport from the backend is always visible
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(bottom: screenWidth * 0.03),
-          child: Text(
-            title,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.045),
-          ),
-        ),
-        ...sports.map((sport) {
-          // Remove any gender prefixes from the display name
-          String displayName = sport;
-          if (displayName.startsWith('Men\'s ')) {
-            displayName = displayName.substring(6);
-          } else if (displayName.startsWith('Women\'s ')) {
-            displayName = displayName.substring(8);
-          }
-          
-          // Capitalize sport name for display (without gender prefix)
-          displayName = displayName.split(' ').map((word) => 
-            word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : word
-          ).join(' ');
-          
-          // For navigation, use the original sport name (backend might already include gender prefix)
-          // If the sport already has a gender prefix, use it; otherwise add one
-          String fullSportName;
-          if (sport.startsWith('Men\'s ') || sport.startsWith('Women\'s ')) {
-            fullSportName = sport; // Backend already has the prefix
-          } else {
-            fullSportName = '$sportPrefix $sport'; // Add prefix for navigation
-          }
-          
-          return _SportChip(
-            name: displayName, // Display without gender prefix
-            onTap: () => Get.to(() => SportDetailPage(sportName: fullSportName)),
-          );
-        }).toList(),
-      ],
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: screenWidth * 0.04,
+        mainAxisSpacing: screenWidth * 0.04,
+        childAspectRatio: 2.5,
+      ),
+      itemCount: sports.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        final sportName = sports[index];
+        return _SportCard(
+          name: sportName,
+          onTap: () => Get.to(() => SportDetailPage(sportName: sportName)),
+        );
+      },
     );
   }
 }
 
-class _SportChip extends StatelessWidget {
-  const _SportChip({required this.name, required this.onTap});
+class _SportCard extends StatelessWidget {
+  const _SportCard({required this.name, required this.onTap});
   final String name;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double fontSize = screenWidth * 0.04;
+    final double fontSize = screenWidth * 0.045;
     final double borderRadius = screenWidth * 0.04;
     final double verticalPadding = screenWidth * 0.04;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        margin: EdgeInsets.only(bottom: screenWidth * 0.03),
         padding: EdgeInsets.symmetric(vertical: verticalPadding),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -315,6 +183,9 @@ class _SportChip extends StatelessWidget {
           child: Text(
             name,
             style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
         ),
       ),
