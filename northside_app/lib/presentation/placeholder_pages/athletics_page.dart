@@ -194,6 +194,9 @@ class AthleticsPage extends StatelessWidget {
     print('=== DEBUG: Displaying sports: $displaySports');
     
     if (displaySports.isEmpty) {
+      // CRITICAL: If no sports are available, the backend might not be loaded yet
+      // Show a loading state instead of hiding the section entirely
+      print('=== CRITICAL: No sports available - this indicates backend data is not loaded yet');
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
         child: Container(
@@ -212,10 +215,10 @@ class AthleticsPage extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                Icon(Icons.sports_outlined, size: 48, color: Colors.grey.shade400),
+                CircularProgressIndicator(),
                 SizedBox(height: screenWidth * 0.04),
                 Text(
-                  'No Sports Available',
+                  'Loading Sports...',
                   style: TextStyle(
                     fontSize: screenWidth * 0.045,
                     fontWeight: FontWeight.w600,
@@ -224,7 +227,7 @@ class AthleticsPage extends StatelessWidget {
                 ),
                 SizedBox(height: screenWidth * 0.02),
                 Text(
-                  'Sports data will appear here when available',
+                  'Loading all sports from the athletics website',
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
                     color: Colors.grey.shade500,

@@ -29,16 +29,18 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final allSports = athleticsController.getAllAvailableSports();
     print('=== DEBUG: All available sports from backend (${allSports.length}): $allSports');
     
-    // Get sports for this season from backend season data (completely backend-driven)
-    final filteredSports = athleticsController.getSportsBySeason(season);
-    print('=== DEBUG: Sports for $season from backend season data (${filteredSports.length}): $filteredSports');
+    // CRITICAL: Show ALL sports from backend regardless of season
+    // This ensures users can access all sports that exist on the website
+    final filteredSports = allSports; // Use ALL sports, not season-filtered
+    print('=== CRITICAL: Showing ALL ${filteredSports.length} sports regardless of season: $filteredSports');
+    print('=== CRITICAL: This ensures complete visibility of all website sports');
     
     // Separate by gender based on backend data
     final mens = <String>[];
     final womens = <String>[];
     
     for (final sport in filteredSports) {
-      // Get all athletes for this sport to debug gender data
+      // Get all athletes for this sport to determine gender distribution
       final allAthletes = athleticsController.getAthletesBySport(sport: sport);
       print('=== DEBUG: Sport "$sport" has ${allAthletes.length} total athletes');
       
@@ -82,12 +84,32 @@ class _AllSportsPageState extends State<AllSportsPage> {
         print('=== DEBUG: Added $sport to womens (${femaleAthletes.length} athletes)');
       }
       
-      // If no athletes found, add to both categories to ensure visibility
-      // This guarantees that ALL sports from the backend are displayed
+      // If no athletes found, check if backend has gender info to decide column
+      // Otherwise add to both categories to ensure visibility
       if (maleAthletes.isEmpty && femaleAthletes.isEmpty) {
-        mens.add(sport);
-        womens.add(sport);
-        print('=== DEBUG: Added $sport to BOTH genders (no athletes found - ensuring visibility)');
+        // Try to get gender info from any athlete for this sport
+        final anyAthleteForSport = allAthletes.isNotEmpty ? allAthletes.first : null;
+        
+        if (anyAthleteForSport != null) {
+          final gender = anyAthleteForSport.gender.toLowerCase();
+          if (gender.contains('boy') || gender.contains('men') || gender.contains('male')) {
+            mens.add(sport);
+            print('=== DEBUG: Added $sport to mens (no roster but gender info: ${anyAthleteForSport.gender})');
+          } else if (gender.contains('girl') || gender.contains('women') || gender.contains('female')) {
+            womens.add(sport);
+            print('=== DEBUG: Added $sport to womens (no roster but gender info: ${anyAthleteForSport.gender})');
+          } else {
+            // Unknown gender, add to both
+            mens.add(sport);
+            womens.add(sport);
+            print('=== DEBUG: Added $sport to BOTH genders (unknown gender: ${anyAthleteForSport.gender})');
+          }
+        } else {
+          // No athletes at all, add to both to ensure visibility
+          mens.add(sport);
+          womens.add(sport);
+          print('=== DEBUG: Added $sport to BOTH genders (no athletes found - ensuring visibility)');
+        }
       }
     }
     
@@ -221,38 +243,8 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final sportPrefix = title == 'Men\'s' ? 'Men\'s' : 'Women\'s';
     
-    if (sports.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: screenWidth * 0.03),
-            child: Text(
-              title,
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: screenWidth * 0.045),
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(screenWidth * 0.04),
-            ),
-            child: Center(
-              child: Text(
-                'No sports available',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: screenWidth * 0.035,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+    // REMOVED: "No sports available" logic - always show all sports that exist in backend
+    // This ensures every sport from the backend is always visible
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

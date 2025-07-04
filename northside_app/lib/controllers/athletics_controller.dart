@@ -424,6 +424,7 @@ class AthleticsController extends GetxController {
   }
 
   // Get all available sports and organize them by season based ONLY on backend data
+  // Get all available sports and organize them by season based ONLY on backend data
   List<String> getSportsBySeason(String season) {
     final seasonLower = season.toLowerCase();
     print('=== DEBUG: getSportsBySeason called for season: "$season" (lowercase: "$seasonLower")');
@@ -435,8 +436,10 @@ class AthleticsController extends GetxController {
     
     // Debug: Check if backend has proper season data
     if (availableSeasons.isEmpty) {
-      print('=== CRITICAL ERROR: No season data found in backend! Backend scraping is not working correctly.');
-      return []; // Return empty list if no backend season data
+      print('=== WARNING: No season data found in backend! Showing ALL sports instead of filtering by season.');
+      print('=== DEBUG: This ensures all sports are visible even when backend season data is missing.');
+      // Return ALL sports when backend season data is missing - never hide sports
+      return getAllAvailableSports();
     }
     
     // Show what sports are available for each season in the backend
@@ -459,6 +462,14 @@ class AthleticsController extends GetxController {
     }
     
     print('=== DEBUG: Sports for season "$season" (BACKEND ONLY): $seasonSports');
+    
+    // If no sports found for this season, but backend has season data, show all sports
+    // This ensures we never hide sports due to missing/incomplete backend season assignments
+    if (seasonSports.isEmpty && availableSeasons.isNotEmpty) {
+      print('=== WARNING: No sports found for $season season, but backend has season data.');
+      print('=== DEBUG: Showing ALL sports to ensure nothing is hidden from users.');
+      return getAllAvailableSports();
+    }
     
     // Normalize and deduplicate (preserve all backend sports)
     final normalizedSports = <String, String>{}; // normalized -> original
