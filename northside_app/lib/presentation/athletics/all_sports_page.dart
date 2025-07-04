@@ -42,6 +42,15 @@ class _AllSportsPageState extends State<AllSportsPage> {
       final allAthletes = athleticsController.getAthletesBySport(sport: sport);
       print('=== DEBUG: Sport "$sport" has ${allAthletes.length} total athletes');
       
+      // Special debug logging for flag football
+      if (sport.toLowerCase().contains('flag')) {
+        print('=== DEBUG: *** FLAG FOOTBALL FOUND: "$sport" ***');
+        print('=== DEBUG: Flag football athletes: ${allAthletes.length}');
+        for (final athlete in allAthletes) {
+          print('=== DEBUG: Flag football athlete: ${athlete.name} - ${athlete.gender} - ${athlete.level}');
+        }
+      }
+      
       if (allAthletes.isNotEmpty) {
         // Log sample gender data for debugging
         final genders = allAthletes.map((a) => a.gender).toSet();

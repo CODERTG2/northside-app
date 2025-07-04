@@ -90,20 +90,42 @@ class AthleticsController extends GetxController {
     String? gender,
     String? level,
   }) {
+    // Debug logging for flag football specifically
+    if (sport != null && sport.toLowerCase().contains('flag')) {
+      print('=== DEBUG: Filtering athletes for flag football: "$sport"');
+      print('=== DEBUG: Total athletes to search: ${athletes.length}');
+    }
+    
     return athletes.where((athlete) {
       bool matches = true;
       
       if (sport != null) {
         final normalizedSport = _normalizeSportName(sport);
         final normalizedAthleteSport = _normalizeSportName(athlete.sport);
+        
+        // Debug logging for flag football
+        if (sport.toLowerCase().contains('flag')) {
+          print('=== DEBUG: Checking athlete "${athlete.name}" - sport: "${athlete.sport}" (normalized: "$normalizedAthleteSport") vs search: "$normalizedSport"');
+        }
+        
         matches = normalizedAthleteSport.contains(normalizedSport) || 
                   normalizedSport.contains(normalizedAthleteSport);
+                  
+        // Debug logging for flag football
+        if (sport.toLowerCase().contains('flag') && matches) {
+          print('=== DEBUG: MATCH FOUND for flag football athlete: "${athlete.name}" - ${athlete.sport} (${athlete.gender})');
+        }
       }
       
       if (gender != null && matches) {
         final normalizedGender = _normalizeGender(gender);
         final normalizedAthleteGender = _normalizeGender(athlete.gender);
         matches = normalizedAthleteGender == normalizedGender;
+        
+        // Debug logging for flag football
+        if (sport != null && sport.toLowerCase().contains('flag')) {
+          print('=== DEBUG: Gender filter for flag football - athlete gender: "${athlete.gender}" (normalized: "$normalizedAthleteGender") vs search: "$normalizedGender" - matches: $matches');
+        }
       }
       
       if (level != null && matches) {
@@ -406,6 +428,10 @@ class AthleticsController extends GetxController {
         if (athlete.sport.startsWith('Men\'s ') || athlete.sport.startsWith('Women\'s ')) {
           print('=== DEBUG: Backend sport has gender prefix: "${athlete.sport}"');
         }
+        // Special debug for flag football
+        if (athlete.sport.toLowerCase().contains('flag')) {
+          print('=== DEBUG: *** FLAG FOOTBALL FOUND in athletes: "${athlete.sport}" (${athlete.gender}) ***');
+        }
       }
     }
     
@@ -416,6 +442,10 @@ class AthleticsController extends GetxController {
         // Debug: Log sport names to see if they have gender prefixes
         if (event.sport.startsWith('Men\'s ') || event.sport.startsWith('Women\'s ')) {
           print('=== DEBUG: Backend schedule sport has gender prefix: "${event.sport}"');
+        }
+        // Special debug for flag football
+        if (event.sport.toLowerCase().contains('flag')) {
+          print('=== DEBUG: *** FLAG FOOTBALL FOUND in schedule: "${event.sport}" (${event.gender}) ***');
         }
       }
     }
