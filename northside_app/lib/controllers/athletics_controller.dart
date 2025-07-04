@@ -378,6 +378,10 @@ class AthleticsController extends GetxController {
 
   // Get unique sports from both athletes and schedule data
   List<String> getAllAvailableSports() {
+    print('=== DEBUG: getAllAvailableSports called');
+    print('=== DEBUG: Athletes count: ${athletes.length}');
+    print('=== DEBUG: Schedule count: ${schedule.length}');
+    
     final sportsSet = <String>{};
     
     // Add sports from athletes
@@ -385,6 +389,7 @@ class AthleticsController extends GetxController {
       final normalizedSport = _normalizeSportName(athlete.sport);
       if (normalizedSport.isNotEmpty) {
         sportsSet.add(athlete.sport); // Keep original case for display
+        print('=== DEBUG: Added sport from athletes: "${athlete.sport}"');
       }
     }
     
@@ -393,8 +398,11 @@ class AthleticsController extends GetxController {
       final normalizedSport = _normalizeSportName(event.sport);
       if (normalizedSport.isNotEmpty) {
         sportsSet.add(event.sport); // Keep original case for display
+        print('=== DEBUG: Added sport from schedule: "${event.sport}"');
       }
     }
+    
+    print('=== DEBUG: Raw sports set (${sportsSet.length}): $sportsSet');
     
     // Convert to list and remove duplicates based on normalized names
     final sportsMap = <String, String>{}; // normalized -> original
@@ -403,11 +411,15 @@ class AthleticsController extends GetxController {
       // Only keep the first occurrence of each normalized sport name
       if (!sportsMap.containsKey(normalized)) {
         sportsMap[normalized] = sport;
+        print('=== DEBUG: Keeping sport: "$sport" (normalized: "$normalized")');
+      } else {
+        print('=== DEBUG: Skipping duplicate sport: "$sport" (normalized: "$normalized")');
       }
     }
     
     final sports = sportsMap.values.toList();
     sports.sort();
+    print('=== DEBUG: Final sports list (${sports.length}): $sports');
     return sports;
   }
 

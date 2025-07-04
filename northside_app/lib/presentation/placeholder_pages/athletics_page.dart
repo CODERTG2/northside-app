@@ -172,8 +172,26 @@ class AthleticsPage extends StatelessWidget {
     // Get available sports from backend
     final availableSports = athleticsController.getAllAvailableSports();
     
-    // Take first 4 sports for the preview grid, or show message if none
-    final displaySports = availableSports.take(4).toList();
+    // Take first 4 sports for the preview grid, but prioritize popular/common sports
+    // Sort to prioritize sports that are more likely to be popular
+    final sortedSports = availableSports.toList();
+    sortedSports.sort((a, b) {
+      // Prioritize common sports for the preview
+      final commonSports = ['basketball', 'football', 'soccer', 'volleyball', 'baseball', 'softball', 'tennis', 'track'];
+      final aCommon = commonSports.any((common) => a.toLowerCase().contains(common));
+      final bCommon = commonSports.any((common) => b.toLowerCase().contains(common));
+      
+      if (aCommon && !bCommon) return -1;
+      if (!aCommon && bCommon) return 1;
+      return a.compareTo(b);
+    });
+    
+    final displaySports = sortedSports.take(4).toList();
+    
+    // Debug: Log all available sports to see what's being filtered
+    print('=== DEBUG: Athletics preview - Total available sports: ${availableSports.length}');
+    print('=== DEBUG: All available sports: $availableSports');
+    print('=== DEBUG: Displaying sports: $displaySports');
     
     if (displaySports.isEmpty) {
       return Padding(

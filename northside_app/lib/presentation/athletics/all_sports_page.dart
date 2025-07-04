@@ -62,33 +62,32 @@ class _AllSportsPageState extends State<AllSportsPage> {
         sport: sport, 
         gender: 'boys'
       );
-      if (maleAthletes.isNotEmpty) {
-        mens.add(sport);
-        print('=== DEBUG: Added $sport to mens (${maleAthletes.length} athletes)');
-      }
       
       // Check if this sport has female/girls athletes  
       final femaleAthletes = athleticsController.getAthletesBySport(
         sport: sport,
         gender: 'girls'
       );
+      
+      // CRITICAL: Always show ALL backend sports, even without athletes
+      // This ensures no sports are filtered out from the website data
+      
+      if (maleAthletes.isNotEmpty) {
+        mens.add(sport);
+        print('=== DEBUG: Added $sport to mens (${maleAthletes.length} athletes)');
+      }
+      
       if (femaleAthletes.isNotEmpty) {
         womens.add(sport);
         print('=== DEBUG: Added $sport to womens (${femaleAthletes.length} athletes)');
       }
       
-      // IMPORTANT: Show sports even if they don't have athletes with clear gender
-      // This ensures ALL backend sports are always shown in at least one category
-      if (maleAthletes.isEmpty && femaleAthletes.isEmpty && allAthletes.isNotEmpty) {
-        // Add to both categories if gender is unclear but athletes exist
+      // If no athletes found, add to both categories to ensure visibility
+      // This guarantees that ALL sports from the backend are displayed
+      if (maleAthletes.isEmpty && femaleAthletes.isEmpty) {
         mens.add(sport);
         womens.add(sport);
-        print('=== DEBUG: Added $sport to BOTH genders due to unclear gender data (${allAthletes.length} athletes)');
-      } else if (maleAthletes.isEmpty && femaleAthletes.isEmpty && allAthletes.isEmpty) {
-        // Still show sport even with no athletes (might have schedule data)
-        mens.add(sport);
-        womens.add(sport);
-        print('=== DEBUG: Added $sport to BOTH genders even with no athletes (schedule data available)');
+        print('=== DEBUG: Added $sport to BOTH genders (no athletes found - ensuring visibility)');
       }
     }
     
