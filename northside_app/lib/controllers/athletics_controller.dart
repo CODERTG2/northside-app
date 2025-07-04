@@ -402,6 +402,10 @@ class AthleticsController extends GetxController {
     for (final athlete in athletes) {
       if (athlete.sport.isNotEmpty) {
         allSports.add(athlete.sport);
+        // Debug: Log sport names to see if they have gender prefixes
+        if (athlete.sport.startsWith('Men\'s ') || athlete.sport.startsWith('Women\'s ')) {
+          print('=== DEBUG: Backend sport has gender prefix: "${athlete.sport}"');
+        }
       }
     }
     
@@ -409,6 +413,10 @@ class AthleticsController extends GetxController {
     for (final event in schedule) {
       if (event.sport.isNotEmpty) {
         allSports.add(event.sport);
+        // Debug: Log sport names to see if they have gender prefixes
+        if (event.sport.startsWith('Men\'s ') || event.sport.startsWith('Women\'s ')) {
+          print('=== DEBUG: Backend schedule sport has gender prefix: "${event.sport}"');
+        }
       }
     }
     

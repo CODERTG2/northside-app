@@ -236,14 +236,23 @@ class AthleticsPage extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             final sportName = displaySports[index];
-            // Capitalize sport name for display
-            final displayName = sportName.split(' ').map((word) => 
+            
+            // Remove any gender prefixes from the display name
+            String displayName = sportName;
+            if (displayName.startsWith('Men\'s ')) {
+              displayName = displayName.substring(6);
+            } else if (displayName.startsWith('Women\'s ')) {
+              displayName = displayName.substring(8);
+            }
+            
+            // Capitalize sport name for display (without gender prefix)
+            displayName = displayName.split(' ').map((word) => 
               word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : word
             ).join(' ');
             
             return _SportButton(
               name: displayName,
-              onTap: () => Get.to(() => SportDetailPage(sportName: "Men's $sportName")),
+              onTap: () => Get.to(() => SportDetailPage(sportName: sportName)), // Use original name for navigation
             );
           },
         ),

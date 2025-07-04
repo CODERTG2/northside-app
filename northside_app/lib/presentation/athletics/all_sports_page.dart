@@ -38,6 +38,16 @@ class _AllSportsPageState extends State<AllSportsPage> {
     final womens = <String>[];
     
     for (final sport in filteredSports) {
+      // Get all athletes for this sport to debug gender data
+      final allAthletes = athleticsController.getAthletesBySport(sport: sport);
+      print('=== DEBUG: Sport "$sport" has ${allAthletes.length} total athletes');
+      
+      if (allAthletes.isNotEmpty) {
+        // Log sample gender data for debugging
+        final genders = allAthletes.map((a) => a.gender).toSet();
+        print('=== DEBUG: Sport "$sport" gender distribution: $genders');
+      }
+      
       // Check if this sport has male/boys athletes
       final maleAthletes = athleticsController.getAthletesBySport(
         sport: sport, 
@@ -56,6 +66,20 @@ class _AllSportsPageState extends State<AllSportsPage> {
       if (femaleAthletes.isNotEmpty) {
         womens.add(sport);
         print('=== DEBUG: Added $sport to womens (${femaleAthletes.length} athletes)');
+      }
+      
+      // IMPORTANT: Show sports even if they don't have athletes with clear gender
+      // This ensures ALL backend sports are always shown in at least one category
+      if (maleAthletes.isEmpty && femaleAthletes.isEmpty && allAthletes.isNotEmpty) {
+        // Add to both categories if gender is unclear but athletes exist
+        mens.add(sport);
+        womens.add(sport);
+        print('=== DEBUG: Added $sport to BOTH genders due to unclear gender data (${allAthletes.length} athletes)');
+      } else if (maleAthletes.isEmpty && femaleAthletes.isEmpty && allAthletes.isEmpty) {
+        // Still show sport even with no athletes (might have schedule data)
+        mens.add(sport);
+        womens.add(sport);
+        print('=== DEBUG: Added $sport to BOTH genders even with no athletes (schedule data available)');
       }
     }
     
@@ -233,14 +257,30 @@ class _AllSportsPageState extends State<AllSportsPage> {
           ),
         ),
         ...sports.map((sport) {
-          // Capitalize sport name for display
-          final displayName = sport.split(' ').map((word) => 
+          // Remove any gender prefixes from the display name
+          String displayName = sport;
+          if (displayName.startsWith('Men\'s ')) {
+            displayName = displayName.substring(6);
+          } else if (displayName.startsWith('Women\'s ')) {
+            displayName = displayName.substring(8);
+          }
+          
+          // Capitalize sport name for display (without gender prefix)
+          displayName = displayName.split(' ').map((word) => 
             word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : word
           ).join(' ');
           
-          final fullSportName = sport.contains('Men\'s') || sport.contains('Women\'s') ? sport : '$sportPrefix $sport';
+          // For navigation, use the original sport name (backend might already include gender prefix)
+          // If the sport already has a gender prefix, use it; otherwise add one
+          String fullSportName;
+          if (sport.startsWith('Men\'s ') || sport.startsWith('Women\'s ')) {
+            fullSportName = sport; // Backend already has the prefix
+          } else {
+            fullSportName = '$sportPrefix $sport'; // Add prefix for navigation
+          }
+          
           return _SportChip(
-            name: displayName,
+            name: displayName, // Display without gender prefix
             onTap: () => Get.to(() => SportDetailPage(sportName: fullSportName)),
           );
         }).toList(),
