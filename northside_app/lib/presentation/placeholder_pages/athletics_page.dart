@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/webview_sheet.dart';
@@ -13,6 +14,7 @@ import '../../widgets/shared_header.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
+import '../../core/utils/logger.dart';
 
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});
@@ -53,14 +55,29 @@ class AthleticsPage extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: GestureDetector(
-        onTap: () {
-          Get.bottomSheet(
-            const WebViewSheet(url: registrationUrl),
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            useRootNavigator: false,
-            enableDrag: true,
-          );
+        onTap: () async {
+          try {
+            final uri = Uri.parse(registrationUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } else {
+              AppLogger.warning('Could not launch URL: $registrationUrl');
+              Get.snackbar(
+                'Error',
+                'Unable to open registration link',
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+            }
+          } catch (e) {
+            AppLogger.error('Error launching registration URL', e);
+            Get.snackbar(
+              'Error',
+              'Error opening registration link',
+              snackPosition: SnackPosition.BOTTOM,
+              duration: const Duration(seconds: 2),
+            );
+          }
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: screenWidth * 0.045),

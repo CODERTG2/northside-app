@@ -53,14 +53,27 @@ class ArticleDetailSheet extends StatelessWidget {
           decoration: TextDecoration.underline,
         ),
         recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            Get.bottomSheet(
-              WebViewSheet(url: linkUrl),
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              useRootNavigator: false,
-              enableDrag: true,
-            );
+          ..onTap = () async {
+            try {
+              final uri = Uri.parse(linkUrl);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              } else {
+                Get.snackbar(
+                  'Error',
+                  'Unable to open link in external browser',
+                  snackPosition: SnackPosition.BOTTOM,
+                  duration: const Duration(seconds: 2),
+                );
+              }
+            } catch (e) {
+              Get.snackbar(
+                'Error',
+                'Error opening link',
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+            }
           },
       ));
       

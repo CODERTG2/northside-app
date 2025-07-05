@@ -3,11 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/webview_sheet.dart';
 import '../../widgets/login_sheet.dart';
+import '../../core/utils/logger.dart';
 
 // Data Model with different action types
 enum ProfileActionType { info, link, login }
@@ -44,6 +46,31 @@ Contact us:
 
 If you encounter any bugs or would like to suggest anything please do so on this [Google Form](https://forms.gle/sQKcGmnXk2KFjkC79) or on [Github](https://github.com/CODERTG2/northside-app).'''
 );
+
+Future<void> _launchInExternalBrowser(String url) async {
+  try {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      AppLogger.warning('Could not launch URL: $url');
+      Get.snackbar(
+        'Error',
+        'Unable to open link in external browser',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+    }
+  } catch (e) {
+    AppLogger.error('Error launching URL in external browser', e);
+    Get.snackbar(
+      'Error',
+      'Error opening link in external browser',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
+  }
+}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -96,13 +123,7 @@ class ProfilePage extends StatelessWidget {
                       enableDrag: true,
                     );
                   } else if (option.actionType == ProfileActionType.link && option.url != null) {
-                    Get.bottomSheet(
-                      WebViewSheet(url: option.url!),
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      useRootNavigator: false,
-                      enableDrag: true,
-                    );
+                    _launchInExternalBrowser(option.url!);
                   } else if (option.actionType == ProfileActionType.login) {
                     Get.bottomSheet(
                       const LoginSheet(),

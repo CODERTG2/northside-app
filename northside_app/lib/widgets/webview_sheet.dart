@@ -14,13 +14,32 @@ class WebViewSheet extends StatefulWidget {
   State<WebViewSheet> createState() => _WebViewSheetState();
 }
 
-class _WebViewSheetState extends State<WebViewSheet> {
+class _WebViewSheetState extends State<WebViewSheet> 
+    with SingleTickerProviderStateMixin {
   late final WebViewController _controller;
   bool _isLoading = true;
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
+    
+    // Create animation controller with iOS-style duration
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600), // Slightly longer for more gradual feel
+      vsync: this,
+    );
+
+    // Create more gradual iOS-style animation with custom curve
+    _slideAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.fastOutSlowIn, // More gradual deceleration than easeOut
+    );
+
+    // Start the animation when the sheet is created
+    _animationController.forward();
+    
     _controller = WebViewController()
       // This line is for native mobile apps (iOS/Android) and enables JavaScript.
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -45,7 +64,8 @@ class _WebViewSheetState extends State<WebViewSheet> {
 
   @override
   void dispose() {
-    // Clean up the WebView controller when the widget is disposed
+    // Clean up the WebView controller and animation when the widget is disposed
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -91,81 +111,95 @@ class _WebViewSheetState extends State<WebViewSheet> {
     final double minChildSize = isNarrowScreen ? 0.4 : 0.5;
     final double maxChildSize = isNarrowScreen ? 0.85 : 0.9;
     
-    return Padding(
-      padding: EdgeInsets.only(top: padding.top),
-      child: DraggableScrollableSheet(
-        initialChildSize: initialChildSize,
-        minChildSize: minChildSize,
-        maxChildSize: maxChildSize,
-        builder: (_, controller) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFFF2F2F7),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-            children: [
-              // Drag handle
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                width: 40,
-                height: 5,
-                decoration: ShapeDecoration(
-                  color: Colors.grey.shade300,
-                  shape: SmoothRectangleBorder(
-                    borderRadius: SmoothBorderRadius(
-                      cornerRadius: 10,
-                      cornerSmoothing: 1.0,
+    return AnimatedBuilder(
+      animation: _slideAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, (1 - _slideAnimation.value) * MediaQuery.of(context).size.height),
+          child: Padding(
+            padding: EdgeInsets.only(top: padding.top),
+            child: DraggableScrollableSheet(
+              initialChildSize: initialChildSize,
+              minChildSize: minChildSize,
+              maxChildSize: maxChildSize,
+              builder: (_, controller) {
+                return Container(
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFF2F2F7),
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius.only(
+                        topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                        topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                      ),
                     ),
+                    shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
                   ),
-                ),
-              ),
-              // Header with external browser button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                   children: [
-                    Expanded(
-                      child: Text(
-                        'Web View',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                    // Drag handle
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      width: 40,
+                      height: 5,
+                      decoration: ShapeDecoration(
+                        color: Colors.grey.shade300,
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 10,
+                            cornerSmoothing: 1.0,
+                          ),
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: _launchInExternalBrowser,
-                      icon: const Icon(Icons.open_in_new),
-                      tooltip: 'Open in external browser',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.blue,
-                        elevation: 2,
-                        shadowColor: Colors.black.withOpacity(0.1),
+                    // Header with external browser button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Web View',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _launchInExternalBrowser,
+                            icon: const Icon(Icons.open_in_new),
+                            tooltip: 'Open in external browser',
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.blue,
+                              elevation: 2,
+                              shadowColor: Colors.black.withOpacity(0.1),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Use a Stack to show a loading indicator over the WebView
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          WebViewWidget(controller: _controller),
+                          // This loading indicator will show on mobile but not in the web preview
+                          if (_isLoading)
+                            const Center(child: CircularProgressIndicator()),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
-              // Use a Stack to show a loading indicator over the WebView
-              Expanded(
-                child: Stack(
-                  children: [
-                    WebViewWidget(controller: _controller),
-                    // This loading indicator will show on mobile but not in the web preview
-                    if (_isLoading)
-                      const Center(child: CircularProgressIndicator()),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
