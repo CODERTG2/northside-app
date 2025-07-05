@@ -191,47 +191,63 @@ class _EventsPageState extends State<EventsPage> {
                 final eventCount = events.length;
                 if (eventCount <= 3) {
                   // Show dots for 1-3 events
-                  return Positioned(
-                    bottom: 1,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(eventCount, (index) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
+                  return SizedBox(
+                    height: 20, // Ensures consistent height for alignment
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(eventCount, (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          )),
                         ),
-                      )),
+                      ),
                     ),
                   );
                 } else {
                   // Show 3 dots + "+" for more than 3 events
-                  return Positioned(
-                    bottom: 1,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ...List.generate(3, (index) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                        )),
-                        const SizedBox(width: 2),
-                        Text(
-                          '+',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: isNarrowScreen ? 10 : 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  return SizedBox(
+                    height: 20, // Ensures consistent height for alignment
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ...List.generate(3, (index) => Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                            )),
+                            const SizedBox(width: 2),
+                            Text(
+                              '+',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: isNarrowScreen ? 8 : 10,
+                                fontWeight: FontWeight.bold,
+                                height: 6 / (isNarrowScreen ? 8 : 10),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   );
                 }
