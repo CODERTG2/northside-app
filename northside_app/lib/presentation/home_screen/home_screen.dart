@@ -2,6 +2,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -154,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Home', style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text('Home', style: GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w900, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
           CircleAvatar(
             radius: screenWidth * 0.06,
             backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9),
@@ -244,7 +245,7 @@ class _QuickActionButton extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [iconWidget, SizedBox(width: screenWidth * 0.03), Text(label, style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600))],
+          children: [iconWidget, SizedBox(width: screenWidth * 0.03), Text(label, style: GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w600))],
         ),
       ),
     );

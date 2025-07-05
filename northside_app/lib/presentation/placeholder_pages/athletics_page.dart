@@ -2,20 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
-import '../../widgets/webview_sheet.dart';
 import '../athletics/all_sports_page.dart';
 import '../athletics/sport_detail_page.dart';
 import '../../widgets/shared_header.dart';
-import '../app_shell/app_shell_controller.dart';
 import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
 import '../../core/utils/logger.dart';
-import '../../models/athletics_schedule.dart';
 import '../../core/design_constants.dart';
 
 class AthleticsPage extends StatelessWidget {

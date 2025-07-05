@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'flexes_controller.dart';
 import '../../models/flex_choice.dart';
 import '../../core/utils/app_colors.dart'; // FIX: Corrected import path
@@ -38,7 +39,11 @@ class _PickFlexPageState extends State<PickFlexPage> {
         ),
         title: Text(
           'Pick ${widget.flexPeriod}',
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
+          style: GoogleFonts.inter(
+            color: Colors.black,
+            fontWeight: FontWeight.w900,
+            fontSize: MediaQuery.of(context).size.width * 0.07,
+          ),
         ),
         actions: [
           Padding(

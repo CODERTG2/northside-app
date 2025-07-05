@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/utils/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/design_constants.dart';
 
 import '../../models/article.dart';
@@ -163,7 +163,7 @@ class ProfilePage extends StatelessWidget {
           child: Icon(Icons.person, size: iconSize, color: Colors.black),
         ),
         SizedBox(height: screenWidth * 0.04),
-        Text('User', style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+        Text('User', style: GoogleFonts.inter(fontSize: nameFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
         SizedBox(height: screenWidth * 0.01),
         Text('ID', style: TextStyle(fontSize: infoFontSize, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
         SizedBox(height: screenWidth * 0.01),
@@ -193,7 +193,7 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(title, style: GoogleFonts.inter(fontSize: titleFontSize, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
             SizedBox(height: screenWidth * 0.01),
             Text(subtitle, style: TextStyle(fontSize: subtitleFontSize, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],

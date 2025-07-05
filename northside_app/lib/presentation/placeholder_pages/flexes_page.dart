@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../flexes/flexes_controller.dart';
 import '../flexes/pick_flex_page.dart';
@@ -27,7 +28,11 @@ class FlexesPage extends StatelessWidget {
         elevation: 0,
         title: Text(
           'Flexes',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: screenWidth * 0.07),
+          style: GoogleFonts.inter(
+            color: Colors.black, 
+            fontWeight: FontWeight.w900, 
+            fontSize: screenWidth * 0.07,
+          ),
         ),
         actions: [
           Padding(
