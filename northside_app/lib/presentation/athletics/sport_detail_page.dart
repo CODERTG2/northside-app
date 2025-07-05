@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/athletics_controller.dart' as AC;
 import '../../core/utils/logger.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/design_constants.dart';
 import '../../api.dart';
 import '../../models/athlete.dart';
 import '../../models/athletics_schedule.dart';
@@ -288,7 +289,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
         color: Colors.grey.shade200,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 32,
+            cornerRadius: DesignConstants.get32Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
@@ -310,7 +311,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                   color: isSelected ? Colors.white : Colors.transparent,
                   shape: SmoothRectangleBorder(
                     borderRadius: SmoothBorderRadius(
-                      cornerRadius: 28,
+                      cornerRadius: DesignConstants.get28Radius(context),
                       cornerSmoothing: 1.0,
                     ),
                   ),
@@ -343,10 +344,10 @@ class _SportDetailPageState extends State<SportDetailPage> {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 24,
+            cornerRadius: DesignConstants.get24Radius(context),
             cornerSmoothing: 1.0,
           ),
-        ),          shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+        ),          shadows: DesignConstants.standardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,6 +8,7 @@ import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
+import '../../core/design_constants.dart';
 import '../../widgets/shared_header.dart';
 import '../../controllers/bulletin_controller.dart';
 
@@ -160,7 +161,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: _buildEventCard(article),
+                child: _buildEventCard(context, article),
               ),
             );
           },
@@ -200,7 +201,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
             },
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: _buildEventCard(article),
+              child: _buildEventCard(context, article),
             ),
           );
         },
@@ -208,7 +209,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
     );
   }
 
-  Widget _buildEventCard(Article article) {
+  Widget _buildEventCard(BuildContext context, Article article) {
     final double screenHeight = MediaQuery.of(Get.context!).size.height;
     final double carouselHeight = screenHeight * 0.4; // 40% of screen height
     final double imageHeight = carouselHeight * 0.70; // 70% of carousel height for image
@@ -218,24 +219,16 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 32,
+            cornerRadius: DesignConstants.get32Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1), // Reduced from 0.25 to 0.1 for subtlety
-            blurRadius: 60,
-            offset: const Offset(0, 10),
-            spreadRadius: 0, // Reduced from 2 to 0 for cleaner shadow
-          ),
-        ],
-      ),
-      child: ClipSmoothRect(
-        radius: SmoothBorderRadius(
-          cornerRadius: 32,
-          cornerSmoothing: 1.0,
-        ),
+        shadows: DesignConstants.standardShadow,
+      ),                    child: ClipSmoothRect(
+                      radius: SmoothBorderRadius(
+                        cornerRadius: DesignConstants.get32Radius(context),
+                        cornerSmoothing: 1.0,
+                      ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -349,18 +342,11 @@ class _QuickActionButton extends StatelessWidget {
           color: Colors.white,
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
-              cornerRadius: 24,
+              cornerRadius: DesignConstants.get24Radius(context),
               cornerSmoothing: 1.0,
             ),
           ),
-          shadows: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1), // Reduced from 0.25 to 0.1 for subtlety
-              blurRadius: 60,
-              offset: const Offset(0, 10),
-              spreadRadius: 0, // Reduced from 2 to 0 for cleaner shadow
-            ),
-          ],
+          shadows: DesignConstants.standardShadow,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

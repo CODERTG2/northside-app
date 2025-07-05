@@ -1,9 +1,10 @@
 // lib/widgets/webview_sheet.dart
 
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:figma_squircle/figma_squircle.dart';
+import '../core/design_constants.dart';
 import '../core/utils/logger.dart';
 
 class WebViewSheet extends StatefulWidget {
@@ -128,11 +129,11 @@ class _WebViewSheetState extends State<WebViewSheet>
                     color: const Color(0xFFF2F2F7),
                     shape: SmoothRectangleBorder(
                       borderRadius: SmoothBorderRadius.only(
-                        topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
-                        topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                        topLeft: SmoothRadius(cornerRadius: DesignConstants.get24Radius(context), cornerSmoothing: 1.0),
+                        topRight: SmoothRadius(cornerRadius: DesignConstants.get24Radius(context), cornerSmoothing: 1.0),
                       ),
                     ),
-                    shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+                    shadows: DesignConstants.standardShadow,
                   ),
                   child: Column(
                   children: [
@@ -145,7 +146,7 @@ class _WebViewSheetState extends State<WebViewSheet>
                         color: Colors.grey.shade300,
                         shape: SmoothRectangleBorder(
                           borderRadius: SmoothBorderRadius(
-                            cornerRadius: 10,
+                            cornerRadius: DesignConstants.get10Radius(context),
                             cornerSmoothing: 1.0,
                           ),
                         ),

@@ -15,6 +15,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/text_helper.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../../widgets/shared_header.dart';
+import '../../core/design_constants.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -165,11 +166,11 @@ class _EventsPageState extends State<EventsPage> {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 24,
+            cornerRadius: DesignConstants.get24Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+        shadows: DesignConstants.standardShadow,
       ),
       // Wrap in LayoutBuilder to adjust calendar based on available space
       child: LayoutBuilder(
@@ -327,11 +328,11 @@ class _NoEventsCard extends StatelessWidget {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 24,
+            cornerRadius: DesignConstants.get24Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+        shadows: DesignConstants.standardShadow,
       ),
       child: Center(
         child: TextHelper.responsiveText(
@@ -363,11 +364,11 @@ class _EventDetailCard extends StatelessWidget {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: AppTheme.cardRadius,
+            cornerRadius: DesignConstants.get24Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+        shadows: DesignConstants.standardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

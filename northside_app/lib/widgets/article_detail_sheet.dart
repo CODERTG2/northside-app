@@ -3,12 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
+import '../core/design_constants.dart';
 import '../models/article.dart';
-import 'webview_sheet.dart';
 
 class ArticleDetailSheet extends StatelessWidget {
   const ArticleDetailSheet({super.key, required this.article, this.scrollController});
@@ -101,8 +100,8 @@ class ArticleDetailSheet extends StatelessWidget {
         color: const Color(0xFFF2F2F7),
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius.only(
-            topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
-            topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+            topLeft: SmoothRadius(cornerRadius: DesignConstants.get24Radius(context), cornerSmoothing: 1.0),
+            topRight: SmoothRadius(cornerRadius: DesignConstants.get24Radius(context), cornerSmoothing: 1.0),
           ),
         ),
       ),
@@ -116,8 +115,7 @@ class ArticleDetailSheet extends StatelessWidget {
             decoration: ShapeDecoration(
               color: Colors.grey.shade300,
               shape: SmoothRectangleBorder(
-                borderRadius: SmoothBorderRadius(
-                  cornerRadius: 10,
+                borderRadius: SmoothBorderRadius(                      cornerRadius: DesignConstants.get10Radius(context),
                   cornerSmoothing: 1.0,
                 ),
               ),
@@ -134,7 +132,7 @@ class ArticleDetailSheet extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 24.0),
                     child: ClipSmoothRect(
                       radius: SmoothBorderRadius(
-                        cornerRadius: 24,
+                        cornerRadius: DesignConstants.get24Radius(context),
                         cornerSmoothing: 1.0,
                       ),
                       child: Image.asset(article.imagePath!, fit: BoxFit.contain),

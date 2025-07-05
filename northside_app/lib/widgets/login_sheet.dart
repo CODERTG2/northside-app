@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import '../core/utils/app_colors.dart';
+import '../core/design_constants.dart';
 import '../core/utils/logger.dart';
 
 class LoginSheet extends StatefulWidget {
@@ -84,7 +86,7 @@ class _LoginSheetState extends State<LoginSheet> {
                   color: Colors.grey.shade300,
                   shape: SmoothRectangleBorder(
                     borderRadius: SmoothBorderRadius(
-                      cornerRadius: 10,
+                      cornerRadius: DesignConstants.get10Radius(context),
                       cornerSmoothing: 1.0,
                     ),
                   ),
@@ -122,7 +124,7 @@ class _LoginSheetState extends State<LoginSheet> {
                         minimumSize: const Size(double.infinity, 50),
                         shape: SmoothRectangleBorder(
                           borderRadius: SmoothBorderRadius(
-                            cornerRadius: 16,
+                            cornerRadius: DesignConstants.get16Radius(context),
                             cornerSmoothing: 1.0,
                           ),
                         ),

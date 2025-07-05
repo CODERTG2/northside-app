@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/design_constants.dart';
 
 class HoofBeatPage extends StatefulWidget {
   const HoofBeatPage({super.key});
@@ -30,7 +31,7 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
         return Dialog(
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
-              cornerRadius: 20,
+              cornerRadius: DesignConstants.get20Radius(context),
               cornerSmoothing: 1.0,
             ),
           ),
@@ -40,7 +41,7 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
               color: Colors.white,
               shape: SmoothRectangleBorder(
                 borderRadius: SmoothBorderRadius(
-                  cornerRadius: 20,
+                  cornerRadius: DesignConstants.get20Radius(context),
                   cornerSmoothing: 1.0,
                 ),
               ),
@@ -230,18 +231,11 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 16,
+            cornerRadius: DesignConstants.get16Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 60,
-            offset: const Offset(0, 10),
-            spreadRadius: 0,
-          ),
-        ],
+        shadows: DesignConstants.standardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,18 +307,11 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 16,
+            cornerRadius: DesignConstants.get16Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 60,
-            offset: const Offset(0, 10),
-            spreadRadius: 0,
-          ),
-        ],
+        shadows: DesignConstants.standardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,18 +376,11 @@ class _HoofBeatPageState extends State<HoofBeatPage> {
         color: Colors.white,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
-            cornerRadius: 16,
+            cornerRadius: DesignConstants.get16Radius(context),
             cornerSmoothing: 1.0,
           ),
         ),
-        shadows: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 60,
-            offset: const Offset(0, 10),
-            spreadRadius: 0,
-          ),
-        ],
+        shadows: DesignConstants.standardShadow,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

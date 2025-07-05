@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../models/article.dart';
+import '../core/design_constants.dart';
 import 'article_detail_sheet.dart';
 
 class ArticleDetailDraggableSheet extends StatefulWidget {
@@ -73,11 +74,11 @@ class _ArticleDetailDraggableSheetState extends State<ArticleDetailDraggableShee
                     color: const Color(0xFFF2F2F7),
                     shape: SmoothRectangleBorder(
                       borderRadius: SmoothBorderRadius.only(
-                        topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
-                        topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                        topLeft: SmoothRadius(cornerRadius: DesignConstants.get24Radius(context), cornerSmoothing: 1.0),
+                        topRight: SmoothRadius(cornerRadius: DesignConstants.get24Radius(context), cornerSmoothing: 1.0),
                       ),
                     ),
-                    shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+                    shadows: DesignConstants.standardShadow,
                   ),
                   child: ArticleDetailSheet(
                     article: widget.article,

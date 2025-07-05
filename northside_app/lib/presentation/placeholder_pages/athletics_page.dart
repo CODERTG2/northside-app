@@ -15,6 +15,8 @@ import '../app_shell/app_shell_controller.dart';
 import '../../core/utils/app_colors.dart';
 import '../../controllers/athletics_controller.dart';
 import '../../core/utils/logger.dart';
+import '../../models/athletics_schedule.dart';
+import '../../core/design_constants.dart';
 
 class AthleticsPage extends StatelessWidget {
   const AthleticsPage({super.key});
@@ -82,14 +84,13 @@ class AthleticsPage extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: screenWidth * 0.045),
           decoration: ShapeDecoration(
-            color: Colors.white,
-            shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(
-                cornerRadius: 24,
-                cornerSmoothing: 1.0,
+            color: Colors.white,              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: DesignConstants.get24Radius(context),
+                  cornerSmoothing: 1.0,
+                ),
               ),
-            ),
-            shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+              shadows: DesignConstants.standardShadow,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -127,13 +128,12 @@ class AthleticsPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 24.0),
             padding: const EdgeInsets.all(20),
             decoration: ShapeDecoration(
-              color: Colors.white.withOpacity(0.9),
-              shape: SmoothRectangleBorder(
-                borderRadius: SmoothBorderRadius(
-                  cornerRadius: 32,
-                  cornerSmoothing: 1.0,
+              color: Colors.white.withOpacity(0.9),                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: DesignConstants.get32Radius(context),
+                    cornerSmoothing: 1.0,
+                  ),
                 ),
-              ),
               shadows: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -351,7 +351,7 @@ class _NewsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isNarrowScreen = screenWidth < 360; // Check for S9 and similar devices
-    final double cardRadius = 32;
+    final double cardRadius = DesignConstants.get32Radius(context);
     final double fontSizeTitle = isNarrowScreen ? screenWidth * 0.042 : screenWidth * 0.045;
     final double fontSizeSubtitle = isNarrowScreen ? screenWidth * 0.032 : screenWidth * 0.035;
     final double cardPadding = isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04;
@@ -372,7 +372,7 @@ class _NewsCard extends StatelessWidget {
                 cornerSmoothing: 1.0,
               ),
             ),
-            shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+            shadows: DesignConstants.standardShadow,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,7 +452,7 @@ class _SportButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.045;
-    final double borderRadius = 24;
+    final double borderRadius = DesignConstants.get24Radius(context);
     final double verticalPadding = screenWidth * 0.04;
     return GestureDetector(
       onTap: onTap,
@@ -466,7 +466,7 @@ class _SportButton extends StatelessWidget {
               cornerSmoothing: 1.0,
             ),
           ),
-          shadows: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 60, offset: const Offset(0, 10), spreadRadius: 0)],
+          shadows: DesignConstants.standardShadow,
         ),
         child: Center(
           child: Text(

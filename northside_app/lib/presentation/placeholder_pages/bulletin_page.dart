@@ -9,8 +9,10 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/bulletin_controller.dart';
+import '../../core/design_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/article.dart';
 import '../../models/bulletin_post.dart';
@@ -578,14 +580,13 @@ class _BulletinEventCard extends StatelessWidget {
         margin: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, isNarrowScreen ? screenWidth * 0.03 : screenWidth * 0.04),
         padding: EdgeInsets.all(isNarrowScreen ? screenWidth * 0.035 : screenWidth * 0.04),
         decoration: ShapeDecoration(
-          color: Colors.white,
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 24,
-              cornerSmoothing: 1.0,
+          color: Colors.white,            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: DesignConstants.get24Radius(context),
+                cornerSmoothing: 1.0,
+              ),
             ),
-          ),
-          shadows: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 4), spreadRadius: 0)],
+          shadows: DesignConstants.bulletinShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,7 +649,7 @@ class _PinnedPostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double cardRadius = 32;
+    final double cardRadius = DesignConstants.get32Radius(context);
     final double cardWidth = screenWidth * 0.65;
     final double imageHeight = screenWidth * 0.32;
     final double fontSizeTitle = screenWidth * 0.045;
@@ -666,7 +667,7 @@ class _PinnedPostCard extends StatelessWidget {
               cornerSmoothing: 1.0,
             ),
           ),
-          shadows: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 4), spreadRadius: 0)],
+          shadows: DesignConstants.bulletinShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
