@@ -190,7 +190,6 @@ class _SportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double fontSize = screenWidth * 0.045;
     final double borderRadius = DesignConstants.get24Radius(context);
     final double verticalPadding = screenWidth * 0.04;
     
@@ -211,7 +210,7 @@ class _SportCard extends StatelessWidget {
         child: Center(
           child: Text(
             name,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
+            style: GoogleFonts.inter(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,

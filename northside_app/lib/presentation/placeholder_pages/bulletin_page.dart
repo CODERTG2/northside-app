@@ -471,7 +471,7 @@ class _BulletinPageState extends State<BulletinPage> {
       padding: EdgeInsets.fromLTRB(screenWidth * 0.06, 0, screenWidth * 0.06, screenWidth * 0.04),
       child: Text(
         title,
-        style: TextStyle(fontSize: screenWidth * 0.055, fontWeight: FontWeight.w900, color: Colors.black),
+        style: GoogleFonts.inter(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.black),
       ),
     );
   }
@@ -499,8 +499,8 @@ class _BulletinPageState extends State<BulletinPage> {
         alignment: Alignment.centerLeft,
         child: Text(
           date,
-          style: TextStyle(
-            fontSize: screenWidth * 0.05, 
+          style: GoogleFonts.inter(
+            fontSize: MediaQuery.of(context).size.width * 0.045, 
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -593,9 +593,9 @@ class _BulletinEventCard extends StatelessWidget {
           children: [
             Text(
               post.title,
-              style: TextStyle(
-                fontSize: isNarrowScreen ? screenWidth * 0.045 : screenWidth * 0.055, 
-                fontWeight: FontWeight.w900
+              style: GoogleFonts.inter(
+                fontSize: MediaQuery.of(context).size.width * 0.045, 
+                fontWeight: FontWeight.bold
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -692,7 +692,7 @@ class _PinnedPostCard extends StatelessWidget {
                 children: [
                   Text(
                     post.title,
-                    style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
+                    style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

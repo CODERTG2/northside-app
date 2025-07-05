@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'home_screen_content_controller.dart';
 import '../app_shell/app_shell_controller.dart';
 import '../placeholder_pages/hoofbeat_page.dart';
@@ -108,14 +109,14 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.announcement_outlined, size: 48, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
                       'No Recent Announcements',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.black),
+                      style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                     SizedBox(height: 8),
                     Text(
@@ -272,7 +273,7 @@ class HomeScreenContent extends GetView<HomeScreenContentController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(article.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(article.title, style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 12),
                     Row(
                       children: [
@@ -356,7 +357,7 @@ class _QuickActionButton extends StatelessWidget {
             Flexible(
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black),
+                style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold, color: Colors.black),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

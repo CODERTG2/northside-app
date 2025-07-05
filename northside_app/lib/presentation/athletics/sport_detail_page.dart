@@ -352,7 +352,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.inter(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w900)),
+          Text(title, style: GoogleFonts.inter(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold)),
           SizedBox(height: screenWidth * 0.02),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,

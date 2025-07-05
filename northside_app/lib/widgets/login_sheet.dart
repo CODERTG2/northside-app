@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import '../core/utils/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design_constants.dart';
 import '../core/utils/logger.dart';
 
@@ -98,9 +98,9 @@ class _LoginSheetState extends State<LoginSheet> {
                   controller: controller,
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   children: [
-                    const Text(
+                    Text(
                       'Link Flex Account',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                      style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 32),
                     // Email/Username TextField

@@ -319,7 +319,7 @@ class _HomecomingCard extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900, fontFamily: 'sans-serif'),
+                      style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
                       children: [
                         TextSpan(text: 'Homecoming ', style: TextStyle(color: Color(0xFFB94056))),
                         TextSpan(text: '2024', style: TextStyle(color: Color(0xFF2E4096))),

@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:stampede/models/article.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -335,12 +336,13 @@ class _NoEventsCard extends StatelessWidget {
         shadows: DesignConstants.standardShadow,
       ),
       child: Center(
-        child: TextHelper.responsiveText(
+        child: Text(
           'No Events Today',
-          context: context,
-          isBold: true,
-          color: Colors.black,
-          customSizeMultiplier: isNarrowScreen ? 0.038 : 0.04,
+          style: GoogleFonts.inter(
+            fontSize: MediaQuery.of(context).size.width * 0.045,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
       ),
     );
@@ -373,12 +375,15 @@ class _EventDetailCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextHelper.responsiveText(
+          Text(
             article.title,
-            context: context,
-            isBold: true,
-            isTitle: true,
+            style: GoogleFonts.inter(
+              fontSize: MediaQuery.of(context).size.width * 0.045,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
             maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: isNarrowScreen ? screenWidth * 0.015 : screenWidth * 0.02),
           Row(

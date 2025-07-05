@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../core/design_constants.dart';
 import '../models/article.dart';
@@ -141,7 +142,7 @@ class ArticleDetailSheet extends StatelessWidget {
                 // Title
                 Text(
                   article.title,
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                  style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
                 // Main content with link support

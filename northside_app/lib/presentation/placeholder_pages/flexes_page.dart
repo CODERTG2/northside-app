@@ -103,7 +103,7 @@ class _FlexRegistrationSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0, top: 16.0),
-          child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          child: Text(title, style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold)),
         ),
         if (pickedChoice != null)
           _PickedFlexCard(choice: pickedChoice!)
@@ -133,7 +133,7 @@ class _PickedFlexCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(choice.teacher, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          Text(choice.teacher, style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold)),
           Text(choice.room, style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
         ],
       ),

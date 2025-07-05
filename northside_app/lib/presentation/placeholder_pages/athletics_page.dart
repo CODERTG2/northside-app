@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/article.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
 import '../athletics/all_sports_page.dart';
@@ -95,7 +96,7 @@ class AthleticsPage extends StatelessWidget {
               SizedBox(width: screenWidth * 0.02),
               Text(
                 'Register for a sport',
-                style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
+                style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryBlue),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -139,14 +140,14 @@ class AthleticsPage extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.sports_outlined, size: 48, color: Colors.grey),
                 SizedBox(height: 16),
                 Text(
                   'No Recent Athletics News',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                  style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -316,7 +317,7 @@ class AthleticsPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: Colors.black),
+            style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold, color: Colors.black),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -416,7 +417,7 @@ class _NewsCard extends StatelessWidget {
                     children: [
                       Text(
                         article.title,
-                        style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.w900),
+                        style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
                         maxLines: isNarrowScreen ? 1 : 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -467,7 +468,7 @@ class _SportButton extends StatelessWidget {
         child: Center(
           child: Text(
             name,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
+            style: GoogleFonts.inter(fontSize: MediaQuery.of(context).size.width * 0.045, fontWeight: FontWeight.bold),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
