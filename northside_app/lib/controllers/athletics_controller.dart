@@ -84,6 +84,46 @@ class AthleticsController extends GetxController {
     }
   }
 
+  // Load fresh data from API for a specific sport and gender
+  // This is useful when opening a team-specific page to ensure latest data
+  Future<Map<String, dynamic>> loadTeamData({
+    required String sport,
+    String? gender,
+    String? level,
+  }) async {
+    try {
+      AppLogger.debug('Loading fresh team data for sport: $sport, gender: $gender, level: $level');
+      
+      // Load fresh roster data from API
+      final freshRoster = await ApiService.getRoster(
+        sport: sport,
+        gender: gender,
+        level: level,
+      );
+      
+      // Load fresh schedule data from API
+      final freshSchedule = await ApiService.getAthleticsSchedule(
+        sport: sport,
+        gender: gender,
+        level: level,
+      );
+      
+      AppLogger.debug('Loaded ${freshRoster.length} athletes and ${freshSchedule.length} schedule items from API');
+      
+      return {
+        'roster': freshRoster,
+        'schedule': freshSchedule,
+      };
+    } catch (e) {
+      AppLogger.error('Error loading fresh team data', e);
+      // Fallback to existing data
+      return {
+        'roster': getAthletesBySport(sport: sport, gender: gender, level: level),
+        'schedule': getScheduleByFilters(sport: sport, gender: gender, level: level),
+      };
+    }
+  }
+
   // Get athletes by sport, gender, and level
   List<Athlete> getAthletesBySport({
     String? sport,
@@ -146,14 +186,14 @@ class AthleticsController extends GetxController {
     String? genderFilter;
     String actualSport = sport;
     
-    if (sport.startsWith("Men's ")) {
+    if (sport.startsWith("Boys ")) {
       genderFilter = 'boys';
-      actualSport = sport.substring(6);
-      AppLogger.debug('Detected Men\'s sport - genderFilter: $genderFilter, actualSport: $actualSport');
-    } else if (sport.startsWith("Women's ")) {
+      actualSport = sport.substring(5);
+      AppLogger.debug('Detected Boys\' sport - genderFilter: $genderFilter, actualSport: $actualSport');
+    } else if (sport.startsWith("Girls ")) {
       genderFilter = 'girls';
-      actualSport = sport.substring(8);
-      AppLogger.debug('Detected Women\'s sport - genderFilter: $genderFilter, actualSport: $actualSport');
+      actualSport = sport.substring(6);
+      AppLogger.debug('Detected Girls\' sport - genderFilter: $genderFilter, actualSport: $actualSport');
     } else {
       AppLogger.debug('No gender prefix detected in sport name');
     }
@@ -214,6 +254,7 @@ class AthleticsController extends GetxController {
   }
 
   // Get schedule by sport, gender, and level (more specific filtering)
+  // This method can optionally use API calls for real-time filtering
   List<AthleticsSchedule> getScheduleByFilters({
     String? sport,
     String? gender,
@@ -224,11 +265,14 @@ class AthleticsController extends GetxController {
     final filteredSchedule = schedule.where((event) {
       bool matches = true;
       
-      if (sport != null && !event.sport.toLowerCase().contains(sport.toLowerCase())) {
-        matches = false;
+      if (sport != null) {
+        final normalizedSport = _normalizeSportName(sport);
+        final normalizedEventSport = _normalizeSportName(event.sport);
+        matches = normalizedEventSport.contains(normalizedSport) || 
+                 normalizedSport.contains(normalizedEventSport);
       }
       
-      if (gender != null) {
+      if (gender != null && matches) {
         String eventGenderLower = event.gender.toLowerCase();
         String genderLower = gender.toLowerCase();
         
@@ -251,8 +295,21 @@ class AthleticsController extends GetxController {
         }
       }
       
-      if (level != null && !event.level.toLowerCase().contains(level.toLowerCase())) {
-        matches = false;
+      if (level != null && matches) {
+        String eventLevelLower = event.level.toLowerCase();
+        String levelLower = level.toLowerCase();
+        
+        // Handle level matching with JV variations
+        bool levelMatches = false;
+        if (levelLower == 'jv' || levelLower == 'junior varsity') {
+          levelMatches = eventLevelLower == 'jv' || eventLevelLower == 'junior varsity';
+        } else {
+          levelMatches = eventLevelLower.contains(levelLower);
+        }
+        
+        if (!levelMatches) {
+          matches = false;
+        }
       }
       
       return matches;
@@ -484,59 +541,6 @@ class AthleticsController extends GetxController {
     result.sort();
     print('=== DEBUG: Final sports for season "$season": $result');
     return result;
-  }
-
-  // Emergency fallback season mapping - should rarely be used if backend data is correct
-  String _getFallbackSeasonForSport(String sport) {
-    final sportLower = sport.toLowerCase();
-    print('=== WARNING: Using emergency fallback for sport: "$sport" - backend data should provide this!');
-    
-    // Find games for this sport in the schedule first
-    final sportGames = schedule.where((game) => 
-      game.sport.toLowerCase().contains(sportLower) ||
-      sportLower.contains(game.sport.toLowerCase())
-    ).toList();
-    
-    print('=== DEBUG: Found ${sportGames.length} games for sport "$sport"');
-    
-    if (sportGames.isNotEmpty) {
-      // Parse game dates and extract months
-      final gameDates = <DateTime>[];
-      for (final game in sportGames) {
-        final date = _parseEventDate(game.date);
-        if (date != null) {
-          gameDates.add(date);
-          print('=== DEBUG: Game date for $sport: ${game.date} -> ${date.month}/${date.year}');
-        }
-      }
-      
-      if (gameDates.isNotEmpty) {
-        // Determine season based on when most games are played
-        final months = gameDates.map((date) => date.month).toList();
-        final avgMonth = months.reduce((a, b) => a + b) / months.length;
-        
-        print('=== DEBUG: Average month for $sport: $avgMonth (months: $months)');
-        
-        // Determine season based on average month
-        String season;
-        if (avgMonth >= 8 && avgMonth <= 11) {
-          season = 'fall';    // August-November
-        } else if (avgMonth >= 12 || avgMonth <= 2) {
-          season = 'winter';  // December-February
-        } else if (avgMonth >= 3 && avgMonth <= 6) {
-          season = 'spring';  // March-June
-        } else {
-          season = 'fall';    // July -> default to fall
-        }
-        
-        print('=== DEBUG: Sport "$sport" assigned to "$season" season based on schedule dates');
-        return season;
-      }
-    }
-    
-    // If absolutely no data, return fall as default
-    print('=== WARNING: No data available for "$sport", defaulting to fall - this indicates a backend issue');
-    return 'fall';
   }
 
   // Get teams by sport (combines gender and level)

@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../controllers/athletics_controller.dart';
+import '../../controllers/athletics_controller.dart' as AC;
 import '../../core/utils/logger.dart';
 import '../../core/utils/app_colors.dart';
 import '../../api.dart';
+import '../../models/athlete.dart';
+import '../../models/athletics_schedule.dart';
 
 class GameSchedule {
   const GameSchedule({required this.date, required this.time, required this.event, required this.opponent, required this.location, required this.score, required this.result});
@@ -38,7 +40,7 @@ class SportDetailPage extends StatefulWidget {
 }
 
 class _SportDetailPageState extends State<SportDetailPage> {
-  final AthleticsController athleticsController = Get.put(AthleticsController());
+  final AC.AthleticsController athleticsController = Get.put(AC.AthleticsController());
   String _selectedLevel = 'All';
   List<String> _levels = ['All'];
   List<GameSchedule> _schedules = [];
@@ -51,6 +53,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
       case 'varsity':
         return 'Varsity';
       case 'jv':
+      case 'junior varsity':
         return 'JV';
       case 'freshman':
         return 'Freshman';
@@ -61,7 +64,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
 
   // Helper function to sort levels in proper order
   List<String> _sortLevels(List<String> levels) {
-    final levelOrder = ['varsity', 'jv', 'freshman'];
+    final levelOrder = ['varsity', 'jv', 'junior varsity', 'freshman'];
     final otherLevels = levels.where((level) => level.toLowerCase() != 'all' && !levelOrder.contains(level.toLowerCase())).toList();
     final orderedLevels = <String>[];
     
@@ -75,7 +78,23 @@ class _SportDetailPageState extends State<SportDetailPage> {
     }
     
     orderedLevels.addAll(otherLevels);
-    return ['All', ...orderedLevels];
+    
+    // Normalize JV variations to show as one option
+    final normalizedLevels = <String>[];
+    bool hasJV = false;
+    
+    for (String level in orderedLevels) {
+      if (level.toLowerCase() == 'jv' || level.toLowerCase() == 'junior varsity') {
+        if (!hasJV) {
+          normalizedLevels.add('jv'); // Use 'jv' as the canonical form
+          hasJV = true;
+        }
+      } else {
+        normalizedLevels.add(level);
+      }
+    }
+    
+    return ['All', ...normalizedLevels];
   }
 
   @override
@@ -89,41 +108,53 @@ class _SportDetailPageState extends State<SportDetailPage> {
     String sportName = widget.sportName;
     String? gender;
     
-    if (sportName.startsWith("Men's ")) {
+    if (sportName.startsWith("Boys ")) {
+      sportName = sportName.substring(5);
+      gender = 'boys';  // Use lowercase to match backend data format
+    } else if (sportName.startsWith("Girls ")) {
       sportName = sportName.substring(6);
-      gender = 'boys';
-    } else if (sportName.startsWith("Women's ")) {
-      sportName = sportName.substring(8);
-      gender = 'girls';
+      gender = 'girls';  // Use lowercase to match backend data format
     }
 
-    // Convert sport name to lowercase for API compatibility
-    sportName = sportName.toLowerCase();
+    // Convert sport name to uppercase for API compatibility
+    sportName = sportName.toUpperCase();
 
     // Load all athletes for this sport/gender to get available levels
     try {
-      final allAthletes = await ApiService.getRoster(
+      // Use the new loadTeamData method for fresh data from API
+      final teamData = await athleticsController.loadTeamData(
         sport: sportName,
         gender: gender,
       );
-      final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
-      _levels = _sortLevels(levels);
-      AppLogger.debug('Available levels for $sportName ($gender): $_levels');
+      
+      if (teamData['roster'] is List) {
+        final freshRoster = (teamData['roster'] as List).cast<Athlete>();
+        final levels = freshRoster.map((athlete) => athlete.level).toSet().toList();
+        _levels = _sortLevels(levels);
+        AppLogger.debug('Available levels for $sportName ($gender): $_levels');
+      }
+      
+      // Also use fresh schedule data
+      if (teamData['schedule'] is List) {
+        final freshSchedule = (teamData['schedule'] as List).cast<AthleticsSchedule>();
+        _schedules = freshSchedule.map((event) => event.toGameSchedule()).toList();
+        AppLogger.debug('Found ${_schedules.length} schedule items for sport: $sportName, gender: $gender');
+      }
     } catch (e) {
-      AppLogger.debug('Error loading levels: $e');
+      AppLogger.debug('Error loading fresh team data: $e');
       // Fallback to controller data
       final allAthletes = athleticsController.getAthletesBySport(sport: sportName, gender: gender);
       final levels = allAthletes.map((athlete) => athlete.level).toSet().toList();
       _levels = _sortLevels(levels);
+      
+      // Get schedule for this sport and gender
+      final schedule = athleticsController.getScheduleByFilters(
+        sport: sportName,
+        gender: gender,
+      );
+      _schedules = schedule.map((event) => event.toGameSchedule()).toList();
+      AppLogger.debug('Found ${_schedules.length} schedule items for sport: $sportName, gender: $gender (fallback)');
     }
-
-    // Get schedule for this sport and gender
-    final schedule = athleticsController.getScheduleByFilters(
-      sport: sportName,
-      gender: gender,
-    );
-    _schedules = schedule.map((event) => event.toGameSchedule()).toList();
-    AppLogger.debug('Found ${_schedules.length} schedule items for sport: $sportName, gender: $gender');
 
     // Load initial roster
     _updateRoster();
@@ -136,19 +167,23 @@ class _SportDetailPageState extends State<SportDetailPage> {
     String? gender;
     String? level;
     
-    if (sportName.startsWith("Men's ")) {
+    if (sportName.startsWith("Boys ")) {
+      sportName = sportName.substring(5);
+      gender = 'boys';  // Use lowercase to match backend data format
+    } else if (sportName.startsWith("Girls ")) {
       sportName = sportName.substring(6);
-      gender = 'boys';
-    } else if (sportName.startsWith("Women's ")) {
-      sportName = sportName.substring(8);
-      gender = 'girls';
+      gender = 'girls';  // Use lowercase to match backend data format
     }
 
-    // Convert sport name to lowercase for API compatibility
-    sportName = sportName.toLowerCase();
+    // Convert sport name to uppercase for API compatibility
+    sportName = sportName.toUpperCase();
 
     if (_selectedLevel != 'All') {
       level = _selectedLevel.toLowerCase();
+      // For roster API, athletes use 'jv', not 'junior varsity'
+      if (level == 'junior varsity') {
+        level = 'jv';
+      }
     }
 
     AppLogger.debug('Updating roster with filters: sport=$sportName, gender=$gender, level=$level, selectedLevel=$_selectedLevel');

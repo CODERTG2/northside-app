@@ -98,11 +98,11 @@ def update_athletics_schedule():
     # print(f"Found {len(locations)} locations")
 
     levels = soup.select("div.text-sm.font-medium.text-core-contrast.text-opacity-80.xl\\:text-base[data-testid*='gender-level']")
-    levels = [p.get_text(strip=True).split()[1] for p in levels]
+    levels = [p.get_text(strip=True).split()[1].lower() for p in levels]
     # print(f"Found {len(teams)} teams")
 
     genders = soup.select("div.text-sm.font-medium.text-core-contrast.text-opacity-80.xl\\:text-base[data-testid*='gender-level']")
-    genders = [p.get_text(strip=True).split()[0] for p in genders] 
+    genders = [p.get_text(strip=True).split()[0].lower() for p in genders] 
 
     opponents = soup.select('h2.mb-1.font-heading.text-xl')
     opponents = [h2.get_text(strip=True).replace("vs ", "").replace("at ", "") for h2 in opponents]

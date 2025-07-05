@@ -160,9 +160,18 @@ class _AllSportsPageState extends State<AllSportsPage> {
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         final sportName = sports[index];
+        // Create gender-prefixed sport name for proper filtering
+        String genderPrefixedSportName = sportName;
+        if (_selectedGender == 'Girls') {
+          genderPrefixedSportName = "Girls $sportName";
+        } else if (_selectedGender == 'Boys') {
+          genderPrefixedSportName = "Boys $sportName";
+        }
+        // For Coed sports, pass without prefix to show all teams
+        
         return _SportCard(
           name: sportName,
-          onTap: () => Get.to(() => SportDetailPage(sportName: sportName)),
+          onTap: () => Get.to(() => SportDetailPage(sportName: genderPrefixedSportName)),
         );
       },
     );
