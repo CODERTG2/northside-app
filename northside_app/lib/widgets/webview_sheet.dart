@@ -27,14 +27,26 @@ class _WebViewSheetState extends State<WebViewSheet> {
       // This delegate is for native mobile apps to show a loading indicator.
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageFinished: (_) => setState(() => _isLoading = false),
+          onPageFinished: (_) {
+            if (mounted) {
+              setState(() => _isLoading = false);
+            }
+          },
           onWebResourceError: (error) {
-            setState(() => _isLoading = false);
+            if (mounted) {
+              setState(() => _isLoading = false);
+            }
             AppLogger.debug('Webview Error: ${error.description}');
           },
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+  }
+
+  @override
+  void dispose() {
+    // Clean up the WebView controller when the widget is disposed
+    super.dispose();
   }
 
   Future<void> _launchInExternalBrowser() async {
