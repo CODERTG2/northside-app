@@ -334,6 +334,21 @@ class _BulletinPageState extends State<BulletinPage> {
       backgroundColor: const Color(0xFFF2F2F7),
       body: Stack(
         children: [
+          // Blue vertical gradient background for Bulletin (like Athletics, but blue)
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF4285F4), // strong blue
+                  Color(0xFFB3D1FF), // lighter blue for smooth fade
+                  Color(0xFFF2F2F7),// fade to white
+                ],
+                stops: [0.0, 0.25, 0.5],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
           // Main header and pinned carousel always visible
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,8 +406,15 @@ class _BulletinPageState extends State<BulletinPage> {
                 return Container(
                   decoration: BoxDecoration(
                     color: Color(0xFFF2F2F7),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.057)), // ~24px at 420px width
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: -5)],
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.057)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.18), // increased opacity
+                        blurRadius: 80, // more blur for a deeper shadow
+                        offset: Offset(0, 16), // stronger offset
+                        spreadRadius: 0,
+                      ),
+                    ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,

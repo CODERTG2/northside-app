@@ -34,8 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFFE8A1A1), Color(0xFFADC6E6), Colors.white],
-                stops: [0.0, 0.25, 0.4],
+                colors: [
+                  Color(0xFF0D1A2F), // much darker blue
+                  Color(0xFF174EA6), // dark blue
+                  Color(0xFFF7F7F7), // light grey-white
+                  Color(0xFFF7F7F7), // solid from even higher up
+                ],
+                stops: [0.0, 0.09, 0.18, 0.26], // transition to white/grey much higher up
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

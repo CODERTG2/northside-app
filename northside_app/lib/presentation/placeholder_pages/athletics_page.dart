@@ -30,7 +30,7 @@ class AthleticsPage extends StatelessWidget {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF8B0000), // Dark maroon
+                  Color(0xFFB22222), // Dark maroon
                   Color(0xFFB22222), // Light maroon
                   Color(0xFFD4A5A5), // Very light maroon transition
                   Color(0xFFE8D0D0), // Even lighter maroon
