@@ -150,109 +150,8 @@ class _AllSportsPageState extends State<AllSportsPage> {
 
   Widget _buildSportsList(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final now = DateTime.now();
-    final schedule = athleticsController.schedule;
-    final isLoading = athleticsController.isLoading.value;
-    // Show loading indicator if schedule is loading
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    // If schedule is empty, fallback to hardcoded list
-    if (schedule.isEmpty) {
-      final fallback = _getSportsForGender(_selectedGender);
-      return GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: screenWidth * 0.04,
-          mainAxisSpacing: screenWidth * 0.04,
-          childAspectRatio: 2.5,
-        ),
-        itemCount: fallback.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          final sportName = fallback[index];
-          return _SportCard(
-            name: sportName,
-            onTap: () => Get.to(() => SportDetailPage(
-              sportName: sportName,
-            )),
-          );
-        },
-      );
-    }
-    // Get all upcoming games for the selected gender
-    // Filter for future games and selected gender
-    final upcoming = schedule.where((event) {
-      // Parse event date
-      DateTime? eventDate;
-      try {
-        if (event.date.contains('/')) {
-          final parts = event.date.split('/');
-          if (parts.length == 3) {
-            final month = int.tryParse(parts[0]) ?? 1;
-            final day = int.tryParse(parts[1]) ?? 1;
-            final year = int.tryParse(parts[2]) ?? now.year;
-            eventDate = DateTime(year, month, day);
-          }
-        } else if (event.date.contains(' ') && !event.date.contains('-')) {
-          final parts = event.date.split(' ');
-          if (parts.length == 3) {
-            final monthMap = {
-              'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
-              'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
-            };
-            final month = monthMap[parts[0]] ?? 1;
-            final day = int.tryParse(parts[1]) ?? 1;
-            final year = int.tryParse(parts[2]) ?? now.year;
-            eventDate = DateTime(year, month, day);
-          }
-        } else {
-          eventDate = DateTime.tryParse(event.date);
-        }
-      } catch (_) {}
-      if (eventDate == null) return false;
-      if (eventDate.isBefore(DateTime(now.year, now.month, now.day))) return false;
-      // Gender filter
-      if (_selectedGender == 'Coed') return true;
-      return event.gender.toLowerCase() == _selectedGender.toLowerCase();
-    }).toList();
-    // Sort by date
-    upcoming.sort((a, b) {
-      DateTime aDate, bDate;
-      try {
-        aDate = DateTime.parse(a.date);
-      } catch (_) {
-        aDate = now.add(const Duration(days: 365));
-      }
-      try {
-        bDate = DateTime.parse(b.date);
-      } catch (_) {
-        bDate = now.add(const Duration(days: 365));
-      }
-      return aDate.compareTo(bDate);
-    });
-    // Get unique sports by soonest game
-    final seen = <String>{};
-    final List<String> sports = [];
-    for (final event in upcoming) {
-      final sport = event.sport;
-      if (!seen.contains(sport)) {
-        seen.add(sport);
-        sports.add(sport);
-        if (sports.length == 4) break;
-      }
-    }
-    // Fallback: if not enough, fill with hardcoded list
-    if (sports.length < 4) {
-      final fallback = _getSportsForGender(_selectedGender);
-      for (final s in fallback) {
-        if (!seen.contains(s)) {
-          sports.add(s);
-          if (sports.length == 4) break;
-        }
-      }
-    }
+    final sports = _getSportsForGender(_selectedGender);
+    
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -265,11 +164,18 @@ class _AllSportsPageState extends State<AllSportsPage> {
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         final sportName = sports[index];
+        // Create gender-prefixed sport name for proper filtering
+        String genderPrefixedSportName = sportName;
+        if (_selectedGender == 'Girls') {
+          genderPrefixedSportName = "Girls $sportName";
+        } else if (_selectedGender == 'Boys') {
+          genderPrefixedSportName = "Boys $sportName";
+        }
+        // For Coed sports, pass without prefix to show all teams
+        
         return _SportCard(
           name: sportName,
-          onTap: () => Get.to(() => SportDetailPage(
-            sportName: sportName,
-          )),
+          onTap: () => Get.to(() => SportDetailPage(sportName: genderPrefixedSportName)),
         );
       },
     );
