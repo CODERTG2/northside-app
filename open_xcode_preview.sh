@@ -8,7 +8,7 @@ set -e
 echo "📱 Opening Xcode project for previews..."
 
 # Navigate to the iOS project directory
-cd ~/Documents/GitHub/northside-app/northside_app/ios
+cd ~/Documents/GitHub/northside-app/northside_app/northside_app/ios
 
 # Open the Xcode workspace
 if [ -f "Runner.xcworkspace" ]; then

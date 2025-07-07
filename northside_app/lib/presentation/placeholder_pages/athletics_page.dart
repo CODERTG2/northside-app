@@ -24,26 +24,45 @@ class AthleticsPage extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7),
-      body: Obx(() {
-        if (athleticsController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        
-        return ListView(
-          padding: EdgeInsets.only(bottom: screenHeight * 0.12),
-          children: [
-            const SharedHeader(title: 'Athletics'),
-            SizedBox(height: screenHeight * 0.02),
-            _buildNewsCarousel(context, athleticsController),
-            SizedBox(height: screenHeight * 0.04),
-            _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
-            _buildSportsGrid(context, athleticsController),
-            SizedBox(height: screenHeight * 0.015),
-            _buildRegisterButton(context),
-          ],
-        );
-      }),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF8B0000), // Dark maroon
+                  Color(0xFFB22222), // Light maroon
+                  Color(0xFFD4A5A5), // Very light maroon transition
+                  Color(0xFFE8D0D0), // Even lighter maroon
+                  Color(0xFFF2F2F7)  // Same as events page background
+                ],
+                stops: [0.0, 0.15, 0.3, 0.4, 0.5],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          Obx(() {
+            if (athleticsController.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            
+            return ListView(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.12),
+              children: [
+                const SharedHeader(title: 'Athletics'),
+                SizedBox(height: screenHeight * 0.02),
+                _buildNewsCarousel(context, athleticsController),
+                SizedBox(height: screenHeight * 0.04),
+                _buildSectionHeader(context, 'Sports', () => Get.to(() => const AllSportsPage())),
+                _buildSportsGrid(context, athleticsController),
+                SizedBox(height: screenHeight * 0.015),
+                _buildRegisterButton(context),
+              ],
+            );
+          }),
+        ],
+      ),
     );
   }
 
