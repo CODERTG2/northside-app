@@ -28,8 +28,7 @@ class AppTheme {
         primary: AppColors.primaryBlue,
         secondary: Colors.amber, // Example secondary color
         surface: const Color(0xFFF2F2F7), // Main background color
-        onSurface: Colors.black, // Text on background
-        background: const Color(0xFFF2F2F7),
+        onSurface: Colors.black,
       ),
 
       // --- TEXT THEME ---

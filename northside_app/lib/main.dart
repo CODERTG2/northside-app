@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
             // Force a specific text scale factor to prevent text overflow
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(
-                textScaleFactor: 1.0, // Fixed text scale factor
+                textScaler: TextScaler.linear(1.0), // Fixed text scale factor
               ),
               child: child!,
             );
