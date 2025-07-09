@@ -3,23 +3,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sticky_headers/sticky_headers.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/bulletin_controller.dart';
 import '../../core/design_constants.dart';
-import '../../core/theme/app_theme.dart';
 import '../../models/article.dart';
 import '../../models/bulletin_post.dart';
 import '../../widgets/article_detail_draggable_sheet.dart';
-import '../../widgets/article_detail_sheet.dart';
 import '../../widgets/shared_header.dart';
-import '../app_shell/app_shell_controller.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({super.key});
@@ -334,21 +329,6 @@ class _BulletinPageState extends State<BulletinPage> {
       backgroundColor: const Color(0xFFF2F2F7),
       body: Stack(
         children: [
-          // Blue vertical gradient background for Bulletin (like Athletics, but blue)
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF4285F4), // strong blue
-                  Color(0xFFB3D1FF), // lighter blue for smooth fade
-                  Color(0xFFF2F2F7),// fade to white
-                ],
-                stops: [0.0, 0.25, 0.5],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
           // Main header and pinned carousel always visible
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,15 +386,8 @@ class _BulletinPageState extends State<BulletinPage> {
                 return Container(
                   decoration: BoxDecoration(
                     color: Color(0xFFF2F2F7),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.057)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.18), // increased opacity
-                        blurRadius: 80, // more blur for a deeper shadow
-                        offset: Offset(0, 16), // stronger offset
-                        spreadRadius: 0,
-                      ),
-                    ],
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.057)), // ~24px at 420px width
+                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: -5)],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
