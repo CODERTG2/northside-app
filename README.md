@@ -1,6 +1,6 @@
 # northside-app
 A modern school cross-platform app for real-time updates on athletics, events, and announcements built with Flutter backed by python.
-Will be available on app store and play store! Scraping and API
+Will be available on app store and play store!
 
 ---
 ## Key Technologies
@@ -12,3 +12,7 @@ Will be available on app store and play store! Scraping and API
 - Backend: REST API built with Flask in python.
 - DB: MongoDB
 - Scraping: BeatifulSoup & Selenium
+
+---
+# How you can use it
+WIP
