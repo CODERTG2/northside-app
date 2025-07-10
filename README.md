@@ -14,5 +14,5 @@ Will be available on app store and play store!
 - Scraping: BeatifulSoup & Selenium
 
 ---
-# How you can use it
+## How you can make your own.
 WIP
