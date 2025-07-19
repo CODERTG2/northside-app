@@ -7,7 +7,7 @@ import 'models/general_event.dart';
 import 'core/utils/logger.dart';
 
 class ApiService {
-  static const String baseUrl = "https://5bd5-2600-1700-67d0-50a0-00-46.ngrok-free.app/api";
+  static const String baseUrl = "https://16e18f65afb0.ngrok-free.app/api";
   
   // Fetch announcements
   static Future<List<Announcement>> getAnnouncements({String? date}) async {
